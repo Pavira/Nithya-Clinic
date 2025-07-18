@@ -1,0 +1,91 @@
+<!-- appointments/view_appointments.html -->
+<!-- Header -->
+<div id="page-header-data"
+     data-title="Appointments"
+     data-icon="calendar-check"
+     data-subtitle="Manage upcoming appointments">
+</div>
+
+<!-- Calendar Row -->
+<div class="row mb-4">
+  <div class="col-auto">
+    <label for="appointment_calendar" class="col-form-label fw-semibold">Filter by Date:</label>
+  </div>
+  <div class="col-md-4">
+    <input
+      type="text"
+      id="appointment_calendar"
+      class="form-control"
+      placeholder="Select a date"
+      style="background-color: white;"
+    />
+  </div>
+</div>
+
+<div class="table-card">
+
+  <!-- Appointment Status Tabs -->
+<div class="status-tabs mb-4">
+  <div class="tab-buttons d-flex position-relative">
+    <button class="tab-btn active" data-status="Active" style="font-weight: 600; font-size: 1.1rem;">
+      Active <span class="badge bg-success ms-1"></span>
+    </button>
+    <button class="tab-btn" data-status="Closed" style="font-weight: 600; font-size: 1.1rem;">
+      Closed <span class="badge bg-secondary ms-1"></span>
+    </button>
+    <button class="tab-btn" data-status="Cancelled" style="font-weight: 600; font-size: 1.1rem;">
+      Cancelled <span class="badge bg-danger ms-1"></span>
+    </button>
+    <div class="tab-underline"></div>
+  </div>
+</div>
+
+
+<!-- Search Controls -->
+<div class="d-flex align-items-center gap-2 mb-3 flex-nowrap">
+  <!-- Dropdown -->
+  <select class="form-select" id="search_type" style="width: 350px; background-color:white;">
+    <!-- <option value="" selected disabled>Select Search Type</option> -->
+    <option value="phone_number" selected >Phone No</option>
+    <option value="full_name">Full Name</option>
+    <option value="registration_id">Registration ID</option>
+  </select>
+
+  <!-- Search Input with Icon -->
+  <div class="input-group" style="width: 400px;">
+    <span class="input-group-text bg-light border-end-0">
+      <i class="bi bi-search"></i>
+    </span>
+    <input type="text" id="search_value" class="form-control border-start-0" placeholder="Search......" style="background-color: #fafafa;" />
+  </div>
+</div>
+
+  <!-- Table -->
+  <table class="table table-hover table-bordered align-middle mb-0">
+    <thead class="table-light">
+      <tr>
+        <th>S.No</th>
+        <th>Registration ID</th>
+        <th>Name</th>
+        <th>Phone Number</th>
+        <th>Appointment Category</th>
+        <th>Time</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody id="appointments-table-body">
+      <!-- Add more rows dynamically -->
+    </tbody>
+  </table>
+
+  <!-- Pagination -->
+<div class="d-flex justify-content-center align-items-center mt-4">
+  <button id="load-more-btn" class="btn btn-outline-primary d-none">
+    <i class="bi bi-chevron-double-down me-1"></i> Load More
+  </button>
+</div>
+
+</div>
+
+
+

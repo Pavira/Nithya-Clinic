@@ -1,0 +1,19 @@
+[project]
+name = "nithya-clinic"
+version = "0.1.0"
+description = "Hosipital management system"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "aiofiles>=24.1.0",
+    "auto-py-to-exe>=2.46.0",
+    "dotenv>=0.9.9",
+    "fastapi>=0.115.12",
+    "firebase>=4.0.1",
+    "firebase-admin>=6.8.0",
+    "pydantic[email]>=2.11.3",
+    "python-multipart>=0.0.20",
+    "pytz>=2025.2",
+    "pywebview>=5.4",
+    "uvicorn>=0.34.2",
+]

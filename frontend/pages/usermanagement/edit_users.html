@@ -1,0 +1,81 @@
+<!-- Header -->
+<div id="page-header-data"
+     data-title="Edit User"
+     data-icon="person-circle"
+     data-subtitle="Update user details">
+</div>
+
+<div class="container-fluid vh-100">
+  <div class="row h-100">
+    <!-- Left Image Section -->
+    <div class="col-md-7 d-none d-md-flex align-items-center justify-content-center bg-light p-0 overflow-hidden">
+      <img src="/admin/assets/images/create_user.jpg" class="img-fluid h-100 w-100 object-fit-cover" style="object-fit: contain;" alt="Clinic" />
+    </div>
+
+    <!-- Right Form Section -->
+    <div class="col-md-5 d-flex align-items-center justify-content-center bg-white ">
+      <div class="card p-4 shadow" style="min-width: 420px; max-width: 420px; width: 100%; min-height: 460px">
+        <!-- <h5 class="text-center text-muted mb-4">Create User</sh5> -->
+        <h2 class="fw-bold text-center mb-6">Edit User</h2>
+
+        <form id="edit-user-form" class="p-4">
+            <input type="hidden" id="user_id" />
+            <!--Display Name  -->
+          <div class="mb-3">
+            <label for="display-name" class="form-label">Display Name*</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-person"></i></span>
+              <input type="text" class="form-control" id="display-name" placeholder="Enter display name" required title="Please enter a valid display name"/>
+            </div>
+          </div>
+
+          <!-- Email -->
+          <div class="mb-3">
+            <label for="email" class="form-label">Email address*</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+              <input type="email" class="form-control" id="user_email" placeholder="Enter email" title="Please enter a valid email" readonly/>
+            </div>
+          </div>
+
+          <!-- Select user role -->
+          <div class="mb-3">
+            <label for="user_role" class="form-label">User Role*</label>
+            <select class="form-select" id="user_role" required title="Please select a user role">
+              <option value="" disabled selected>Select user role</option>
+              <option value="Admin">Admin</option>
+              <option value="Staff">Staff</option>
+              <option value="Pharmacist">Pharmacist</option>
+            </select>
+          </div>
+
+          <!-- PIN -->
+          <div class="mb-3">
+            <label for="pin" class="form-label">Enter New 6 Digit PIN*</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi-shield-check"></i></span>
+              <input type="text" class="form-control" id="pin" maxlength="6" placeholder="Enter PIN" required title="Please enter a valid 6-digit PIN"/>
+            </div>
+          </div>
+          
+          <div class="d-flex justify-content-center align-items-center mt-4 gap-2">
+            <!-- delete Buttons -->
+            <div>
+                <button type="submit" id="delete-user" class="btn btn-danger ">Delete User</button>
+            </div>
+            <!-- Update Buttons -->
+            <div>
+                <button type="submit" id="update-user" class="btn btn-success ">Update User</button>
+            </div>
+          </div>
+
+          <!-- Forget Password Link -->
+          <div class="text-center mt-3">
+            <a id="reset-password-link" class="text-decoration-none">Reset Password</a>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
