@@ -1,0 +1,14 @@
+
+{
+  "type": "service_account",
+  "project_id": "nithya-clinic",
+  "private_key_id": "0289468c2cab791b395a426916232e9bea787cb4",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCTtQVSfvSP64Bm\nwyMMwB+Uk8TumGLRqjf4hYHwzsVsr5xvJJ6Zvj9ZMs1A8iZw3IWBdeqz2ROvnv8n\nDzNDR35iwbLTxbPTqe6rKPqIN6a3kxa08bwfnIEsD18OHvwezaSSBNqWSb7o36Kl\ne/aOQUQFvyeyaMtuspjDy84m3jwuo932njIDzpwbsAiKoyKyvXEmbpeX4QUxrELn\nEL1+xG9hBy7sbbZ4PYsWn3dJ2p5E0A19z6X2RhcGRxz0SGzLw2OH5cm0If6h9dmH\n965AOA28RBTG1em5ApBKCC9ZDJzBsRi9Pgga+awpLxQhEjTHx22mTK08fRBw8OOM\nR0wQCWabAgMBAAECggEAAx6Hhj54G7H1fDYSv2ovQIv+VKuTKqpVlEH9hIBZWvo6\na35yevyxiciw3PZAKZH+n8VFt5aV+9d3u/NuObWAzcUZaa97JLUp/SNYZxgFxUqt\n6BRSzLgZYjzQ3RN6b4wYNZ00oIfeKDzQyn3brxVhwl1PEU11Plk3MKtVJyz6SGHV\nS+yt6ki3esPtMviUUnAMLYwyKw/9l2+qpV2PwMA5edZsi/j0937k5aSywEq1YAag\nM35Vx0CK9pRdjfctmv3kxjPJW8r/Sd67qM+GKPqBBemRKai4RJDhGf+1GHNVkO50\n4ctaTJKMSulDQmDK59MHfAfJDn/MYEJfu0/KLT+MwQKBgQDOThRCqflJFUwIZxOF\ntQ9W3xE5l8xNhWKYxnys8Wt99Bqw9u0GsGsiFUyTlqnDcD4xjF4Wh44IewpgZWVp\nqAKKaPJroNzFZdr/7dMkqsEKYjT0t4ycT9KnB9FC8StkY5OAI7inkCmzeK1FGcyA\n7ADLJIMXro9bbr/fgd1cbpEzRQKBgQC3SXfWYvcIZHc+fjzggJI+PO/qtyxF1jp7\nUtollMAdb+bfLjIVzQbejCCBHLls0lmWAIMVDtgzs1CwSfEmQLOS0GtPWvkvdLO5\nIbFOTNVZGfMuQrrjXp3YcuW0JTXvEec/xGQQpggK6quUpNupYtEe+0N2y+uyCdJP\n793SlU/gXwKBgFOti742XyxrfPlzhZGYDO65b60iivVugr1g1LT4/xaJakIZBa7O\n48VhSjwawiTJZBCI1KjitpNuBJlwxx+By/YD9z/8cU+Hrrpb5mZa9A2YI86WnGvS\nXKjvHMvAMk93rB4vXvhoGuH2sqDyg+ZO00uSNbHnVbJKS30GmZiiKDbZAoGAeWHU\nVUyRISO3vNFJa7x6HXGpyZ2pWk63yDhkdAMA//29vgwP61Quum++jwMA4cqkvax1\nIxsDn6mfRECTzauHwTD6AEHVSNJWu8JOc/Z6TFndLMPQlQdyLYhaC2WhRERtC1P6\nmPP7247yNqy/NHxW1de9JA2EeBH9ECdgljeAAK0CgYEAhO56fPfG6Lt7iuxq0qXI\n1V+hRPPa7hWM/YkQHp9EcRN3K3df8puJ5D37kU4wdNRpK1HujcVhIYnwPy1HuJ4v\nf17+KoTARBLciUshHWBrYzCFPfsea/4YWtRLMxjpIGkajiI6NSIAKpkuhiy34g8X\nu98p3R7nQ0hBDL1PB9DQX7U=\n-----END PRIVATE KEY-----\n",
+  "client_email": "firebase-adminsdk-fbsvc@nithya-clinic.iam.gserviceaccount.com",
+  "client_id": "112419024362341693854",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-fbsvc%40nithya-clinic.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
