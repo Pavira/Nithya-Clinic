@@ -17,6 +17,7 @@ FIREBASE_API_KEY = os.getenv("FIREBASE_API_KEY")
 
 def login_user_service(login_data: LoginRequest) -> dict:
     print("🔐 Logging in user...")
+    print("Firebase Key:---", FIREBASE_API_KEY)
     try:
         payload = {
             "email": login_data.email,
