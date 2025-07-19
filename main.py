@@ -50,20 +50,25 @@ app.mount("/admin", StaticFiles(directory="frontend/", html=True), name="admin")
 
 
 # ---------- Default Route ----------
+# @app.get("/", include_in_schema=False)
+# def serve_signin():
+#     signin_path = os.path.join(FRONTEND_DIR, "pages/auth/signin.html")
+#     return FileResponse(signin_path)
+
+
 @app.get("/", include_in_schema=False)
 def serve_signin():
-    signin_path = os.path.join(FRONTEND_DIR, "pages/auth/signin.html")
-    return FileResponse(signin_path)
+    return FileResponse("frontend/pages/auth/signin.html")
 
 
 # ---------- Uvicorn Server Thread ----------
-def start_server():
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+# def start_server():
+#     uvicorn.run(app, host="127.0.0.1", port=8000)
 
 
-# ---------- Main Entrypoint ----------
-if __name__ == "__main__":
-    threading.Thread(target=start_server, daemon=True).start()
-    webview.create_window(
-        "Nithya Clinic App", "http://127.0.0.1:8000", width=1280, height=800
-    )
+# # ---------- Main Entrypoint ----------
+# if __name__ == "__main__":
+#     threading.Thread(target=start_server, daemon=True).start()
+#     webview.create_window(
+#         "Nithya Clinic App", "http://127.0.0.1:8000", width=1280, height=800
+#     )
