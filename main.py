@@ -45,6 +45,7 @@ app.include_router(patients.router, prefix="/api/v1/patients")
 app.include_router(appointments.router, prefix="/api/v1/appointments")
 
 # ---------- Firebase Client ----------
+print("Initializing Firebase...")
 initialize_firebase()
 
 # ---------- Static Files ----------

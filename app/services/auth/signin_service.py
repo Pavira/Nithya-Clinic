@@ -27,7 +27,7 @@ def login_user_service(login_data: LoginRequest) -> dict:
         logger.info(f"🔐 Attempting login for {login_data.email}")
 
         url = f"https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={FIREBASE_API_KEY}"
-        response = requests.post(url, json=payload)
+        response = requests.post(url, json=payload, timeout=10)
         response_data = response.json()
 
         if response.status_code != 200:
