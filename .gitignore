@@ -15,8 +15,9 @@ dist/
 *.log
 .DS_Store
 
+
 # Firebase credentials (secret file)
-# app/db/firebase_config.json
+app/db/firebase_config.json
 
 # Uvicorn/Poetry
 uv.lock
