@@ -11,13 +11,13 @@ class AppointmentModel(BaseModel):
     AppointmentCategory: str = Field(..., alias="appointment_category")
     AppointmentInformation: str = Field(..., alias="description")
     AppointmentDateTime: datetime = Field(..., alias="appointment_datetime")
+    User: str = Field(..., alias="user")
 
     AppointmentRegNum: str
     AppointmentNumber: int
     AppointmentStatus: str
     DoctorFees: int
     LogDateTime: datetime
-    User: str
 
 
 class VitalsModel(BaseModel):
@@ -38,7 +38,7 @@ class UpdateAppointmentModel(BaseModel):
     Height: Optional[float] = Field(0, alias="height")
     Weight: Optional[float] = Field(0, alias="weight")
     BMI: Optional[float] = Field(0, alias="bmi")
-    BloodPressure: Optional[float] = Field(0, alias="blood_pressure")
+    BP: Optional[float] = Field(0, alias="blood_pressure")
     Pulse: Optional[float] = Field(0, alias="pulse")
     History: Optional[str] = Field("", alias="history")
     ClinicalFeature: Optional[str] = Field("", alias="clinical_feature")

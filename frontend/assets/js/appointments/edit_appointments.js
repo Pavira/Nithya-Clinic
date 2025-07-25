@@ -64,7 +64,8 @@ async function EditAppointmentForm() {
       const clinical_feature = document.getElementById("clinical_feature").value || '';
       const investigation = document.getElementById("investigation").value || '';
       const diagnosis = document.getElementById("diagnosis").value || '';
-      const review_datetime = document.getElementById("review_datetime").value;
+      const localDateTimeString = document.getElementById("review_datetime").value;
+      const utcDate = new Date(localDateTimeString);
       const doctor_fees = document.getElementById("doctor_fees").value || '';
       const allPrescriptions = getPrescriptionTableData(); // Get prescription table data
       const images = document.getElementById("upload_images")?.files || [];
@@ -72,7 +73,16 @@ async function EditAppointmentForm() {
       const noOfImages = images.length;
       const noOfPrescriptions = prescriptionImages.length;
 
+      
 
+      if(!consultationCategory || !appointmentCategory || description === ""|| doctor_fees === ""){
+        Swal.fire({
+          icon: 'Warning',
+          title: 'Warning',
+          text: 'Please fill in all the required fields.'
+        })      
+        return
+      }
       const formData = new FormData();
 
          // Now you can send the form data
@@ -90,7 +100,7 @@ async function EditAppointmentForm() {
         investigation : investigation,
         diagnosis : diagnosis,
         doctor_fees : doctor_fees,
-        review_datetime : review_datetime,
+        review_datetime : utcDate,
         allPrescriptions : allPrescriptions,
         images : images,
         prescription_images : prescriptionImages,
@@ -482,6 +492,15 @@ async function CancelAppointment() {
     });
 }
 
+
+// -----------------Date for Datetime Local Input ------------------- //
+function formatDateForDatetimeLocalInput(dateStr) {
+  const date = new Date(dateStr); // convert string to Date object
+  const pad = (n) => n.toString().padStart(2, '0');
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+}
+// ---------------------------
+
 // ------------------Init Edit Appointments Page ------------------
 async function initEditAppointmentsPage() {
 
@@ -491,11 +510,75 @@ async function initEditAppointmentsPage() {
         console.log("Appointment ID:-"+ window.pageParams?.appointment_id);
 
         // ----------Fetch Vitals Data----------
-        const vitals = await fetchVitalsData();
+        const vitals = await fetchVitalsData();        
 
-        
+        // ----------Function For Closed Appointment----------
+        const appointment_status = vitals.AppointmentStatus;
+        const doctor_fees = vitals.DoctorFees;
+        const review_datetime = vitals.ReviewDate;
+        console.log("Review Date:-"+ review_datetime);
+        const prescription = vitals.Prescription;
+        const history = vitals.History;
+        const clinical_feature = vitals.ClinicalFeature;
+        const investigation = vitals.Investigation;
+        const diagnosis = vitals.Diagnosis;    
 
-        console.log("vitalss"+ vitals.Height);
+        const timingOptions = ['M', 'A', 'E', 'N', 'B/F', 'A/F'];
+        const timingButtonsHTML = timingOptions.map(timing => `
+        <button type="button" class="btn btn-outline-secondary btn-sm timing-btn" data-value="${timing}">
+            ${timing}
+        </button>
+        `).join('');
+
+        document.getElementById('timing-buttons').innerHTML = timingButtonsHTML;
+
+        if(appointment_status === "Closed" || appointment_status === "Cancelled") {
+            document.getElementById("cancelAppointment").style.display = "none";
+            document.getElementById("closeAppointment").style.display = "none";
+            document.getElementById("review_datetime").value = formatDateForDatetimeLocalInput(review_datetime);
+            document.getElementById("doctor_fees").value = doctor_fees;
+            document.getElementById("history").value = history || '';
+            document.getElementById("clinical_feature").value = clinical_feature || '';
+            document.getElementById("investigation").value = investigation || '';
+            document.getElementById("diagnosis").value = diagnosis || '';
+            document.getElementById("drug_name").style.display = 'none';
+            document.getElementById("dosage").style.display = 'none';
+            document.getElementById("timing_label").style.display = 'none';
+            document.getElementById("timing-buttons").style.display = 'none';         
+            document.getElementById("drug_name_label").style.display = 'none';
+            document.getElementById("dosage_label").style.display = 'none';
+            document.getElementById("add-medicine-btn").style.display = 'none';
+            document.getElementById('timing-buttons').innerHTML = '';
+            
+
+            const prescriptionTableBody = prescription.map((item, index) => {
+    const timings = [];
+
+    if (item.M) timings.push("M");
+    if (item.A) timings.push("A");
+    if (item.E) timings.push("E");
+    if (item.N) timings.push("N");
+    if (item["B/F"]) timings.push("B/F");
+    if (item["A/F"]) timings.push("A/F");
+
+    return `
+      <tr>
+        <td>${index + 1}</td>
+        <td>${item.drug}</td>
+        <td>${item.dosage}</td>
+        <td>${timings.join(", ")}</td>
+        <td>"N/A"</td>
+      </tr>
+    `;
+  }).join("");
+
+  document.getElementById("prescription-table-body").innerHTML = prescriptionTableBody;
+            }
+        else {
+            document.getElementById("cancelAppointment").style.display = "block";
+            document.getElementById("closeAppointment").style.display = "block";
+        }
+        // ----------Function For Cancel Appointment End----------
 
         document.getElementById("height").value= vitals.Height ?? '';
         document.getElementById("weight").value= vitals.Weight ?? '';
@@ -526,14 +609,7 @@ async function initEditAppointmentsPage() {
         document.getElementById("start_datetime").value = patientAppointmentDateTime === null ? "" : patientAppointmentDateTime;
         document.getElementById("appointment-info").textContent = `This appointment was created on ${formatedDateTime} by ${user}.`;
 
-        const timingOptions = ['M', 'A', 'E', 'N', 'B/F', 'A/F'];
-        const timingButtonsHTML = timingOptions.map(timing => `
-        <button type="button" class="btn btn-outline-secondary btn-sm timing-btn" data-value="${timing}">
-            ${timing}
-        </button>
-        `).join('');
-
-        document.getElementById('timing-buttons').innerHTML = timingButtonsHTML;
+        
     } 
     catch (err) {
         Swal.fire({

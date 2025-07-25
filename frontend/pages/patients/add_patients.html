@@ -72,10 +72,10 @@
               <input class="form-check-input" type="radio" name="marital" value="Married" id="married">
               <label class="form-check-label" for="married">Married</label>
             </div>
-            <div class="form-check form-check-inline">
+            <!-- <div class="form-check form-check-inline">
               <input class="form-check-input" type="radio" name="marital" value="Divorced" id="divorced">
               <label class="form-check-label" for="divorced">Divorced</label>
-            </div>
+            </div> -->
           </div>
         </div>
 
@@ -84,6 +84,7 @@
           <label for="profession" class="form-label">Profession*</label>
           <select class="form-select" id="profession">
             <option selected disabled value="">Select Profession</option>
+            <option>Others</option>
             <option>Teacher</option>
             <option>Professor</option>
             <option>Doctor</option>
@@ -104,8 +105,7 @@
             <option>Accountant</option>
             <option>Auditor</option>
             <option>Pilot</option>
-            <option>Flight Air Crew</option>
-            <option>Others</option>
+            <option>Flight Air Crew</option>            
             <option>Student - School</option>
             <option>Student - College</option>
           </select>
@@ -120,7 +120,7 @@
         <!-- Aadhar Number -->
         <div class="col-md-6">
           <label for="aadhar" class="form-label">Aadhar Number</label>
-          <input type="text" class="form-control" id="aadhar" placeholder="Enter Aadhar Number" pattern="[0-9]{12}" title="Please enter a valid 12-digit Aadhar number">
+          <input type="text" class="form-control" id="aadhar" placeholder="Enter Aadhar Number" maxlength="12" pattern="[0-9]{12}" oninput="this.value = this.value.replace(/[^0-9]/g, '')" title="Please enter a valid 12-digit Aadhar number">
         </div>
 
         <!-- Email -->
@@ -162,7 +162,7 @@
 
         <!-- Referred By -->
         <div class="col-md-6">
-          <label for="referred" class="form-label">Referred By*</label>
+          <label for="referred" class="form-label">Referred By</label>
           <input type="text" class="form-control" id="referredBy" placeholder="Enter Referred By" required title="Please enter who referred the patient">
         </div>
       </div>

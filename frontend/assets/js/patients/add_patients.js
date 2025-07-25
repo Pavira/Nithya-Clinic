@@ -83,7 +83,7 @@ function validatePatientForm() {
   // }
   
 
-  if (!fullName || !phoneNumber || !dob || !gender || !marital || !profession || !treatment_type || !purposeOfVisit || !referredBy) {
+  if (!fullName || !phoneNumber || !dob || !gender || !marital || !profession || !treatment_type || !purposeOfVisit) {
     Swal.fire({
       icon: 'warning',
       title: 'Validation',

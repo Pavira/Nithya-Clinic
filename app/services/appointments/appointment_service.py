@@ -27,9 +27,7 @@ from app.utils.response import not_found_response
 
 
 # -------------------------Create Appointment-------------------------
-async def create_appointment_service(
-    appointment_data: AppointmentSchema, current_user: dict = None
-):
+async def create_appointment_service(appointment_data: AppointmentSchema):
     try:
         patient_id = appointment_data.patient_id
 
@@ -70,7 +68,8 @@ async def create_appointment_service(
             }
 
         # Extra Model Data
-        created_by = current_user.get("email") if current_user else "Unknown"
+        # created_by = current_user.get("email") if current_user else "Unknown"
+        # print("👤 Created by:===", created_by)
         created_at = datetime.now(timezone.utc)
         status = "Active"
         appointment_no = appointment_count
@@ -89,7 +88,6 @@ async def create_appointment_service(
             AppointmentNumber=appointment_no,
             DoctorFees=doctor_fees,
             LogDateTime=created_at,
-            User=created_by,
             AppointmentStatus=status,
         )
 

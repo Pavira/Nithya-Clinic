@@ -1,0 +1,130 @@
+body {
+  font-family: "Segoe UI", sans-serif;
+  background-color: #f1f3f5 !important; /* Light grey background */
+}
+
+.prescription-container {
+    display: flex;
+    width: 21cm; /* A4 width */
+    min-height: 29.7cm; /* A4 height */
+    margin: auto;
+    background-color: #fff;
+    box-shadow: 0 0 0.5cm rgba(0, 0, 0, 0.1);
+    box-sizing: border-box;
+    padding: 16px;
+    font-family: 'Segoe UI', sans-serif;
+    page-break-after: always;
+}
+
+.left-panel {
+    width: 20%;
+    background-color: #f7f7f7;
+    padding: 4px;
+    border: 3px solid #ccc;
+    box-sizing: border-box;
+}
+
+.left-panel h3 {
+    margin-top: 60px;
+    margin-bottom: 40px;
+    font-style: italic;
+}
+
+.left-panel ul {
+    list-style: none;
+    padding-left: 2px;
+    font-size: 13px;
+    font-style: italic;
+}
+
+.left-panel li {
+    margin-bottom: 13px;
+    font-style: italic;
+}
+
+.left-panel li span {
+    font-size: 11px;
+    color: #555;
+}
+
+.right-panel {
+    width: 80%;
+    padding: 0 15px 0 10px;
+    border: 3px solid #ccc;
+    box-sizing: border-box;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 60px;
+}
+
+.header h1 {
+    font-size: 30px;
+    
+    color: #004080;
+    font-style: italic;
+}
+
+.header p {
+    font-size: 13px;
+    text-align: right;
+    font-style: italic;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    margin: 6px 0;
+}
+
+.vitals {
+    display: flex;
+    gap: 16px;
+    font-size: 13px;
+    margin: 8px 0;
+    flex-wrap: wrap;
+}
+
+.section {
+    margin-top: 12px;
+    font-size: 13px;
+}
+
+.section p {
+    margin: 4px 0 0 0;
+}
+
+.rx-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 8px;
+    font-size: 13px;
+}
+
+.rx-table th, .rx-table td {
+    border: 1px solid #000;
+    padding: 4px 6px;
+    text-align: center;
+}
+
+.review-date {
+    margin-top: 12px;
+    font-size: 13px;
+}
+
+.footer {
+    margin-top: 16px;
+    font-size: 11px;
+    border-top: 1px solid #000;
+    padding-top: 8px;
+}
+
+.consult-time {
+    margin-top: 6px;
+    font-weight: bold;
+    color: #004080;
+}

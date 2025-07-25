@@ -65,14 +65,14 @@ async function fetchPatients(isInitial = false) {
     patients.forEach((patient, index) => {
       const row = document.createElement("tr");
       row.innerHTML = `
-        <td>#</td>
+        <td>${index + 1}</td>
         <td>${patient.PatientRegistrationNumber || "N/A"}</td>
         <td>${patient.FullName || "N/A"}</td>
         <td>${patient.PhoneNumber || "N/A"}</td>
         <td>${patient.PatientType || "N/A"}</td>
         <td>     
           <button class="btn btn-sm btn-outline-secondary me-1" title="Edit Patient" onclick="loadPage('patients/edit_patients', {patient_id: '${patient.PatientRegistrationNumber}'})"><i class="bi bi-pencil"></i></button>
-          <button class="btn btn-sm btn-outline-warning me-1" title="View History"><i class="bi bi-clock-history"></i></button>
+          <button class="btn btn-sm btn-outline-warning me-1" title="View History" onclick="loadPage('appointments/view_appointment_history', {reg_no: '${patient.PatientRegistrationNumber}'})"><i class="bi bi-clock-history"></i></button>
           <button class="btn btn-sm btn-outline-primary me-1" onclick = "loadPage('appointments/add_appointments', {patient_id: '${patient.PatientRegistrationNumber}', patient_name: '${patient.FullName}', patient_phone: '${patient.PhoneNumber}'})" title="Book Appointment"><i class="bi bi-calendar-plus"></i></button>
         </td>
       `;

@@ -1,6 +1,9 @@
 import threading
 import uvicorn
 import webview
+
+from app.api.v1.routes.dashboard import dashboard
+from app.api.v1.routes.appointments import prescription_pdf
 from app.api.v1.routes.appointments import appointments
 from app.api.v1.routes.auth import signin
 from fastapi import FastAPI
@@ -43,6 +46,8 @@ app.include_router(users.router, prefix="/api/v1/users")
 app.include_router(signin.router, prefix="/api/v1/auth")
 app.include_router(patients.router, prefix="/api/v1/patients")
 app.include_router(appointments.router, prefix="/api/v1/appointments")
+app.include_router(prescription_pdf.router, prefix="/api/v1/appointments")
+app.include_router(dashboard.router, prefix="/api/v1/dashboard")
 
 
 # ---------- Static Files ----------

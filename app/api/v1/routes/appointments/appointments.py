@@ -35,16 +35,13 @@ router = APIRouter(tags=["Appointments"])
 
 # -------------Add Appointment----------------
 @router.post("/add_appointment")
-async def add_appointment(appointment_data: AppointmentSchema, request: Request):
+async def add_appointment(appointment_data: AppointmentSchema):
     """
     API to create a new appointment record.
     """
     try:
         print("Creating appointment with data:", appointment_data)
-        current_user = getattr(request.state, "current_user", None)
-        result = await create_appointment_service(
-            appointment_data, current_user=current_user
-        )
+        result = await create_appointment_service(appointment_data)
 
         print("Result:", result)
         if result.get("success") is False:

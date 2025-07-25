@@ -29,6 +29,8 @@ EXCLUDE_PREFIXES = [
     "/favicon.ico",  # ✅ Optional
     "/robots.txt",  # ✅ Optional
     "/manifest.json",  # ✅ PWA/Chrome install support
+    "/api/v1/appointments/generate_prescription_pdf/",
+    "/",
 ]
 
 
@@ -59,7 +61,10 @@ class AuthMiddleware(BaseHTTPMiddleware):
         try:
             id_token = auth_header.split("Bearer ")[1]
             decoded_token = auth.verify_id_token(id_token)
-            request.state.current_user = decoded_token  # Attach user info to request
+            email = decoded_token.get("email")
+            logger.info("✅ Decoded email:", email)
+            request.state.current_user = decoded_token
+            request.state.email = email  # ✅ Attach email to request state
         except Exception as e:
             logger.error(f"🔒 Invalid Token: {str(e)}")
             return JSONResponse(

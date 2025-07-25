@@ -28,7 +28,8 @@ async function AppointmentForm() {
         consultation_category: consultationCategory,
         appointment_category: appointmentCategory,
         description: description,
-        appointment_datetime: startDateTime     
+        appointment_datetime: startDateTime,
+        user: localStorage.getItem("email")   
       };
 
       console.log("Sending appointment data:", data);

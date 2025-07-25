@@ -56,7 +56,7 @@
       </div>
 
       <div class="col-md-6">
-        <label for="appointment_category" class="form-label">Appointment Category</label>
+        <label for="appointment_category" class="form-label">Appointment Category*</label>
         <select class="form-select" id="appointment_category" required>
           <option selected disabled value="">Select...</option>
           <option>Out Patient</option>
@@ -96,7 +96,7 @@
         </div>
 
       <div class="col-md-2 mt-2">
-        <label for="weight" class="form-label">Weight (KG)</label>
+        <label for="weight" class="form-label">Weight(KG)</label>
         <input
         type="text"
         class="form-control"
@@ -170,17 +170,17 @@
         </div>
 
         <div class="col-md-4">
-            <label for="drug_name" class="form-label">Drug Name</label>
+            <label for="drug_name" id="drug_name_label" class="form-label">Drug Name</label>
             <input type="text" class="form-control" id="drug_name" placeholder="Drug Name" >
         </div>
 
         <div class="col-md-4">
-            <label for="dosage" class="form-label">Dosage</label>
+            <label for="dosage" id="dosage_label" class="form-label">Dosage</label>
             <input type="text" class="form-control" id="dosage" >
         </div>
 
         <div class="col-md-4">
-            <label class="form-label d-block">Timing</label>
+            <label class="form-label" id="timing_label">Timing</label>
             <div id="timing-buttons" class="d-flex flex-wrap gap-1"></div>
         </div>
 
@@ -202,7 +202,7 @@
                 <th>Actions</th>
             </tr>
             </thead>
-            <tbody>
+            <tbody id="prescription-table-body">
             <!-- Dynamically added rows go here -->
             </tbody>
         </table>
@@ -225,7 +225,7 @@
 
         <!-- Review Date -->
         <div class="col-md-6 mt-2">
-            <label for="review_datetime" class="form-label">Review Date & Time*</label>
+            <label for="review_datetime" class="form-label">Review Date & Time</label>
             <input type="datetime-local" class="form-control" id="review_datetime" required >
         </div>
 

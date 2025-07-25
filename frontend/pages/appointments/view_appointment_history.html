@@ -20,10 +20,27 @@
     
     <!-- Dynamically populated -->
 
-
   </div>
 </div>
 
+<!-- Prescription Modal -->
+<div class="modal fade" id="prescriptionModal" tabindex="-1" aria-labelledby="prescriptionModalLabel" aria-hidden="true" >
+  <div class="modal-dialog modal-dialog-scrollable ">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="prescriptionModalLabel">Prescription</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body prescription-body">
+        <!-- Dynamically injected prescription HTML will go here -->
+      </div>
+      <div class="modal-footer">
+        <button id="downloadPdfBtn" class="btn btn-success">Download Prescription</button>
+        <!-- <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button> -->
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- <form id="add-appointment-form">
       <div class="row">
