@@ -1,7 +1,4 @@
 from fastapi import APIRouter, HTTPException, Response, Query
-from app.services.appointments.prescription_pdf_service import (
-    get_prescription_pdf_service,
-)
 from io import BytesIO
 import os
 from fastapi import HTTPException, Response
