@@ -1,11 +1,14 @@
 from fastapi import APIRouter, HTTPException, Response, Query
-from io import BytesIO
-import os
+
+# from io import BytesIO
+# import os
 from fastapi import HTTPException, Response
-from fastapi.responses import StreamingResponse
-from firebase_admin import firestore
-from jinja2 import Environment, FileSystemLoader
-from weasyprint import HTML
+
+# from fastapi.responses import StreamingResponse
+# from firebase_admin import firestore
+
+# from jinja2 import Environment, FileSystemLoader
+# from weasyprint import HTML
 from app.utils.logger import logger
 from app.db.firebase_client import db
 
