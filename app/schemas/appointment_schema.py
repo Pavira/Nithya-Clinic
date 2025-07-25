@@ -11,6 +11,7 @@ class AppointmentSchema(BaseModel):
     appointment_category: str
     description: str
     appointment_datetime: str
+    user: str
 
 
 class VitalsSchema(BaseModel):

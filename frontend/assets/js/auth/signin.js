@@ -48,15 +48,30 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const result = await response.json();
 
+        // console.log("Login result:", result.success);
+
         if (response.ok && result.success) {
+          // alert("Login successful!");
           localStorage.setItem("token", result.data.id_token);
           localStorage.setItem("display_name", result.data.display_name);
+          localStorage.setItem("user_role", result.data.user_role);
+          localStorage.setItem("email", result.data.email);
+          console.log("User role?????: " + localStorage.getItem("user_role"));
           window.location.href = "/admin/index.html";
-        } else {
-          alert(result.message || "Login failed");
+        } else if (response.ok && result.success === false) {
+          console.error("Login failed-------:", result.message);
+          Swal.fire({
+            icon: 'error',
+            title: 'Login Failed',
+            text: result.message,
+          });
         }
       } catch (err) {
-        alert("Server error. Try again later.");
+        Swal.fire({
+          icon: 'error',
+          title: 'Login Failed',
+          text: 'Server error. Try again later.',
+        })
         console.error(err);
       }finally {
         hideLoader(); // Hide loader after processing
@@ -64,3 +79,69 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 });
+
+// --------------------------Forgot Password------------------
+  document.getElementById("forgot-password").addEventListener("click", function (e) {
+    e.preventDefault();
+    const modal = new bootstrap.Modal(document.getElementById("forgotPasswordModal"));
+    modal.show();
+  });
+
+  document.getElementById("forgot-password-form").addEventListener("submit", async function (e) {
+    e.preventDefault();
+    const email = document.getElementById("reset-email").value;
+
+    const token = localStorage.getItem("token");
+
+        showLoader();
+
+        try{
+            const res = await fetch(`/api/v1/auth/reset_password/${email}`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`,
+            },
+            });
+            const result = await res.json();
+            console.log("Login result----:", result.success);
+            if (res.ok && result.success) {
+                Swal.fire({
+                    icon: 'Info',
+                    title: 'Reset Password',
+                    text: `Password reset link has been sent to ${email}\n Follow the link to reset the password.`,
+                }).then(() => {
+                loadPage("usermanagement/view_users");
+            });
+          }
+            else if (res.ok && result.success === false) {
+              console.log("Login failed-------:", result.message);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Invalid Email!',
+                    text: result.message,
+                })
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Failed!',
+                    text: 'Failed to send password reset link: ' + result.message,
+                })
+            }
+        } catch (err) {
+            Swal.fire({
+                    icon: 'error',
+                    title: 'Failed!',
+                    text: 'Server error: ' + err,                   
+                })
+            
+        }finally{
+            hideLoader();
+        }
+
+    // Close the modal
+    bootstrap.Modal.getInstance(document.getElementById("forgotPasswordModal")).hide();
+
+    // Optionally reset form
+    e.target.reset();
+  });

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <style>
+    body { font-family: Arial, sans-serif; font-size: 12px; }
+    .container { display: flex; }
+    .left { width: 30%; padding: 10px; border-right: 1px solid #999; }
+    .right { width: 70%; padding: 10px; }
+    .section { margin-bottom: 10px; }
+    table, th, td { border: 1px solid black; border-collapse: collapse; font-size: 11px; }
+    th, td { padding: 4px; text-align: center; }
+    h2, h4 { margin: 0; }
+  </style>
+</head>
+<body>
+  <h2>Dermatology Clinic</h2>
+  <p>
+    <strong>Dr. Nithya D, MD (DVL), DNB</strong><br>
+    Consultant Dermatologist<br>
+    Reg. No. 84140
+  </p>
+
+  <div class="container">
+    <div class="left">
+      <h4>PROCEDURES</h4>
+      <ul>
+        <li><strong>CHEMICAL PEELING</strong><br>(for acne, scars)</li>
+        <li><strong>ELECTRO CAUTERY</strong><br>(removal of tags)</li>
+        <li><strong>LASERS</strong><br>(tattoo, hair removal)</li>
+        <li><strong>DERMA ROLLER</strong><br>(acne scars)</li>
+        <li><strong>FACIAL REJUVENATION</strong></li>
+        <li><strong>ANTI AGEING</strong><br>(Botox, threads)</li>
+        <li><strong>PHOTO THERAPY</strong></li>
+        <li><strong>PLATELET RICH PLASMA</strong></li>
+        <li><strong>PUNCH EXCISION</strong></li>
+        <li><strong>SCAR REVISION</strong></li>
+        <li><strong>MICRODERMABRASION</strong></li>
+        <li><strong>CRYOTHERAPY</strong></li>
+      </ul>
+    </div>
+
+    <div class="right">
+      <div class="section">
+        <strong>Name:</strong> {{ data.FullName | default('N/A') }} |
+        <!-- <strong>Age:</strong> {{ data.age | default('N/A') }} | -->
+        <!-- <strong>Gender:</strong> {{ data.gender | default('N/A') }}<br> -->
+        <strong>Date:</strong> {{ data.AppointmentDateTime | default('N/A') }} |
+        <strong>Reg. No:</strong> {{ data.PatientRegistrationNumber | default('N/A') }} |
+        <strong>Phone:</strong> {{ data.PhoneNumber | default('N/A') }}
+      </div>
+
+      <div class="section">
+        <strong>Weight:</strong> {{ data.Weight | default('') }}kg |
+        <strong>Height:</strong> {{ data.Height | default('') }}cm |
+        <strong>BMI:</strong> {{ data.BMI | default('') }} |
+        <strong>BP:</strong> {{ data.BP | default('') }} |
+        <strong>Pulse:</strong> {{ data.Pulse | default('') }}
+      </div>
+
+      <div class="section"><strong>History:</strong> {{ data.History | default('None') }}</div>
+      <div class="section"><strong>Clinical Features:</strong> {{ data.ClinicalFeature | default('None') }}</div>
+      <div class="section"><strong>Diagnosis:</strong> {{ data.Diagnosis | default('None') }}</div>
+      <div class="section"><strong>Investigation:</strong> {{ data.Investigation | default('None') }}</div>
+
+      <div class="section">
+        <h4>Rx</h4>
+        <table width="100%">
+          <thead>
+            <tr>
+              <th>S.No</th><th>Drug Name</th><th>Dosage</th>
+              <th>M</th><th>A</th><th>E</th><th>N</th>
+              <th>B/F</th><th>A/F</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in data.Prescription or [] %}
+            <tr>
+              <td>{{ loop.index }}</td>
+              <td>{{ item.drug | default('') }}</td>
+              <td>{{ item.dosage | default('') }}</td>
+              <td>{{ item.M | default('') }}</td>
+              <td>{{ item.A | default('') }}</td>
+              <td>{{ item.E | default('') }}</td>
+              <td>{{ item.N | default('') }}</td>
+              <td>{{ item.B/F | default('') }}</td>
+              <td>{{ item.A/F | default('') }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="9">No prescriptions provided.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="section"><strong>Review Date:</strong> {{ data.ReviewDate | default('N/A') }}</div>
+    </div>
+  </div>
+
+  <hr>
+  <small>
+    Clinic: New No. 4, Raja Annamalai Road...<br>
+    Consulting Time: 10:00am–1:00pm & 3:00pm–7:00pm (Mon–Sat) | Sunday Holiday
+  </small>
+</body>
+</html>

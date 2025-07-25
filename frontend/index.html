@@ -13,6 +13,9 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <!-- Flatpickr JS -->
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <!-- html2pdf -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
 
 </head>
 <body>
@@ -40,9 +43,31 @@
         </div>
       </div>
 
-    <div id="footer" class="ms-sidebar"></div>
+    <!-- <div id="footer" class="ms-sidebar"></div> -->
 
   </div>
+
+
+<!-- Logout Confirmation Modal -->
+<div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title" id="logoutModalLabel">Confirm Logout</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-center">
+        <p>Are you sure you want to log out?</p>
+      </div>
+      <div class="modal-footer justify-content-center">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button id="confirmLogoutBtn" type="button" class="btn btn-danger">Logout</button>
+      </div> 
+    </div>
+  </div>
+</div>
+
+
   <!-- Scripts -->
   <script src="/admin/assets/js/main.js"></script>
 </body>

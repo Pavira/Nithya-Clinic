@@ -8,8 +8,18 @@ function loadComponent(id, path) {
       if (id === "navbar") {
         const displayName = localStorage.getItem("display_name") || "User";
         const displaySpan = document.getElementById("display_name");
+        console.log("Display name: " + displayName);
         if (displaySpan) {
           displaySpan.textContent = displayName;
+        }
+      }
+      if(id === "sidebar") {
+        const userRole = localStorage.getItem("user_role");  
+        // console.log("User role: " + userRole);
+        const navUserMgmt = document.getElementById("nav-usermanagement-view_users");
+        if (userRole !== "Admin" && navUserMgmt) {
+          // console.log("test---------: " + userRole); 
+          navUserMgmt.style.display = "none";  // 👈 Hide User Management
         }
       }
     });
@@ -34,6 +44,16 @@ function loadPage(relativePath, params = {}) {
 
       highlightActiveNav(relativePath);
       setHeaderFromMetadataOrMap(relativePath, pageKey);
+
+      //-------------------------Dashboard scripts--------------------------
+      if (relativePath === "dashboard/dashboard") {
+        const display_name = localStorage.getItem("display_name");
+        const showName = `<span style="font-weight: bold; color: #6f42c1; font-style: italic">Hello ${display_name}!</span>`;
+        const img_url = "/admin/assets/images/doctor.jpg";
+        setPageHeader(" ", showName, "Overview of appointments, patients, and clinic activity",img_url);
+        loadScriptOnce("/admin/assets/js/dashboard/dashboard.js");
+        
+      }
 
       //-------------------------Patients scripts--------------------------
       if (relativePath === "patients/add_patients") {
@@ -83,10 +103,10 @@ function loadPage(relativePath, params = {}) {
       }
       
       if (relativePath === "appointments/view_appointment_history") {
-        // loadStyleOnce("admin/assets/css/appointments/add_appointments.css");
+        // loadStyleOnce("admin/assets/css/appointments/view_appointment_history.css");
         loadScriptOnce("/admin/assets/js/appointments/view_appointment_history.js", () => {
-          if (typeof initAppointmentHistoryPage === "function") {
-            initAppointmentHistoryPage(); // ✅ Safe call
+          if (typeof initAppointmentHistory === "function") {
+            initAppointmentHistory(); // ✅ Safe call
           }
         });
       }
@@ -152,10 +172,21 @@ function setHeaderFromMetadataOrMap(path, key) {
 }
 
 // Render page header
-function setPageHeader(icon, title, subtitle = "") {
+function setPageHeader(icon, title, subtitle = "",bgImage = "") {
   const header = document.getElementById("page-header");
-  console.log("Setting page header with icon: " + icon + ", title: " + title); // Debugging line
+  // console.log("Setting page header with icon: " + icon + ", title: " + title); // Debugging line
   if (header) {
+  //   const backgroundStyle = bgImage
+  //     ? `style="
+  //     background-image: url('${bgImage}');
+  //     background-size: contain;              /* smaller image */
+  //     background-position: right center;      /* shift to left */
+  //     background-repeat: no-repeat;
+  //     border-radius: 10px;
+  //     padding: 0;          /* extra left padding to make room for image */
+  //     min-height: 80px;"`                   /* control height */
+  // : "";
+
     header.innerHTML = `
       <div>
         <h2 class="mb-1 d-flex align-items-center">
@@ -255,11 +286,10 @@ function loadStyleOnce(href) {
   }
 }
 
-
 function loadLayoutComponents() {
   loadComponent("navbar", "navbar.html");
   loadComponent("sidebar", "sidebar.html");
-  loadComponent("footer", "footer.html");
+  // loadComponent("footer", "footer.html");
 
   const pageHeader = document.getElementById("page-header");
   if (!pageHeader) {
@@ -304,3 +334,14 @@ window.onload = () => {
     console.log("testing");
   }
 };
+
+document.getElementById("confirmLogoutBtn").addEventListener("click", function () {
+  // Clear local/session storage or tokens if needed
+  sessionStorage.clear();
+  localStorage.clear();
+
+  // Optionally: Call logout API or Firebase signOut
+
+  // Redirect to login page
+  window.location.href = "/admin/pages/auth/signin.html";
+});

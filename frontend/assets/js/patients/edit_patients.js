@@ -238,6 +238,52 @@ async function initEditPatientsPage() {
     finally {
         hideLoader();
     }
+
+    // ---------------Date of Birth and Age Calculation ---------------
+  document.getElementById("dob").setAttribute("max", new Date().toISOString().split("T")[0]);
+
+  const dobInput = document.getElementById("dob");
+  const ageField = document.getElementById("age");
+
+  // alert("Please fill in all the required fields.");
+
+  if (dobInput && ageField) {
+    console.log("DOB and Age fields found.");
+
+    dobInput.addEventListener("change", function () {
+      console.log("DOB changed:", this.value);
+
+      const dob = new Date(this.value);
+      const today = new Date();
+
+      let years = today.getFullYear() - dob.getFullYear();
+      let months = today.getMonth() - dob.getMonth();
+      let days = today.getDate() - dob.getDate();
+
+      // Adjust months and years if current date is before birthdate this year
+      if (months < 0 || (months === 0 && days < 0)) {
+        years--;
+        months += 12;
+      }
+
+      // Recalculate days after adjusting months
+      const dobThisYear = new Date(today.getFullYear(), dob.getMonth(), dob.getDate());
+      const msInDay = 1000 * 60 * 60 * 24;
+      const totalDays = Math.floor((today - dob) / msInDay);
+
+      if (years > 0) {
+        ageField.value = `${years} year${years > 1 ? 's' : ''}`;
+      } else if (months > 0) {
+        ageField.value = `${months} month${months > 1 ? 's' : ''}`;
+      } else {
+        ageField.value = `${totalDays} day${totalDays !== 1 ? 's' : ''}`;
+      }
+    });
+
+  } else {
+    console.warn("DOB or Age field not found.");
+  }
+
 }
 
 initEditPatientsPage();

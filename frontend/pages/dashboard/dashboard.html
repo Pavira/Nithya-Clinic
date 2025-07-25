@@ -1,8 +1,120 @@
 <!-- dashboard.html -->
 
 <!-- Header -->
-<div id="page-header-data"
-     data-title="Dashboard"
+<!-- <div id="page-header-data"
+     data-title,
      data-icon="grid-1x2"
      data-subtitle="Overview of appointments, patients, and clinic activity">
+</div> -->
+
+<div class="card p-4" style="background-color: white; border: none; border-radius: 12px;">
+  <!-- Row 1: Heading + Date Filter -->
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="mb-4">Clinical Overview</h5>
+    <div class="d-flex gap-2">
+     
+      <div class="d-flex flex-column">
+     <label for="filter-start" class="form-label small text-muted">Start Date</label>
+     <input type="date" class="form-control form-control-sm" id="filter-start">
+     </div>
+
+     <div class="d-flex flex-column">
+     <label for="filter-end" class="form-label small text-muted">End Date</label>
+     <input type="date" class="form-control form-control-sm" id="filter-end">
+     </div>
+      <button class="btn btn-outline-primary btn-sm" id="filter-today">Today</button>
+    </div>
+  </div>
+
+  <div class="row mb-2">
+     <div class="col-md-6 fw-bold ">Patient Count</div>
+     <div class="col-md-6 fw-bold ">Revenue Split</div>
+  </div>
+
+  <!-- Row 2: Four gradient cards -->
+  <div class="row g-3 mb-4">
+<!-- ========================= -->
+  <!-- Card 1: Out Patients -->
+  <div class="col-md-3">
+    <div class="card text-white shadow-sm" style="background: #fad0c4; border: none; border-radius: 12px;">
+      <div class="card-body d-flex justify-content-between align-items-center" style="height: 90px;">
+        <div class="d-flex flex-column">
+          <h3 id="outpatients-count" class="fw-bold mb-2"></h3>
+          <h6 class="fw-semibold">Out Patients</h6>
+        </div>
+        <div class="d-flex align-items-center justify-content-center"
+             style="width: 50px; height: 50px; border-radius: 32px; background: #FAF7F3; opacity: 0.5;">
+          <i class="bi bi-people-fill fs-4 text-primary"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Card 2: In Patients -->
+  <div class="col-md-3">
+    <div class="card text-white shadow-sm" style="background: #c2e9fb; border: none; border-radius: 12px;">
+      <div class="card-body d-flex justify-content-between align-items-center" style="height: 90px;">
+        <div class="d-flex flex-column">
+          <h3 id="op-procedures-patients-count" class="fw-bold mb-2"></h3>
+          <h6 class="fw-semibold">OP Procedures</h6>
+        </div>
+        <div class="d-flex align-items-center justify-content-center"
+             style="width: 50px; height: 50px; border-radius: 32px; background: #F2FCFE; opacity: 0.5;">
+          <i class="bi bi-hospital fs-4 text-info"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Card 3: Revenue OP -->
+  <div class="col-md-3">
+    <div class="card text-white shadow-sm" style="background: #fbc2eb; border: none; border-radius: 12px;">
+      <div class="card-body d-flex justify-content-between align-items-center" style="height: 90px;">
+        <div class="d-flex flex-column">
+          <h3 id="op-revenue" class="fw-bold mb-2">₹</h3>
+          <h6 class="fw-semibold">Out Patients</h6>
+        </div>
+        <div class="d-flex align-items-center justify-content-center"
+             style="width: 50px; height: 50px; border-radius: 32px; background: #FDF3FC; opacity: 0.5;">
+          <i class="bi bi-currency-rupee fs-4 text-danger"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Card 4: Total Revenue -->
+  <div class="col-md-3">
+    <div class="card text-white shadow-sm" style="background: #d4fc79; border: none; border-radius: 12px;">
+      <div class="card-body d-flex justify-content-between align-items-center" style="height: 90px;">
+        <div class="d-flex flex-column">
+          <h3 id="op-procedures-revenue" class="fw-bold mb-2"></h3>
+          <h6 class="fw-semibold">OP Procedures</h6>
+        </div>
+        <div class="d-flex align-items-center justify-content-center"
+             style="width: 50px; height: 50px; border-radius: 32px; background: #F6FFE8; opacity: 0.5;">
+          <i class="bi bi-graph-up-arrow fs-4 text-success"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="d-flex justify-content-center align-items-center mb-2" >Total Revenue</div>
+  <!-- Row 3: Centered Total Revenue -->
+  <div class="d-flex justify-content-center">
+     <div class="col-md-3">
+    <div class="card text-white shadow-sm" style="background: #B13BFF; opacity: 0.6; border: none; border-radius: 12px;">
+      <div class="card-body d-flex justify-content-between align-items-center" style="height: 90px;">
+        <div class="d-flex flex-column">
+          <h3 id="total-revenue" class="fw-bold mb-2"></h3>
+          <h6 class="fw-semibold">Total Revenue</h6>
+        </div>
+        <div class="d-flex align-items-center justify-content-center"
+             style="width: 50px; height: 50px; border-radius: 32px; background: #F6FFE8; opacity: 0.5;">
+          <i class="bi bi-bar-chart-line-fill fs-4 text-dark"></i>
+        </div>
+      </div>
+    </div>
+    </div>
+  </div>
 </div>
