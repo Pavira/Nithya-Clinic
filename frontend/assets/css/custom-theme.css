@@ -353,3 +353,28 @@ body {
     background-color: #004080;
 }
 /* =====================Prescription Container======================== */
+
+footer {
+  font-size: 0.95rem;
+}
+
+footer a:hover {
+  text-decoration: underline;
+}
+/* =====================Drug Name======================== */
+ /* Style Select2 dropdown to match form-select */
+  .select2-container--default .select2-selection--single {
+    height: 38px !important;
+    border: 1px solid #ddd !important;
+    border-radius: 6px !important;
+    padding: 4px 8px;
+  }
+
+  .select2-selection__rendered {
+    line-height: 28px !important;
+  }
+
+  .select2-selection__arrow {
+    height: 36px !important;
+  }
+  /* =====================Drug Name======================== */

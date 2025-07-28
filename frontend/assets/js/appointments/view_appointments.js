@@ -96,6 +96,13 @@ function initViewAppointmentsPage() {
       const result = await response.json();
       const appointments = result.data?.appointments || [];
 
+      console.log(result.data.active_count);
+      console.log(result.data.closed_count);
+      console.log(result.data.cancelled_count);
+
+      document.getElementById("active-badge").textContent = result.data.active_count;
+      document.getElementById("closed-badge").textContent = result.data.closed_count;
+      document.getElementById("cancelled-badge").textContent = result.data.cancelled_count;
 
       // Clear table
       tableBody.innerHTML = "";

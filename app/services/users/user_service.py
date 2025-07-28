@@ -54,6 +54,33 @@ async def get_user_service(role: str = None):
     global db
     try:
         users_ref = db.collection("users")
+
+        admin_count = 0
+        staff_count = 0
+        phamrmacist_count = 0
+
+        print("🔍 Fetching users...")
+
+        for doc in users_ref.get():
+            data = doc.to_dict()
+            role_value = data.get("user_role")
+
+            if role_value == "Admin":
+                admin_count += 1
+            elif role_value == "Staff":
+                staff_count += 1
+            elif role_value == "Phamrmacist":
+                phamrmacist_count += 1
+
+        print(
+            "🎯 Admins:",
+            admin_count,
+            "Staff:",
+            staff_count,
+            "Pharmacists:",
+            phamrmacist_count,
+        )
+
         if role is not None:
             print(f"🔍 Filtering users by role: {role}")
             query = users_ref.where("user_role", "==", role)
@@ -62,7 +89,12 @@ async def get_user_service(role: str = None):
 
         docs = query.get()
         users = [doc.to_dict() | {"id": doc.id} for doc in docs]
-        return {"users": users}
+        return {
+            "users": users,
+            "admin_count": admin_count,
+            "staff_count": staff_count,
+            "phamrmacist_count": phamrmacist_count,
+        }
     except Exception as e:
         logger.error(f"❌ Error: {e}")
         raise not_found_response()

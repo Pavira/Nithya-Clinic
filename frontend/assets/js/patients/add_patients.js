@@ -75,12 +75,7 @@ function validatePatientForm() {
   const referredBy = document.getElementById("referredBy").value;
   const phonePattern = /^[0-9]{10}$/;
   const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-  // if (!emailPattern.test(email)) {
-  //   const toast = new bootstrap.Toast(document.getElementById('emailToast'));
-  //   toast.show();
-  //   return false;
-  // }
+  const email = document.getElementById("email").value;
   
 
   if (!fullName || !phoneNumber || !dob || !gender || !marital || !profession || !treatment_type || !purposeOfVisit) {
@@ -93,6 +88,16 @@ function validatePatientForm() {
     //   alert("Please enter a valid email and phone number.");
     //   return false;
     // }
+    return false;
+  }
+  if (email && !emailPattern.test(email)) {
+    const toast = new bootstrap.Toast(document.getElementById('emailToast'));
+    toast.show();
+    return false;
+  }
+  if (phoneNumber && !phonePattern.test(phoneNumber)) {
+    const toast = new bootstrap.Toast(document.getElementById('phoneToast'));
+    toast.show();
     return false;
   }
 
@@ -200,10 +205,10 @@ async function initAddPatientForm() {
         gender,
         marital_status : marital,
         address,
-        email : email ? email : null,
+        email : email ? email : "",
         profession,
         guardian,
-        aadhar,
+        aadhar: aadhar ? parseInt(aadhar) : 0,
         treatment_type: treatmentType,
         purpose_of_visit : purposeOfVisit,
         referred_by : referredBy

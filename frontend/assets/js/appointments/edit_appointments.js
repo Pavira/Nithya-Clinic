@@ -157,7 +157,7 @@ async function EditAppointmentForm() {
         if (response.ok && result.success === true) {
           Swal.fire({
             icon: 'success',
-            title: 'Appointment Confirmation!',
+            title: 'Appointment Closed!',
             text: `Appointment Closed for ${fullName}`,
             confirmButtonText: 'OK',
           }).then(() => {
@@ -233,7 +233,8 @@ async function initPrescription() {
     });
 
     function resetPrescriptionForm() {
-      document.getElementById('drug_name').value = '';
+       // Reset Select2 dropdown (drug name)
+      $('#drug_name').val(null).trigger('change');
       document.getElementById('dosage').value = '';
       document.querySelectorAll('.timing-btn').forEach(btn => {
           btn.classList.remove('btn-success', 'active');
@@ -640,6 +641,15 @@ async function viewPatientHistory() {
       loadPage("appointments/view_appointment_history", {reg_no});
     });
 }
+
+
+  $(document).ready(function() {
+    $('.searchable-select').select2({
+      placeholder: "Drug Name.....",
+      allowClear: true,
+      width: '100%'
+    });
+  });
 
 
 initEditAppointmentsPage();

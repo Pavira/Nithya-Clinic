@@ -128,6 +128,28 @@ async def get_appointment_service(
                 "AppointmentDateTime", ">=", start_dt
             ).where("AppointmentDateTime", "<", end_dt)
 
+        active_count = 0
+        closed_count = 0
+        cancelled_count = 0
+
+        for doc in appointment_ref.stream():
+            data = doc.to_dict()
+            if data["AppointmentStatus"] == "Active":
+                active_count += 1
+            elif data["AppointmentStatus"] == "Closed":
+                closed_count += 1
+            elif data["AppointmentStatus"] == "Cancelled":
+                cancelled_count += 1
+
+        print(
+            "🎯 Active appointments count:",
+            active_count,
+            "Closed appointments count:",
+            closed_count,
+            "Cancelled appointments count:",
+            cancelled_count,
+        )
+
         # 🔍 Status filter
         if status:
             print("🎯 Filtering by status:", status)
@@ -159,7 +181,12 @@ async def get_appointment_service(
             else:
                 appointments.append(data)
 
-        return {"appointments": appointments}
+        return {
+            "appointments": appointments,
+            "active_count": active_count,
+            "closed_count": closed_count,
+            "cancelled_count": cancelled_count,
+        }
 
     except Exception as e:
         logger.error(f"❌ Error fetching appointments: {e}")

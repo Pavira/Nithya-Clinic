@@ -53,7 +53,7 @@ async def view_and_search_patients(
     search_type: str = None,
     search_value: str = None,
     cursor: str = None,
-    limit: int = 10,
+    limit: int = None,
 ):
     """
     API to view and search patients.

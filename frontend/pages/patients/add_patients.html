@@ -6,11 +6,27 @@
      data-subtitle="Register new patients into the system">
 </div>
 
+<!-- Back  Button -->
+<div class="d-flex justify-content-end align-items-center gap-2 mb-3 flex-wrap">
+  <button class="btn btn-danger" id="backButton">
+    <i class="bi bi-arrow-left-circle me-1"></i> Back
+  </button>
+</div>
+
 <!-- Add Patient Form Card -->
 <div class="card shadow-sm border-0">
   <div class="card-body">
-    <form id="add-patient-form" novalidate>
+    
+    <form id="add-patient-form">
+      
       <div class="row gy-4 gx-3">
+        <!-- Close Button (Top Right) -->
+        <!-- <div>         
+          <button type="button" class="btn btn-outline-danger position-absolute top-0 end-0 m-2" id="backButton" title="Close">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </div> -->
+
         <!-- Full Name -->
         <div class="col-md-6">
           <label for="fullName" class="form-label">Full Name*</label>
@@ -20,13 +36,13 @@
         <!-- Phone Number -->
         <div class="col-md-3">
           <label for="phone" class="form-label">Phone Number*</label>
-          <input type="tel" class="form-control" id="phoneNumber" placeholder="Enter Phone Number" maxlength="10" minlength="10" pattern="[0-9]{10}" required title="Please enter a valid 10-digit phone number">
+          <input type="tel" class="form-control" id="phoneNumber" placeholder="Enter Phone Number" maxlength="10" minlength="10" pattern="[0-9]{10}" oninput="this.value = this.value.replace(/[^0-9]/g, '')" required title="Please enter a valid 10-digit phone number">
         </div>
 
         <!-- Alternate Phone -->
         <div class="col-md-3">
           <label for="altPhone" class="form-label">Alternate Phone</label>
-          <input type="tel" class="form-control" id="altPhoneNumber" placeholder="Enter Alternate Phone" maxlength="10" minlength="10" pattern="[0-9]{10}" title="Please enter a valid 10-digit phone number">
+          <input type="tel" class="form-control" id="altPhoneNumber" placeholder="Enter Alternate Phone" maxlength="10" minlength="10" pattern="[0-9]{10}" oninput="this.value = this.value.replace(/[^0-9]/g, '')" title="Please enter a valid 10-digit phone number">
         </div>
 
         <!-- Date of Birth -->
@@ -132,14 +148,14 @@
         <!-- Address -->
         <div class="col-12">
           <label for="address" class="form-label">Address</label>
-          <textarea class="form-control" id="address" rows="3" placeholder="Enter Address" required title="Please enter the patient's address"></textarea>
+          <textarea class="form-control" id="address" rows="3" placeholder="Enter Address" title="Please enter the patient's address"></textarea>
         </div>
 
         <!-- Treatment Type -->
         <div class="col-md-6">
           <label for="treatment" class="form-label">Treatment Type*</label>
           <select class="form-select" id="treatmentType">
-            <option selected disabled value="">Select Treatment</option>
+            <option selected>General</option>
             <option>General</option>
             <option>Chemical Peel</option>
             <option>MNRF</option>
@@ -163,17 +179,17 @@
         <!-- Referred By -->
         <div class="col-md-6">
           <label for="referred" class="form-label">Referred By</label>
-          <input type="text" class="form-control" id="referredBy" placeholder="Enter Referred By" required title="Please enter who referred the patient">
+          <input type="text" class="form-control" id="referredBy" placeholder="Enter Referred By" title="Please enter who referred the patient">
         </div>
       </div>
 
       <div class="d-flex justify-content-end mt-4 gap-2">
         <!-- Back Button -->
-        <div >
+        <!-- <div >
           <button type="button" class="btn btn-danger" id="backButton">
             <i class="bi bi-arrow-left me-2"></i>Back
           </button>
-        </div>
+        </div> -->
 
         <!-- Submit Button -->
         <div >

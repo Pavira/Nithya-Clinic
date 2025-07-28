@@ -289,7 +289,7 @@ function loadStyleOnce(href) {
 function loadLayoutComponents() {
   loadComponent("navbar", "navbar.html");
   loadComponent("sidebar", "sidebar.html");
-  // loadComponent("footer", "footer.html");
+  loadComponent("footer", "footer.html");
 
   const pageHeader = document.getElementById("page-header");
   if (!pageHeader) {
