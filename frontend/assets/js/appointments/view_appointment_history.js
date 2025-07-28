@@ -1,3 +1,5 @@
+
+// --------------------------Show Prescription PDFFunction-------------------------
 async function getPrescription(appointmentId) {
   console.log("Generating prescription PDF for appointment ID---:", appointmentId);
 
@@ -239,6 +241,7 @@ function goBack() {
   }
 }
 
+// --------------Calling getPrescription Function on Card Body Click-------------- //
 document.querySelector(".card-body").addEventListener("click", function (e) {
     const button = e.target.closest("#viewPrescription");
     if (button) {
@@ -248,6 +251,19 @@ document.querySelector(".card-body").addEventListener("click", function (e) {
       getPrescription(appointmentId);
     }
   });
+// ---------------------------------------------------------------------
+// --------------Calling View Image Function on Card Body Click-------------- //
+document.querySelector(".card-body").addEventListener("click", function (e) {
+    const button = e.target.closest("#viewImage");
+    if (button) {
+      e.preventDefault(); // 🛑 Prevent default form submission
+      const appointmentId = button.getAttribute("data-index");
+      console.log("Viewing Image for appointment ID:", appointmentId);
+      viewImage(appointmentId);
+    }
+  });
+// ---------------------------------------------------------------------
+
 
 async function initAppointmentHistory() {
 
@@ -293,6 +309,8 @@ async function initAppointmentHistory() {
 
     // 🧩 Create the HTML dynamically
     let cardBodyHTML = "";
+
+    data.sort((a, b) => new Date(b.AppointmentDateTime) - new Date(a.AppointmentDateTime));
 
     data.forEach((data, index) => {
       cardBodyHTML += `
@@ -346,9 +364,12 @@ async function initAppointmentHistory() {
 
             <p class="text-muted mt-2">${data.AppointmentStatus} on ${formatDateTime(data.AppointmentDateTime)} by ${data.User}</p>
 
-            <div class="d-flex justify-content-center align-items-center mt-2">
+            <div class="d-flex justify-content-center align-items-center mt-2 gap-2">
               <button type="button" class="btn btn-primary" id="viewPrescription" data-index="${data.AppointmentRegNum}">
                 <i class="bi bi-file-earmark-pdf me-1"></i> View PDF
+              </button>
+              <button type="button" class="btn btn-warning" id="viewImage" data-index="${data.AppointmentRegNum}">
+                <i class="bi bi-image me-1"></i> View Image
               </button>
             </div>
           </div>

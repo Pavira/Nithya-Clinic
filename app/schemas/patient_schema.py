@@ -13,10 +13,10 @@ class PatientCreateSchema(BaseModel):
     gender: str
     marital_status: str
     address: Optional[str] = None
-    email: Optional[EmailStr] = None
+    email: Optional[str] = None
     profession: Optional[str] = None
     guardian: Optional[str] = None
-    aadhar: Optional[str] = None
+    aadhar: Optional[int] = 0
     treatment_type: Optional[str] = None
     purpose_of_visit: Optional[str] = None
     referred_by: Optional[str] = None

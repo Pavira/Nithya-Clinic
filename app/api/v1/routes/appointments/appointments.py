@@ -56,7 +56,7 @@ async def add_appointment(appointment_data: AppointmentSchema):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-# -------------------Get Appointments-------------------
+# -------------------View Appointments-------------------
 @router.get("/view_appointments")
 async def view_appointments(
     status: Optional[str] = Query(None),

@@ -44,6 +44,14 @@ function initUserManagementPage() {
       const result = await response.json();
       const users = result.data?.users || [];
 
+
+      document.getElementById("admin-count").textContent = result.data.admin_count;
+      document.getElementById("staff-count").textContent = result.data.staff_count;
+      document.getElementById("pharmacist-count").textContent = result.data.phamrmacist_count;
+      const all_count = result.data.admin_count + result.data.staff_count + result.data.phamrmacist_count;
+      document.getElementById("all-count").textContent = all_count;
+
+
       // Clear table
       tableBody.innerHTML = "";
 
