@@ -16,7 +16,7 @@
 <!-- Edit Patient Form Card -->
 <div class="card shadow-sm border-0">
   <div class="card-body">
-    <form id="edit-patient-form" novalidate>
+    <form id="edit-patient-form">
 
         <input type="hidden" id="patient_id" name="patient_id">
 
@@ -37,13 +37,13 @@
         <!-- Phone Number -->
         <div class="col-md-3">
           <label for="phone" class="form-label">Phone Number*</label>
-          <input type="tel" class="form-control" id="phoneNumber" placeholder="Enter Phone Number" maxlength="10" minlength="10" pattern="[0-9]{10}" required title="Please enter a valid 10-digit phone number">
+          <input type="tel" class="form-control" id="phoneNumber" placeholder="Enter Phone Number" maxlength="10" minlength="10" pattern="[0-9]{10}" oninput="this.value = this.value.replace(/[^0-9]/g, '')" required title="Please enter a valid 10-digit phone number">
         </div>
 
         <!-- Alternate Phone -->
         <div class="col-md-3">
-          <label for="altPhone" class="form-label">Alternate Phone</label>
-          <input type="tel" class="form-control" id="altPhoneNumber" placeholder="Enter Alternate Phone" maxlength="10" minlength="10" pattern="[0-9]{10}" title="Please enter a valid 10-digit phone number">
+          <label for="altPhone" class="form-label">Alternate Phone Number</label>
+          <input type="tel" class="form-control" id="altPhoneNumber" placeholder="Enter Alternate Phone" maxlength="10" minlength="10" pattern="[0-9]{10}" oninput="this.value = this.value.replace(/[^0-9]/g, '')" title="Please enter a valid 10-digit phone number">
         </div>
 
         <!-- Date of Birth -->
@@ -101,17 +101,16 @@
           <label for="profession" class="form-label">Profession*</label>
           <select class="form-select" id="profession">
             <option selected disabled value="">Select Profession</option>
+            <option>Others</option>
             <option>Teacher</option>
             <option>Professor</option>
             <option>Doctor</option>
             <option>Lawyer</option>
             <option>Home Maker</option>
-            <option>Entrepreneur</option>
             <option>Tailor</option>
             <option>Entrepreneur</option>
             <option>Business</option>
             <option>Nurse</option>
-            <option>Industrial Worker</option>
             <option>Industrial Worker</option>
             <option>Government Officer</option>
             <option>Police</option>
@@ -122,7 +121,6 @@
             <option>Auditor</option>
             <option>Pilot</option>
             <option>Flight Air Crew</option>
-            <option>Others</option>
             <option>Student - School</option>
             <option>Student - College</option>
           </select>
@@ -137,7 +135,7 @@
         <!-- Aadhar Number -->
         <div class="col-md-6">
           <label for="aadhar" class="form-label">Aadhar Number</label>
-          <input type="text" class="form-control" id="aadhar" placeholder="Enter Aadhar Number" pattern="[0-9]{12}" title="Please enter a valid 12-digit Aadhar number">
+          <input type="text" class="form-control" id="aadhar" placeholder="Enter Aadhar Number" pattern="[0-9]{12}" oninput="this.value = this.value.replace(/[^0-9]/g, '')" title="Please enter a valid 12-digit Aadhar number">
         </div>
 
         <!-- Email -->
@@ -149,15 +147,15 @@
         <!-- Address -->
         <div class="col-12">
           <label for="address" class="form-label">Address</label>
-          <textarea class="form-control" id="address" rows="3" placeholder="Enter Address" required title="Please enter the patient's address"></textarea>
+          <textarea class="form-control" id="address" rows="3" placeholder="Enter Address" title="Please enter the patient's address"></textarea>
         </div>
 
         <!-- Treatment Type -->
         <div class="col-md-6">
           <label for="treatment" class="form-label">Treatment Type*</label>
           <select class="form-select" id="treatmentType">
-            <option selected disabled value="">Select Treatment</option>
-            <option>General</option>
+            <option selected>General</option>
+            <!-- <option>General</option> -->
             <option>Chemical Peel</option>
             <option>MNRF</option>
             <option>LHR</option>
@@ -179,8 +177,8 @@
 
         <!-- Referred By -->
         <div class="col-md-6">
-          <label for="referred" class="form-label">Referred By*</label>
-          <input type="text" class="form-control" id="referredBy" placeholder="Enter Referred By" required title="Please enter who referred the patient">
+          <label for="referred" class="form-label">Referred By</label>
+          <input type="text" class="form-control" id="referredBy" placeholder="Enter Referred By"  title="Please enter who referred the patient">
         </div>
       </div>
 

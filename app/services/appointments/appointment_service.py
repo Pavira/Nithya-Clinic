@@ -418,3 +418,64 @@ async def check_appointment_service(reg_no: str):
     except Exception as e:
         logger.error(f"❌ Error checking appointment for {reg_no}: {e}")
         raise HTTPException(status_code=500, detail="Internal server error")
+
+
+# -------------------View Image---------------------
+async def view_image_service(appointment_id: str):
+    global db, bucket
+    try:
+        query = db.collection("collection_PatientAppointment").where(
+            "AppointmentRegNum", "==", appointment_id
+        )
+        docs = query.stream()
+
+        first_doc = next(docs, None)
+        if not first_doc:
+            raise HTTPException(status_code=404, detail="Appointment not found")
+
+        data = first_doc.to_dict()
+        image_urls = data.get("ImageURLs", [])
+
+        if not image_urls:
+            raise HTTPException(
+                status_code=404, detail="No images found for this appointment"
+            )
+
+        print("Image URLs service:", image_urls)
+
+        return {"image_urls": image_urls}
+
+    except Exception as e:
+        logger.error(f"❌ Error viewing image for {appointment_id}: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# -------------------View prescription image---------------------
+async def view_prescription_service(appointment_id: str):
+    global db, bucket
+    try:
+        query = db.collection("collection_PatientAppointment").where(
+            "AppointmentRegNum", "==", appointment_id
+        )
+        docs = query.stream()
+
+        first_doc = next(docs, None)
+        if not first_doc:
+            raise HTTPException(status_code=404, detail="Appointment not found")
+
+        data = first_doc.to_dict()
+        image_urls = data.get("MedPrescImages", [])
+
+        if not image_urls:
+            raise HTTPException(
+                status_code=404,
+                detail="No prescription images found for this appointment",
+            )
+
+        print("Image URLs service:", image_urls)
+
+        return {"image_urls": image_urls}
+
+    except Exception as e:
+        logger.error(f"❌ Error viewing prescription for {appointment_id}: {e}")
+        raise HTTPException(status_code=500, detail=str(e))

@@ -83,7 +83,7 @@
 
       <div class="col-md-6">
         <label for="start_datetime" class="form-label">Start Date & Time*</label>
-        <input type="datetime-local" class="form-control" id="start_datetime" required readonly>
+        <input type="datetime-local" class="form-control" id="start_datetime" disabled>
       </div>
 
       <div class="d-flex justify-content-center align-items-center mt-2">
@@ -173,7 +173,7 @@
 
        <!--------------------------- Prescription ------------------------------>
         <div class="d-flex justify-content-center align-items-center">
-            <h6 class="pb-2 mt-2" style="border-bottom: 1px solid #ccc; width: max-content;"> Prescription </h6>
+            <h6 class="pb-2 mt-2" style="border-bottom: 1px solid #ccc; width: max-content; font-size: 14px; font-weight: bold;"> Prescription </h6>
         </div>
 
         <div class="col-md-4">
@@ -546,12 +546,12 @@
         <!-- Review Date -->
         <div class="col-md-6 mt-2">
             <label for="review_datetime" class="form-label">Review Date & Time</label>
-            <input type="datetime-local" class="form-control" id="review_datetime" required >
+            <input type="datetime-local" class="form-control" id="review_datetime" >
         </div>
 
         <!-- Multiple Image Upload -->
         <div class="col-md-6 mt-4 mb-4">
-            <label for="upload_images" class="form-label fw-bold">Upload Images</label>
+            <label for="upload_images_label" class="form-label fw-bold">Upload Images</label>
             <input 
             type="file" 
             class="form-control" 
@@ -564,7 +564,7 @@
 
         <!-- Update Prescription Button -->
         <div class="col-md-6 mt-4 mb-4">
-            <label for="upload_prescriptions" class="form-label fw-bold">Update Prescription</label>
+            <label for="upload_prescriptions_label" class="form-label fw-bold">Update Prescription</label>
             <input 
             type="file" 
             class="form-control" 

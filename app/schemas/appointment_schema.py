@@ -39,7 +39,7 @@ class UpdateAppointmentSchema(BaseModel):
     investigation: Optional[str] = ""
     diagnosis: Optional[str] = ""
     doctor_fees: float
-    review_datetime: datetime
+    review_datetime: Optional[datetime] = None
     allPrescriptions: Optional[list] = []
     # images: Optional[list] = []
     # prescription_images: Optional[list] = []
