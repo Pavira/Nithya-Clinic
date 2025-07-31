@@ -45,7 +45,7 @@ class UpdateAppointmentModel(BaseModel):
     Investigation: Optional[str] = Field("", alias="investigation")
     Diagnosis: Optional[str] = Field("", alias="diagnosis")
     DoctorFees: float = Field(..., alias="doctor_fees")
-    ReviewDate: datetime = Field(..., alias="review_datetime")
+    ReviewDate: Optional[datetime] = Field(None, alias="review_datetime")
     Prescription: Optional[list] = Field(default_factory=list, alias="allPrescriptions")
     # ImageURLs: Optional[list] = Field(default_factory=list, alias="images")
     # MedPrescImages: Optional[list] = Field(

@@ -50,8 +50,18 @@ function loadPage(relativePath, params = {}) {
         const display_name = localStorage.getItem("display_name");
         const showName = `<span style="font-weight: bold; color: #6f42c1; font-style: italic">Hello ${display_name}!</span>`;
         const img_url = "/admin/assets/images/doctor.jpg";
-        setPageHeader(" ", showName, "Overview of appointments, patients, and clinic activity",img_url);
+        setPageHeader(" ", showName, "Overview of Out Patients and OP Procedure",img_url);
         loadScriptOnce("/admin/assets/js/dashboard/dashboard.js");
+         const userRole = localStorage.getItem("user_role");  
+        // console.log("User role: " + userRole);
+        const navUserMgmt = document.getElementById("nav-usermanagement-view_users");
+        if (userRole !== "Admin" && navUserMgmt) {
+          console.log("test---------: " + userRole); 
+          document.getElementById("op-revenue").style.display = "none"; // Hide total revenue
+          document.getElementById("op-procedures-revenue").style.display = "none";
+          document.getElementById("total-revenue").style.display = "none"; // Hide total patients
+        }
+
         
       }
 

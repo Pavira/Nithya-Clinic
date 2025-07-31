@@ -28,6 +28,8 @@ from app.services.appointments.appointment_service import (
     get_vitals_service,
     save_vitals_service,
     update_appointment_service,
+    view_image_service,
+    view_prescription_service,
 )
 
 router = APIRouter(tags=["Appointments"])
@@ -192,6 +194,50 @@ async def check_appointment(reg_no: str):
         return success_response(
             data=result, message="Appointments retrieved successfully"
         )
+
+    except Exception as e:
+        logger.error(f"❌ Error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ----------------------View Image---------------------
+@router.get("/view_image/{appointment_id}")
+async def view_image(appointment_id: str):
+    """
+    API to view appointment image
+    """
+    try:
+        # Assuming the service returns a URL or path to the image
+        result = await view_image_service(appointment_id)
+        if result.get("image_urls") is None or result == []:
+            return {"success": False}
+
+        print("Image URL:-", result.get("image_urls"))
+        print("Result:-", result)
+
+        return success_response(data=result, message="Image retrieved successfully")
+
+    except Exception as e:
+        logger.error(f"❌ Error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ----------------------View Prescription Image---------------------
+@router.get("/view_prescription_image/{appointment_id}")
+async def view_image(appointment_id: str):
+    """
+    API to view appointment prescription image
+    """
+    try:
+        # Assuming the service returns a URL or path to the image
+        result = await view_prescription_service(appointment_id)
+        if result.get("image_urls") is None or result == []:
+            return {"success": False}
+
+        print("Image URL:-", result.get("image_urls"))
+        print("Result:-", result)
+
+        return success_response(data=result, message="Image retrieved successfully")
 
     except Exception as e:
         logger.error(f"❌ Error: {e}")

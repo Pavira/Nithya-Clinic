@@ -30,7 +30,7 @@ async def dashboard(start_date: str, end_date: str):
         docs = query.stream()
         data = [doc.to_dict() for doc in docs]
 
-        print("data===", data)
+        # print("data===", data)
 
         outpatient_count = 0
         outpatient_fees = 0

@@ -73,9 +73,7 @@ async function EditAppointmentForm() {
       const noOfImages = images.length;
       const noOfPrescriptions = prescriptionImages.length;
 
-      
-
-      if(!consultationCategory || !appointmentCategory || description === ""|| doctor_fees === ""){
+      if(!consultationCategory || !appointmentCategory || description === ""){
         Swal.fire({
           icon: 'Warning',
           title: 'Warning',
@@ -83,6 +81,16 @@ async function EditAppointmentForm() {
         })      
         return
       }
+
+      if(doctor_fees === ""){
+        Swal.fire({
+          icon: 'Warning',
+          title: 'Warning',
+          text: 'Please fill Doctor Fees'
+        })      
+        return
+      }
+
       const formData = new FormData();
 
          // Now you can send the form data
@@ -100,8 +108,8 @@ async function EditAppointmentForm() {
         investigation : investigation,
         diagnosis : diagnosis,
         doctor_fees : doctor_fees,
-        review_datetime : utcDate,
-        allPrescriptions : allPrescriptions,
+        review_datetime : utcDate || null,
+        allPrescriptions : allPrescriptions,     
         images : images,
         prescription_images : prescriptionImages,
         noOfImages : noOfImages,
@@ -369,7 +377,7 @@ async function saveVitals() {
           Swal.fire({
             icon: 'success',
             title: 'Vitals Saved ',
-            text: `Height: ${height}CM, \n Weight: ${weight}KG, \n BMI: ${bmi}, \n Blood Pressure: ${blood_pressure} mmHg, \n Pulse: ${pulse}`,
+            text: `Height: ${height}CM, \n Weight: ${weight}KG, \n BMI: ${bmi}, \n Blood Pressure: ${blood_pressure} mmHg, \n Pulse: ${pulse} bpm`,
             // confirmButtonText: 'OK',
           });       
         }
@@ -522,7 +530,8 @@ async function initEditAppointmentsPage() {
         const history = vitals.History;
         const clinical_feature = vitals.ClinicalFeature;
         const investigation = vitals.Investigation;
-        const diagnosis = vitals.Diagnosis;    
+        const diagnosis = vitals.Diagnosis;
+
 
         const timingOptions = ['M', 'A', 'E', 'N', 'B/F', 'A/F'];
         const timingButtonsHTML = timingOptions.map(timing => `
@@ -542,7 +551,8 @@ async function initEditAppointmentsPage() {
             document.getElementById("clinical_feature").value = clinical_feature || '';
             document.getElementById("investigation").value = investigation || '';
             document.getElementById("diagnosis").value = diagnosis || '';
-            document.getElementById("drug_name").style.display = 'none';
+            $('#drug_name').hide();
+            $('#drug_name').next('.select2-container').hide();
             document.getElementById("dosage").style.display = 'none';
             document.getElementById("timing_label").style.display = 'none';
             document.getElementById("timing-buttons").style.display = 'none';         
@@ -550,8 +560,29 @@ async function initEditAppointmentsPage() {
             document.getElementById("dosage_label").style.display = 'none';
             document.getElementById("add-medicine-btn").style.display = 'none';
             document.getElementById('timing-buttons').innerHTML = '';
-            
 
+            document.getElementById("consultation_category").disabled = true;
+            document.getElementById("appointment_category").disabled = true;
+            document.getElementById("description").disabled = true;
+            document.getElementById("weight").disabled = true;
+            document.getElementById("height").disabled = true;
+            document.getElementById("bmi").disabled = true;
+            document.getElementById("blood_pressure").disabled = true;
+            document.getElementById("pulse").disabled = true;
+            document.getElementById("history").disabled = true;
+            document.getElementById("clinical_feature").disabled = true;
+            document.getElementById("investigation").disabled = true;
+            document.getElementById("diagnosis").disabled = true;
+            document.getElementById("review_datetime").disabled = true;
+            document.getElementById("doctor_fees").disabled = true;
+            document.getElementById("upload_images").disabled = true;
+            document.getElementById("upload_prescriptions").disabled = true;
+            document.getElementById("save_vitals").style.display = 'none';
+            document.getElementById("upload_images").style.display = 'none';
+            document.getElementById("upload_prescriptions").style.display = 'none';
+            document.getElementById("upload_images_label").style.display = 'none';
+            document.getElementById("upload_prescriptions_label").style.display = 'none';
+            
             const prescriptionTableBody = prescription.map((item, index) => {
     const timings = [];
 
