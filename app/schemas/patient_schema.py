@@ -20,6 +20,7 @@ class PatientCreateSchema(BaseModel):
     treatment_type: Optional[str] = None
     purpose_of_visit: Optional[str] = None
     referred_by: Optional[str] = None
+    user: Optional[str] = None  # Who created this patient
 
     def to_dict(self):
         return self.model_dump()

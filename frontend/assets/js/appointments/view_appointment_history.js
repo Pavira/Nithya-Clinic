@@ -542,12 +542,6 @@ async function initAppointmentHistory() {
   }
 }
 
-
-
-
-initAppointmentHistory();
-downloadPdf();
-
 function downloadPdf() {
   document.getElementById("downloadPdfBtn").addEventListener("click", function () {
     const element = document.querySelector(".prescription-body");
@@ -563,4 +557,10 @@ function downloadPdf() {
     html2pdf().set(opt).from(element).save();
   });
 }
+
+
+initAppointmentHistory();
+downloadPdf();
+
+
 

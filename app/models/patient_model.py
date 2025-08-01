@@ -37,7 +37,7 @@ class PatientCreateModel(BaseModel):
         default_factory=lambda: datetime.now(timezone.utc),
         description="Timestamp of when the record was logged (UTC)",
     )
-    User: Optional[str] = None  # Who created this patient
+    User: Optional[str] = Field(None, alias="user")  # Who created this patient
 
     def to_dict(self):
         return self.model_dump()
@@ -70,11 +70,11 @@ class PatientUpdateModel(BaseModel):
     PurposeOfVisit: Optional[str] = Field(None, alias="purpose_of_visit")
     ReferredBy: Optional[str] = Field(None, alias="referred_by")
 
-    ModifiedDateTime: datetime = Field(
-        default_factory=lambda: datetime.now(timezone.utc),
-        description="Timestamp of when the record was Updated (UTC)",
-    )
-    ModifiedUser: Optional[str] = None  # Who created this patient
+    # ModifiedDateTime: datetime = Field(
+    #     default_factory=lambda: datetime.now(timezone.utc),
+    #     description="Timestamp of when the record was Updated (UTC)",
+    # )
+    # ModifiedUser: Optional[str] = None  # Who created this patient
 
     def to_dict(self):
         return self.model_dump()

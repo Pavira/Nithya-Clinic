@@ -194,6 +194,8 @@ async function initAddPatientForm() {
       const treatmentType = document.getElementById("treatmentType").value;
       const purposeOfVisit = document.getElementById("purposeOfVisit").value;
       const referredBy = document.getElementById("referredBy").value;
+      const user_email = localStorage.getItem("email");
+      console.log("User email:####", user_email);
 
          // Now you can send the form data
       const data = {
@@ -211,7 +213,8 @@ async function initAddPatientForm() {
         aadhar: aadhar ? parseInt(aadhar) : 0,
         treatment_type: treatmentType,
         purpose_of_visit : purposeOfVisit,
-        referred_by : referredBy
+        referred_by : referredBy,
+        user : user_email ? user_email : "Unknown",
       };
 
       console.log("Sending patient data:", data);

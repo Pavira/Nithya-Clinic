@@ -12,6 +12,8 @@ from app.utils.response import (
     not_implemented_response,
 )
 
+from firebase_admin._auth_utils import EmailAlreadyExistsError
+
 # ------------ Firebase Collection name----------------
 USERS_COLLECTION = "users"
 
@@ -43,7 +45,10 @@ def create_user_service(user_data):
         logger.info(
             f"✅ Firestore User {user_model.display_name} created successfully."
         )
-        return {**user_model.model_dump()}
+        return {"success": True, **user_model.model_dump()}
+    except EmailAlreadyExistsError:
+        logger.warning(f"⚠️ Email already exists: {user_data.email}")
+        return {"success": False, "message": "Email already exists."}
     except Exception as e:
         logger.error(f"❌ Failed to create user: {str(e)}")
         raise not_implemented_response()

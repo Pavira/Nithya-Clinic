@@ -206,7 +206,7 @@ async function initEditPatientsPage() {
     document.getElementById("age").value = patient.Age;
     const genderRadio = document.querySelector(`input[name="gender"][value="${patient.Gender}"]`);
     if (genderRadio) genderRadio.checked = true;
-    console.log(patient.MaritialStatus);
+    // console.log(patient.MaritialStatus);
     const maritalRadio = document.querySelector(`input[name="martial"][value="${patient.MaritialStatus}"]`);
     if (maritalRadio) maritalRadio.checked = true;
     document.getElementById("address").value = patient.Address === "" ? "" : patient.Address;
@@ -219,6 +219,7 @@ async function initEditPatientsPage() {
 
     const logDateTime = patient.LogDateTime; // e.g. "2025-07-10T13:06:57.407608+00:00"
     const userName = patient.User || "Unknown"; // Replace with actual field if different
+    console.log("patient.User===:", patient.User);
 
     const formattedDate = await formatDateToReadable(logDateTime);
     const registrationInfo = `This Registration was done on ${formattedDate} by ${userName}`;

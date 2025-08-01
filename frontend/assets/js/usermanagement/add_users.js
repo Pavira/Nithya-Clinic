@@ -128,6 +128,8 @@ async function initUserForm() {
 
         const result = await response.json();
 
+        console.log("Response from server:", result.success); 
+
         if (response.ok && result.success) {
           Swal.fire({
             icon: 'success',
@@ -138,7 +140,15 @@ async function initUserForm() {
             // Redirect after user clicks OK
             loadPage("usermanagement/view_users");
           });       
-        } else {
+        }else if (response.ok && result.success === false || result.message === "Email already exists.") { 
+          Swal.fire({
+            icon: 'warning',
+            title: '⚠️ Email already exists',
+            text: 'The email address you entered is already registered. Please use a different email.',
+          });
+          // alert("⚠️ Email already exists");
+        }
+        else {
           Swal.fire({
             icon: 'error',
             title: '⛔ User creation failed',
