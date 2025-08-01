@@ -187,8 +187,8 @@ body {
 .prescription-container {
     display: flex;
     width: 21cm; /* A4 width */
-    /* max-height: 29.7cm;  */
-    min-height: 29.7cm; 
+    max-height: 29.7cm; 
+    /* min-height: 29.7cm;  */
     margin: auto;
     background-color: #fff;
     box-shadow: 0 0 0.5cm rgba(0, 0, 0, 0.1);

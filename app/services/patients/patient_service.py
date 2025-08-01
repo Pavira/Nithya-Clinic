@@ -17,20 +17,21 @@ from firebase_admin import firestore
 
 # -------------------------Create Patient-------------------------
 async def create_patient_service(
-    patient_data: PatientCreateSchema, current_user: dict = None
+    patient_data: PatientCreateSchema,
 ):
     try:
         patient_id = str(int(time.time() * 1000))
 
         # Extract user email from Firebase decoded token (if available)
-        created_by = current_user.get("email") if current_user else "Unknown"
+        # created_by = current_user.get("email") if current_user else "Unknown"
+        # print("created_by===", current_user.get("email"))
 
         # Create the model instance from incoming schema
         patient_model = PatientCreateModel(
             **patient_data.model_dump(),
             PatientRegistrationNumber=patient_id,
             LogDateTime=datetime.now(timezone.utc),
-            User=created_by,
+            # User=created_by,
         )
 
         # Store in Firestore
@@ -246,17 +247,18 @@ async def get_patient_by_id_service(patientId: str):
 
 # ---------------------------Update Patient---------------------------
 async def update_patient_service(
-    patientId: str, patient_data: PatientCreateSchema, current_user: dict = None
+    patientId: str,
+    patient_data: PatientCreateSchema,
 ):
     try:
         # Extract user email from Firebase decoded token (if available)
-        created_by = current_user.get("email") if current_user else "Unknown"
+        # created_by = current_user.get("email") if current_user else "Unknown"
 
         # Create the model instance from incoming schema
         patient_model = PatientUpdateModel(
             **patient_data.model_dump(),
-            ModifiedDateTime=datetime.now(timezone.utc),
-            ModifiedUser=created_by,
+            # ModifiedDateTime=datetime.now(timezone.utc),
+            # ModifiedUser=created_by,
         )
         # Query the collection for the patient registration number
         query = db.collection("collection_PatientRegistration").where(

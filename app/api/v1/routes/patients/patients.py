@@ -18,14 +18,14 @@ router = APIRouter(tags=["Patients"])
 
 # -------------Add Patient----------------
 @router.post("/add_patient")
-async def add_patient(patient_data: PatientCreateSchema, request: Request):
+async def add_patient(patient_data: PatientCreateSchema):
     """
     API to create a new patient record.
     """
     try:
         print("Creating patient with data:", patient_data)
-        current_user = getattr(request.state, "current_user", None)
-        result = await create_patient_service(patient_data, current_user=current_user)
+        # current_user = getattr(request.state, "current_user", None)
+        result = await create_patient_service(patient_data)
 
         return success_response(message="Patient created successfully", data=result)
 
@@ -73,17 +73,16 @@ async def view_and_search_patients(
 # -------------Update Patient----------------
 @router.put("/{patientId}")
 async def update_patient(
-    patientId: str, patient_data: PatientCreateSchema, request: Request
+    patientId: str,
+    patient_data: PatientCreateSchema,
 ):
     """
     API to update a patient record.
     """
     try:
         # print("Creating patient with data:", patient_data)
-        current_user = getattr(request.state, "current_user", None)
-        result = await update_patient_service(
-            patientId, patient_data, current_user=current_user
-        )
+        # current_user = getattr(request.state, "current_user", None)
+        result = await update_patient_service(patientId, patient_data)
         print(result)
         return success_response(message="Patient updated successfully", data=result)
 
