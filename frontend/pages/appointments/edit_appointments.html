@@ -34,10 +34,10 @@
         <input type="text" class="form-control bg-light" id="full_name" required readonly>
       </div>
 
-      <div class="col-md-4">
+      <!-- <div class="col-md-4">
         <label for="phone" class="form-label">Phone Number</label>
         <input type="tel" class="form-control bg-light" id="phone" required readonly>
-      </div>
+      </div> -->
 
       <!-- 🟨 Appointment Category -->
       <div class="col-12 mt-4">
@@ -92,18 +92,18 @@
 
       <!-- 🟪 Doctor Details -->
       <div class="col-12 mt-4">
-        <h5 class="text-danger border-bottom pb-2">Investigation</h5>
+        <h5 class="text-danger border-bottom pb-2" id="investigation_heading">Investigation</h5>
       </div>
 
       <!-- Vitals -->
       <div class="d-flex justify-content-center align-items-center">
-        <h6 class="pb-2" style="border-bottom: 1px solid #ccc; width: max-content; font-size: 14px; font-weight: bold;">
+        <h6 class="pb-2" id="vitals_heading" style="border-bottom: 1px solid #ccc; width: max-content; font-size: 14px; font-weight: bold;">
             Vitals
         </h6>
         </div>
 
       <div class="col-md-2 mt-2">
-        <label for="weight" class="form-label">Weight(KG)</label>
+        <label for="weight" class="form-label" id="weight_label">Weight(KG)</label>
         <input
         type="text"
         class="form-control"
@@ -115,7 +115,7 @@
 
       </div>
       <div class="col-md-2 mt-2">
-        <label for="Height" class="form-label">Height(CM)</label>
+        <label for="Height" class="form-label" id="height_label" >Height(CM)</label>
         <input type="text" 
             class="form-control" 
             id="height" 
@@ -124,12 +124,12 @@
             oninput="this.value = this.value.replace(/[^0-9.]/g, '')">
       </div>
       <div class="col-md-2 mt-2">
-        <label for="BMI" class="form-label">BMI</label>
+        <label for="BMI" class="form-label" id="bmi_label" >BMI</label>
         <input type="text" class="form-control bg-light" id="bmi" readonly >
       </div>
 
       <div class="col-md-3 mt-2">
-        <label for="blood_pressure" class="form-label">Blood Pressure(mmHg)</label>
+        <label for="blood_pressure" class="form-label" id="blood_pressure_label">Blood Pressure(mmHg)</label>
         <input type="text" 
             class="form-control" 
             id="blood_pressure" 
@@ -138,7 +138,7 @@
             oninput="this.value = this.value.replace(/[^0-9.]/g, '')" >
       </div>
       <div class="col-md-3 mt-2">
-        <label for="pulse" class="form-label">Pulse</label>
+        <label for="pulse" class="form-label" id="pulse_label" >Pulse</label>
         <input type="text" 
             class="form-control" 
             id="pulse" 
@@ -152,28 +152,28 @@
 
       <!-- History -->
        <div class="col-md-12">
-        <label for="history" class="form-label">History</label>
+        <label for="history" class="form-label" id="history_label" >History</label>
         <textarea class="form-control" id="history" rows="3" placeholder="Describe the details of History..." ></textarea>
        </div>
       <!-- Clinical Feature -->
        <div class="col-md-12 mt-2">
-        <label for="clinical_feature" class="form-label">Clinical Feature</label>
+        <label for="clinical_feature" class="form-label" id="clinical_feature_label" >Clinical Feature</label>
         <textarea class="form-control" id="clinical_feature" rows="3" placeholder="Describe the details of Clinical Feature..." ></textarea>
        </div>
        <!-- Diagnosis -->
        <div class="col-12 mt-2">
-        <label for="diagnosis" class="form-label">Diagnosis</label>
+        <label for="diagnosis" class="form-label" id="diagnosis_label">Diagnosis</label>
         <textarea class="form-control" id="diagnosis" rows="3" placeholder="Describe the details of Diagnosis..." ></textarea>
        </div>
        <!-- Investigation -->
        <div class="col-12 mt-2">
-        <label for="investigation" class="form-label">Investigation</label>
+        <label for="investigation" class="form-label" id="investigation_label">Investigation</label>
         <textarea class="form-control" id="investigation" rows="3" placeholder="Describe the details of Investigation..." ></textarea>
        </div>
 
        <!--------------------------- Prescription ------------------------------>
         <div class="d-flex justify-content-center align-items-center">
-            <h6 class="pb-2 mt-2" style="border-bottom: 1px solid #ccc; width: max-content; font-size: 14px; font-weight: bold;"> Prescription </h6>
+            <h6 class="pb-2 mt-2" id="prescription_heading" style="border-bottom: 1px solid #ccc; width: max-content; font-size: 14px; font-weight: bold;"> Prescription </h6>
         </div>
 
         <div class="col-md-4">
@@ -533,7 +533,7 @@
 
         <!-- Doctor Fees -->
         <div class="col-md-6 mt-2">
-            <label for="doctor_fees" class="form-label">Doctor Fees*</label>
+            <label for="doctor_fees" class="form-label" id="doctor_fees_label">Doctor Fees*</label>
             <input type="text" 
             class="form-control"
             id="doctor_fees"
@@ -545,13 +545,13 @@
 
         <!-- Review Date -->
         <div class="col-md-6 mt-2">
-            <label for="review_datetime" class="form-label">Review Date & Time</label>
+            <label for="review_datetime" id="review_datetime_label" class="form-label">Review Date & Time</label>
             <input type="datetime-local" class="form-control" id="review_datetime" >
         </div>
 
         <!-- Multiple Image Upload -->
         <div class="col-md-6 mt-4 mb-4">
-            <label for="upload_images_label" class="form-label fw-bold">Upload Images</label>
+            <label for="upload_images_label" id="upload_images_label" class="form-label fw-bold">Upload Images</label>
             <input 
             type="file" 
             class="form-control" 
@@ -564,7 +564,7 @@
 
         <!-- Update Prescription Button -->
         <div class="col-md-6 mt-4 mb-4">
-            <label for="upload_prescriptions_label" class="form-label fw-bold">Update Prescription</label>
+            <label for="upload_prescriptions_label" id="upload_prescriptions_label" class="form-label fw-bold">Update Prescription</label>
             <input 
             type="file" 
             class="form-control" 
@@ -582,10 +582,10 @@
         <!-- Left-aligned Text -->
         <p id="appointment-info" class="text mb-2 mb-md-0"></p>
         <!-- Cancel Buttons -->
-        <div class="d-flex"></div>
-            <button type="submit" class="btn btn-danger" id="cancelAppointment"><i class="bi bi-x-circle me-1"></i> Cancel Appointment</button>
+        <div class="d-flex" id="cancel-close-buttons"></div>
+            <button type="submit" class="btn btn-danger" name="cancel" id="cancelAppointment"><i class="bi bi-x-circle me-1"></i> Cancel Appointment</button>
         <!-- Close Buttons -->
-            <button type="submit" class="btn btn-success" id="closeAppointment"><i class="bi bi-check2-circle me-1"></i> Close Appointment
+            <button type="submit" class="btn btn-success" name="close" id="closeAppointment"><i class="bi bi-check2-circle me-1"></i> Close Appointment
         </button>
         </div>
       </div>

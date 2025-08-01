@@ -333,12 +333,25 @@ function hideLoader() {
 // On page load
 window.onload = () => {
   const token = localStorage.getItem("token");
-  if (!token || isTokenExpired(token)) {
+  if (!token) {
     console.warn("No valid token found. Redirecting to sign-in page.");
+    // localStorage.removeItem("token");
+    // window.location.href = "/"; // or your login page
     // localStorage.removeItem("token");
     // loadPage("auth/signin");
     return;
-  } else {
+  } 
+  else if (isTokenExpired(token)) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Session Expired',
+      text: 'Your session has expired. Please sign in again.',
+    }).then(() => {
+      localStorage.removeItem("token");
+      window.location.href = "/"; // or your login page
+    });
+  }
+  else {
     loadLayoutComponents();
     loadPage("dashboard/dashboard");
     console.log("testing");

@@ -124,6 +124,8 @@ async def get_appointment_service(
             start_dt = tz.localize(date_obj)
             end_dt = start_dt + timedelta(days=1)
 
+            print("Appointment Start date:", start_dt, "End date:", end_dt)
+
             appointment_ref = appointment_ref.where(
                 "AppointmentDateTime", ">=", start_dt
             ).where("AppointmentDateTime", "<", end_dt)
@@ -169,9 +171,9 @@ async def get_appointment_service(
                 value = search_value
 
                 match = False
-                if search_type == "phone_number":
-                    match = value in str(data.get("PhoneNumber", ""))
-                elif search_type == "full_name":
+                # if search_type == "phone_number":
+                #     match = value in str(data.get("PhoneNumber", ""))
+                if search_type == "full_name":
                     match = value in str(data.get("FullName", "")).upper()
                 elif search_type == "registration_id":
                     match = value in str(data.get("PatientRegistrationNumber", ""))
