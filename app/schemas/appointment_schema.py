@@ -6,7 +6,7 @@ from pydantic import BaseModel, Field
 class AppointmentSchema(BaseModel):
     patient_id: str
     full_name: str
-    phone_number: int
+    # phone_number: int
     consultation_category: str
     appointment_category: str
     description: str

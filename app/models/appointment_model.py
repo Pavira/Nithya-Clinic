@@ -6,7 +6,7 @@ from datetime import datetime, timezone
 class AppointmentModel(BaseModel):
     PatientRegistrationNumber: str = Field(..., alias="patient_id")
     FullName: str = Field(..., alias="full_name")
-    PhoneNumber: int = Field(..., alias="phone_number")
+    # PhoneNumber: int = Field(..., alias="phone_number")
     Department: str = Field(..., alias="consultation_category")
     AppointmentCategory: str = Field(..., alias="appointment_category")
     AppointmentInformation: str = Field(..., alias="description")

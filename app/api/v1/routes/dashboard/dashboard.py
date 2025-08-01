@@ -2,6 +2,7 @@ from fastapi import APIRouter
 
 from datetime import datetime, timedelta
 from fastapi import HTTPException
+import pytz
 from app.db.firebase_client import db
 
 router = APIRouter(tags=["Dashboard"])
@@ -11,6 +12,7 @@ router = APIRouter(tags=["Dashboard"])
 async def dashboard(start_date: str, end_date: str):
     global db
     try:
+
         # Parse string to datetime
         start_dt = datetime.strptime(start_date, "%Y-%m-%d")
         end_dt = (
@@ -19,12 +21,26 @@ async def dashboard(start_date: str, end_date: str):
             - timedelta(seconds=1)
         )
 
-        print("Date----", start_dt, end_dt)
+        # print("Date----", start_dt, end_dt)
+
+        # tz = pytz.timezone("Asia/Kolkata")
+
+        # if not start_date or not end_date:
+        #     # If no filter provided, use today's full range
+        #     today = datetime.now(tz).date()
+        #     start_dt = tz.localize(datetime.combine(today, datetime.min.time()))
+        #     end_dt = tz.localize(datetime.combine(today, datetime.max.time()))
+        # else:
+        #     # Convert input dates to localized datetime
+        #     start_dt = tz.localize(datetime.strptime(start_date, "%Y-%m-%d"))
+        #     end_dt = tz.localize(datetime.strptime(end_date, "%Y-%m-%d")) + timedelta(
+        #         hours=23, minutes=59, seconds=59
+        #     )
 
         query = (
             db.collection("collection_PatientAppointment")
-            .where("LogDateTime", ">=", start_dt)
-            .where("LogDateTime", "<=", end_dt)
+            .where("AppointmentDateTime", ">=", start_dt)
+            .where("AppointmentDateTime", "<=", end_dt)
         )
 
         docs = query.stream()

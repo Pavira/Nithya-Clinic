@@ -65,6 +65,7 @@ async def generate_prescription_pdf(appointment_id: str, reg_no: str):
 
         data["Age"] = user_data["Age"]
         data["Gender"] = user_data["Gender"]
+        data["PhoneNumber"] = user_data["PhoneNumber"]
 
         print("✅ Appointment data retrieved from Firestore.", data)
 

@@ -1,7 +1,7 @@
 function initViewAppointmentsPage() {
   let currentStatus = "active";
   let currentDate = new Date().toISOString().split("T")[0]; // default to today
-  let currentSearchType = "phone_number";
+  let currentSearchType = "full_name";
   let currentSearchValue = "";
 
   const buttons = document.querySelectorAll(".tab-btn");
@@ -123,14 +123,13 @@ function initViewAppointmentsPage() {
           <td>${index + 1}</td>
           <td>${appointment.PatientRegistrationNumber || "N/A"}</td>
           <td>${appointment.FullName || "N/A"}</td>
-          <td>${appointment.PhoneNumber || "N/A"}</td>
           <td>${appointment.AppointmentCategory || "N/A"}</td>
           <td>${formated_datetime || "N/A"}</td>
           <td>
           <button class="btn btn-sm btn-outline-primary" onclick = "loadPage('appointments/edit_appointments', 
                 {
                   patient_id: '${appointment.PatientRegistrationNumber}', 
-                  patient_name: '${appointment.FullName}', patient_phone: '${appointment.PhoneNumber}', 
+                  patient_name: '${appointment.FullName}', 
                   patient_appointment_datetime: '${format_datetime_local}', patient_appointment_category: '${appointment.AppointmentCategory}', 
                   patient_department: '${appointment.Department}', patient_appointment_information: '${appointment.AppointmentInformation}', user:'${appointment.User}',
                   formatted_datetime: '${formate_log_datetime}', appointment_id: '${appointment.AppointmentRegNum}'

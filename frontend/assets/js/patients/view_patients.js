@@ -7,42 +7,105 @@
     };
   }
 
+  // function renderPagination(currentPage, totalPages) {
+  //   const paginationContainer = document.getElementById("pagination-container");
+  //   paginationContainer.innerHTML = "";
+
+  //   // Previous
+  //   const prevItem = document.createElement("li");
+  //   prevItem.className = `page-item ${currentPage === 1 ? "disabled" : ""}`;
+  //   prevItem.innerHTML = `<a class="page-link" href="#">Previous</a>`;
+  //   prevItem.addEventListener("click", (e) => {
+  //     e.preventDefault();
+  //     if (currentPage > 1) fetchPatients(false, currentPage - 1);
+  //   });
+  //   paginationContainer.appendChild(prevItem);
+
+  //   // Page Numbers
+  //   for (let i = 1; i <= totalPages; i++) {
+  //     const pageItem = document.createElement("li");
+  //     pageItem.className = `page-item ${i === currentPage ? "active" : ""}`;
+  //     pageItem.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+  //     pageItem.addEventListener("click", (e) => {
+  //       e.preventDefault();
+  //       fetchPatients(false, i);
+  //     });
+  //     paginationContainer.appendChild(pageItem);
+  //   }
+
+  //   // Next
+  //   const nextItem = document.createElement("li");
+  //   nextItem.className = `page-item ${currentPage === totalPages ? "disabled" : ""}`;
+  //   nextItem.innerHTML = `<a class="page-link" href="#">Next</a>`;
+  //   nextItem.addEventListener("click", (e) => {
+  //     e.preventDefault();
+  //     if (currentPage < totalPages) fetchPatients(false, currentPage + 1);
+  //   });
+  //   paginationContainer.appendChild(nextItem);
+  // }
   function renderPagination(currentPage, totalPages) {
-    const paginationContainer = document.getElementById("pagination-container");
-    paginationContainer.innerHTML = "";
+  const paginationContainer = document.getElementById("pagination-container");
+  paginationContainer.innerHTML = "";
 
-    // Previous
-    const prevItem = document.createElement("li");
-    prevItem.className = `page-item ${currentPage === 1 ? "disabled" : ""}`;
-    prevItem.innerHTML = `<a class="page-link" href="#">Previous</a>`;
-    prevItem.addEventListener("click", (e) => {
-      e.preventDefault();
-      if (currentPage > 1) fetchPatients(false, currentPage - 1);
-    });
-    paginationContainer.appendChild(prevItem);
-
-    // Page Numbers
-    for (let i = 1; i <= totalPages; i++) {
-      const pageItem = document.createElement("li");
-      pageItem.className = `page-item ${i === currentPage ? "active" : ""}`;
-      pageItem.innerHTML = `<a class="page-link" href="#">${i}</a>`;
-      pageItem.addEventListener("click", (e) => {
+  // Helper to create page item
+  function createPageItem(label, page, isActive = false, isDisabled = false) {
+    const li = document.createElement("li");
+    li.className = `page-item ${isActive ? "active" : ""} ${isDisabled ? "disabled" : ""}`;
+    li.innerHTML = `<a class="page-link" href="#">${label}</a>`;
+    if (!isDisabled && !isActive) {
+      li.addEventListener("click", (e) => {
         e.preventDefault();
-        fetchPatients(false, i);
+        fetchPatients(false, page);
       });
-      paginationContainer.appendChild(pageItem);
+    }
+    return li;
+  }
+
+  // Previous
+  paginationContainer.appendChild(createPageItem("Previous", currentPage - 1, false, currentPage === 1));
+
+  const maxVisiblePages = 3; // Number of adjacent pages to show
+
+  if (totalPages <= 7) {
+    // Show all pages if not many
+    for (let i = 1; i <= totalPages; i++) {
+      paginationContainer.appendChild(createPageItem(i, i, i === currentPage));
+    }
+  } else {
+    // Always show first page
+    paginationContainer.appendChild(createPageItem(1, 1, currentPage === 1));
+
+    // Show ellipsis if needed
+    if (currentPage > maxVisiblePages + 2) {
+      const dots = document.createElement("li");
+      dots.className = "page-item disabled";
+      dots.innerHTML = `<span class="page-link">...</span>`;
+      paginationContainer.appendChild(dots);
     }
 
-    // Next
-    const nextItem = document.createElement("li");
-    nextItem.className = `page-item ${currentPage === totalPages ? "disabled" : ""}`;
-    nextItem.innerHTML = `<a class="page-link" href="#">Next</a>`;
-    nextItem.addEventListener("click", (e) => {
-      e.preventDefault();
-      if (currentPage < totalPages) fetchPatients(false, currentPage + 1);
-    });
-    paginationContainer.appendChild(nextItem);
+    // Calculate range of pages to show
+    const start = Math.max(2, currentPage - maxVisiblePages);
+    const end = Math.min(totalPages - 1, currentPage + maxVisiblePages);
+    for (let i = start; i <= end; i++) {
+      paginationContainer.appendChild(createPageItem(i, i, i === currentPage));
+    }
+
+    // Ellipsis before last
+    if (currentPage < totalPages - maxVisiblePages - 1) {
+      const dots = document.createElement("li");
+      dots.className = "page-item disabled";
+      dots.innerHTML = `<span class="page-link">...</span>`;
+      paginationContainer.appendChild(dots);
+    }
+
+    // Last page
+    paginationContainer.appendChild(createPageItem(totalPages, totalPages, currentPage === totalPages));
   }
+
+  // Next
+  paginationContainer.appendChild(createPageItem("Next", currentPage + 1, false, currentPage === totalPages));
+}
+
 
   // 🔁 PAGINATION STATE
   let paginationMap = new Map(); // pageNumber => cursor
@@ -128,7 +191,7 @@
           <td>
             <button class="btn btn-sm btn-outline-secondary me-1" title="Edit Patient" onclick="loadPage('patients/edit_patients', {patient_id: '${patient.PatientRegistrationNumber}'})"><i class="bi bi-pencil"></i></button>
             <button class="btn btn-sm btn-outline-warning me-1" title="View History" onclick="loadPage('appointments/view_appointment_history', {reg_no: '${patient.PatientRegistrationNumber}'})"><i class="bi bi-clock-history"></i></button>
-            <button class="btn btn-sm btn-outline-primary me-1" title="Book Appointment" onclick="loadPage('appointments/add_appointments', {patient_id: '${patient.PatientRegistrationNumber}', patient_name: '${patient.FullName}', patient_phone: '${patient.PhoneNumber}'})"><i class="bi bi-calendar-plus"></i></button>
+            <button class="btn btn-sm btn-outline-primary me-1" title="Book Appointment" onclick="loadPage('appointments/add_appointments', {patient_id: '${patient.PatientRegistrationNumber}', patient_name: '${patient.FullName}')"><i class="bi bi-calendar-plus"></i></button>
           </td>
         `;
         patientsTableBody.appendChild(row);

@@ -525,8 +525,12 @@ async function initEditAppointmentsPage() {
         const appointment_status = vitals.AppointmentStatus;
         const doctor_fees = vitals.DoctorFees;
         const review_datetime = vitals.ReviewDate;
+        if(!review_datetime || review_datetime === null || review_datetime === undefined) {
+            document.getElementById("review_datetime").value = '';
+        }
         console.log("Review Date:-"+ review_datetime);
         const prescription = vitals.Prescription;
+        console.log("Prescription:-"+ prescription);
         const history = vitals.History;
         const clinical_feature = vitals.ClinicalFeature;
         const investigation = vitals.Investigation;
@@ -541,11 +545,69 @@ async function initEditAppointmentsPage() {
         `).join('');
 
         document.getElementById('timing-buttons').innerHTML = timingButtonsHTML;
-
-        if(appointment_status === "Closed" || appointment_status === "Cancelled") {
+        
+        // ----------Function For Cancel Appointment Start----------
+        if (appointment_status === "Cancelled") {
             document.getElementById("cancelAppointment").style.display = "none";
             document.getElementById("closeAppointment").style.display = "none";
-            document.getElementById("review_datetime").value = formatDateForDatetimeLocalInput(review_datetime);
+
+          document.getElementById("consultation_category").disabled = true;
+          document.getElementById("appointment_category").disabled = true;
+          document.getElementById("description").disabled = true;
+        
+          document.getElementById("view_appointment_history").style.display = "none";
+          document.getElementById("investigation_heading").style.display = "none";
+          document.getElementById("vitals_heading").style.display = "none";
+
+          document.getElementById("history_label").style.display = "none";
+          document.getElementById("history").style.display = "none";
+          document.getElementById("clinical_feature_label").style.display = "none";
+          document.getElementById("clinical_feature").style.display = "none";
+          document.getElementById("investigation_label").style.display = "none";
+          document.getElementById("investigation").style.display = "none";
+          document.getElementById("diagnosis_label").style.display = "none";
+          document.getElementById("diagnosis").style.display = "none";
+
+          document.getElementById("height_label").style.display = "none";
+          document.getElementById("weight_label").style.display = "none";
+          document.getElementById("bmi_label").style.display = "none";
+          document.getElementById("blood_pressure_label").style.display = "none";
+          document.getElementById("pulse_label").style.display = "none";
+          document.getElementById("height").style.display = "none";
+          document.getElementById("weight").style.display = "none";
+          document.getElementById("bmi").style.display = "none";
+          document.getElementById("blood_pressure").style.display = "none";
+          document.getElementById("pulse").style.display = "none";
+          document.getElementById("save_vitals").style.display = "none";
+
+          document.getElementById("prescription_heading").style.display = "none";
+          document.getElementById("prescription-table").style.display = "none";
+
+          $('#drug_name').hide();
+          $('#drug_name').next('.select2-container').hide();
+          document.getElementById("dosage").style.display = 'none';
+          document.getElementById("timing_label").style.display = 'none';
+          document.getElementById("timing-buttons").style.display = 'none';         
+          document.getElementById("drug_name_label").style.display = 'none';
+          document.getElementById("dosage_label").style.display = 'none';
+          document.getElementById("add-medicine-btn").style.display = 'none';
+          document.getElementById('timing-buttons').innerHTML = '';
+          
+          document.getElementById("review_datetime_label").style.display = "none";
+          document.getElementById("review_datetime").style.display = "none";
+          document.getElementById("doctor_fees_label").style.display = "none";
+          document.getElementById("doctor_fees").style.display = "none";
+          
+          document.getElementById("upload_images").style.display = 'none';
+          document.getElementById("upload_prescriptions").style.display = 'none';
+          document.getElementById("upload_images_label").style.display = 'none';
+          document.getElementById("upload_prescriptions_label").style.display = 'none';
+        }
+
+        if(appointment_status === "Closed" ) {
+            document.getElementById("cancelAppointment").disabled = true;
+            document.getElementById("closeAppointment").disabled = true;
+            document.getElementById("review_datetime").value = formatDateForDatetimeLocalInput(review_datetime) || '';
             document.getElementById("doctor_fees").value = doctor_fees;
             document.getElementById("history").value = history || '';
             document.getElementById("clinical_feature").value = clinical_feature || '';
@@ -575,8 +637,8 @@ async function initEditAppointmentsPage() {
             document.getElementById("diagnosis").disabled = true;
             document.getElementById("review_datetime").disabled = true;
             document.getElementById("doctor_fees").disabled = true;
-            document.getElementById("upload_images").disabled = true;
-            document.getElementById("upload_prescriptions").disabled = true;
+            // document.getElementById("upload_images").disabled = true;
+            // document.getElementById("upload_prescriptions").disabled = true;
             document.getElementById("save_vitals").style.display = 'none';
             document.getElementById("upload_images").style.display = 'none';
             document.getElementById("upload_prescriptions").style.display = 'none';
@@ -584,32 +646,29 @@ async function initEditAppointmentsPage() {
             document.getElementById("upload_prescriptions_label").style.display = 'none';
             
             const prescriptionTableBody = prescription.map((item, index) => {
-    const timings = [];
+          const timings = [];
 
-    if (item.M) timings.push("M");
-    if (item.A) timings.push("A");
-    if (item.E) timings.push("E");
-    if (item.N) timings.push("N");
-    if (item["B/F"]) timings.push("B/F");
-    if (item["A/F"]) timings.push("A/F");
+          if (item.M) timings.push("M");
+          if (item.A) timings.push("A");
+          if (item.E) timings.push("E");
+          if (item.N) timings.push("N");
+          if (item["B/F"]) timings.push("B/F");
+          if (item["A/F"]) timings.push("A/F");
 
-    return `
-      <tr>
-        <td>${index + 1}</td>
-        <td>${item.drug}</td>
-        <td>${item.dosage}</td>
-        <td>${timings.join(", ")}</td>
-        <td>"N/A"</td>
-      </tr>
-    `;
-  }).join("");
+          return `
+            <tr>
+              <td>${index + 1}</td>
+              <td>${item.drug}</td>
+              <td>${item.dosage}</td>
+              <td>${timings.join(", ")}</td>
+              <td>"N/A"</td>
+            </tr>
+          `;
+        }).join("");
 
-  document.getElementById("prescription-table-body").innerHTML = prescriptionTableBody;
+        document.getElementById("prescription-table-body").innerHTML = prescriptionTableBody;
             }
-        else {
-            document.getElementById("cancelAppointment").style.display = "block";
-            document.getElementById("closeAppointment").style.display = "block";
-        }
+        
         // ----------Function For Cancel Appointment End----------
 
         document.getElementById("height").value= vitals.Height ?? '';
@@ -621,7 +680,7 @@ async function initEditAppointmentsPage() {
 
         const patientId = window.pageParams?.patient_id;
         const patientName = window.pageParams?.patient_name;
-        const patientPhone = window.pageParams?.patient_phone;
+        // const patientPhone = window.pageParams?.patient_phone;
         const patientDepartment = window.pageParams?.patient_department;
         const patientAppointmentCategory = window.pageParams?.patient_appointment_category;
         const patientAppointmentInformation = window.pageParams?.patient_appointment_information;
@@ -634,7 +693,7 @@ async function initEditAppointmentsPage() {
         // Fill the form
         document.getElementById("reg_no").value = patientId === null ? "" : patientId;
         document.getElementById("full_name").value = patientName === null ? "" : patientName;
-        document.getElementById("phone").value = patientPhone === null ? "" : patientPhone;
+        // document.getElementById("phone").value = patientPhone === null ? "" : patientPhone;
         document.getElementById("consultation_category").value = patientDepartment === null ? "" : patientDepartment;
         document.getElementById("appointment_category").value = patientAppointmentCategory === null ? "" : patientAppointmentCategory;
         document.getElementById("description").value = patientAppointmentInformation === null ? "" : patientAppointmentInformation;

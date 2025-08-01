@@ -12,13 +12,14 @@ import time
 
 from app.utils.exceptions import UserNotFoundError
 
+from firebase_admin import firestore
+
 
 # -------------------------Create Patient-------------------------
 async def create_patient_service(
     patient_data: PatientCreateSchema, current_user: dict = None
 ):
     try:
-        # Generate a patient ID (fixed prefix "1751" + 10-digit random number)
         patient_id = str(int(time.time() * 1000))
 
         # Extract user email from Firebase decoded token (if available)
@@ -36,6 +37,10 @@ async def create_patient_service(
         doc_ref = db.collection("collection_PatientRegistration").document()
         doc_ref.set(patient_model.model_dump())
 
+        db.collection("Count").document("count").update(
+            {"patient_count": firestore.Increment(1)}
+        )
+
         logger.info(f"✅ Patient {patient_model.FullName} created successfully.")
 
         return {"id": patient_id, **patient_model.model_dump()}
@@ -43,6 +48,47 @@ async def create_patient_service(
     except Exception as e:
         logger.error(f"❌ Failed to create patient: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to create patient")
+
+
+# async def create_patient_service(
+#     patient_data: PatientCreateSchema, current_user: dict = None
+# ):
+#     try:
+#         patient_id = str(int(time.time() * 1000))
+#         created_by = current_user.get("email") if current_user else "Unknown"
+
+#         patient_model = PatientCreateModel(
+#             **patient_data.model_dump(),
+#             PatientRegistrationNumber=patient_id,
+#             LogDateTime=datetime.now(timezone.utc),
+#             User=created_by,
+#         )
+
+#         # Create Firestore references
+#         patient_doc_ref = db.collection("collection_PatientRegistration").document()
+#         count_doc_ref = db.collection("Count").document("count")
+
+#         def transaction_function(transaction):
+#             # Read the current count safely inside the transaction
+#             snapshot = count_doc_ref.get(transaction=transaction)
+#             current_count = snapshot.get("patient_count") or 0
+
+#             # Increment count
+#             new_count = current_count + 1
+#             transaction.update(count_doc_ref, {"patient_count": new_count})
+
+#             # Create patient document
+#             transaction.set(patient_doc_ref, patient_model.model_dump())
+
+#         # Run Firestore transaction
+#         db.run_transaction(transaction_function)
+
+#         logger.info(f"✅ Patient {patient_model.FullName} created successfully.")
+#         return {"id": patient_id, **patient_model.model_dump()}
+
+#     except Exception as e:
+#         logger.error(f"❌ Failed to create patient: {str(e)}")
+#         raise HTTPException(status_code=500, detail="Failed to create patient")
 
 
 # -------------------------Check Duplicate Patient-------------------------
@@ -77,26 +123,16 @@ async def view_and_search_patients_service(
     limit: int = 10,
 ):
     try:
+        # Get total patient count from count document
+        patient_count_doc = db.collection("Count").document("count").get()
+        if patient_count_doc.exists:
+            total_docs = patient_count_doc.to_dict().get("patient_count", 0)
+        else:
+            total_docs = 0
+
         collection_ref = db.collection("collection_PatientRegistration")
 
-        # Count total docs (for frontend pagination calculation)
-        total_docs_query = collection_ref
-        # if search_type == "full_name" and search_value:
-        #     total_docs_query = total_docs_query.where(
-        #         "FullName", ">=", search_value.upper()
-        #     ).where("FullName", "<=", search_value.upper() + "\uf8ff")
-        # elif search_type == "phone_number" and search_value:
-        #     total_docs_query = total_docs_query.where(
-        #         "PhoneNumber", "==", int(search_value)
-        #     )
-        # elif search_type == "registration_id" and search_value:
-        #     total_docs_query = total_docs_query.where(
-        #         "PatientRegistrationNumber", "==", str(search_value)
-        #     )
-
-        total_docs = len(total_docs_query.get())
-
-        # Now construct the query
+        # Build query based on search type
         if search_type == "full_name" and search_value:
             query = (
                 collection_ref.order_by("FullName")
@@ -105,7 +141,6 @@ async def view_and_search_patients_service(
             )
         elif search_type == "phone_number" and search_value:
             query = collection_ref.where("PhoneNumber", "==", int(search_value))
-
         elif search_type == "registration_id" and search_value:
             query = collection_ref.where(
                 "PatientRegistrationNumber", "==", str(search_value)
@@ -113,7 +148,7 @@ async def view_and_search_patients_service(
         else:
             query = collection_ref.order_by("LogDateTime", direction="DESCENDING")
 
-        # Add cursor if present
+        # Apply cursor for pagination
         if cursor:
             cursor_doc = collection_ref.document(cursor).get()
             if cursor_doc.exists:
@@ -123,7 +158,7 @@ async def view_and_search_patients_service(
         docs = query.get()
 
         # print("docs===", docs)
-
+        # Determine next cursor
         next_cursor = docs[-1].id if len(docs) == limit else None
         results = [doc.to_dict() | {"doc_id": doc.id} for doc in docs]
 
@@ -262,6 +297,10 @@ async def delete_patient_service(patientId: str):
 
         # ✅ Delete only the matched document
         existing_doc.reference.delete()
+
+        # ✅ Decrement patient count atomically
+        count_doc_ref = db.collection("Count").document("count")
+        count_doc_ref.update({"patient_count": firestore.Increment(-1)})
 
         return {"success": True, "message": "Patient deleted successfully."}
 
