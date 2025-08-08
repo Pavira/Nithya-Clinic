@@ -1,3 +1,12 @@
+
+function debounce(func, delay) {
+  let timer;
+  return function (...args) {
+    clearTimeout(timer);
+    timer = setTimeout(() => func.apply(this, args), delay);
+  };
+}
+
 // -----------Retrieve Prescription Table details helper function ----------------
 function getPrescriptionTableData() {
     const tableData = [];
@@ -700,8 +709,143 @@ async function initEditAppointmentsPage() {
         document.getElementById("start_datetime").value = patientAppointmentDateTime === null ? "" : patientAppointmentDateTime;
         document.getElementById("appointment-info").textContent = `This appointment was created on ${formatedDateTime} by ${user}.`;
 
-        
-    } 
+
+
+        // Drug Name Dropdown Initialization
+       const drugMap = new Map(); // key: DrugName, value: DrugCategoryId
+       async function fetchDrugNames() {
+        const token = localStorage.getItem("token");
+        const searchValue = document.getElementById("drug_name").value.trim().toUpperCase();
+        const datalist = document.getElementById("drug_name_options");
+
+        showLoader();
+
+        try {
+          const queryParams = new URLSearchParams({
+            search_type: "drug_name",
+            search_value: searchValue,
+            limit: 10, // or whatever reasonable limit
+          });
+
+          const response = await fetch(`/api/v1/drug_names/view_and_search_drug_names?${queryParams}`, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          });
+
+          if (response.status === 401) {
+            Swal.fire({
+              icon: 'warning',
+              title: 'Session Expired',
+              text: 'Your session has expired. Please sign in again.',
+            }).then(() => {
+              localStorage.removeItem("token");
+              window.location.href = "/";
+            });
+            return;
+          }
+
+          const result = await response.json();
+          const drugs = result.data || [];
+
+          // Clear previous options
+          datalist.innerHTML = "";
+          drugMap.clear();
+
+          // Add new options
+          drugs.forEach(drug => {
+            const option = document.createElement("option");
+            option.value = drug.DrugName || "";
+            datalist.appendChild(option);
+
+            // Store category ID for this drug
+            if (drug.DrugName && drug.DrugCategoryId) {
+              drugMap.set(drug.DrugName, drug.DrugCategoryId);
+            }
+          });
+
+          //Function to detect the selected drug 
+          document.getElementById("drug_name").addEventListener("change", async () => {
+            const selectedDrug = document.getElementById("drug_name").value.trim();
+            const categoryId = drugMap.get(selectedDrug);
+
+            if (!categoryId) {
+              console.warn("No category found for drug:", selectedDrug);
+              return;
+            }
+
+            try {
+              await fetchCategoryDescriptions(categoryId);
+            } catch (err) {
+              console.error("Error loading category descriptions:", err);
+            }
+          });
+          // Function to fetch category descriptions based on selected drug
+          async function fetchCategoryDescriptions(categoryId) {
+            const token = localStorage.getItem("token");
+            const notesSelect = document.getElementById("notes");
+
+            notesSelect.innerHTML = `<option value="">Select Note</option>`;
+
+            showLoader();
+
+            try {
+              const response = await fetch(`/api/v1/drug_category/${categoryId}/descriptions`, {
+                method: "GET",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${token}`,
+                },
+              });
+
+              if (!response.ok) {
+                throw new Error("Failed to fetch category descriptions");
+              }
+
+              const result = await response.json();
+              const descriptions = result.data || [];
+
+              // Clear existing options
+              notesSelect.innerHTML = `<option value="">Select Note</option>`;
+
+              descriptions.forEach((desc, index) => {
+                const option = document.createElement("option");
+                option.value = desc; // or you can use `desc.id` if needed
+                option.textContent = desc;
+                notesSelect.appendChild(option);
+              });
+
+            } catch (err) {
+              console.error("Error fetching descriptions:", err);
+            } finally {
+              hideLoader();
+            }
+          }
+
+
+        } catch (error) {
+          console.error("Error fetching drug names:", error);
+          // Optionally show error toast
+        } finally {
+          hideLoader();
+        }
+      }
+
+      const drugNameInput = document.getElementById("drug_name");
+
+      const handleSearch = debounce(() => {
+        const value = drugNameInput.value.trim();
+        if (value === "" || value.length > 3) {
+          fetchDrugNames();
+        }
+      }, 400);
+
+      drugNameInput.addEventListener("input", handleSearch);
+            
+            
+        } 
     catch (err) {
         Swal.fire({
             icon: 'error',

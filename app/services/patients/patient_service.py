@@ -175,54 +175,6 @@ async def view_and_search_patients_service(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-# async def view_and_search_patients_service(
-#     search_type: Optional[str] = Query(None),  # 'full_name' or 'phone_number'
-#     search_value: Optional[str] = Query(None),  # value to search
-#     cursor: Optional[str] = Query(None),  # document ID for cursor
-#     limit: int = 10,
-# ):
-#     try:
-#         collection_ref = db.collection("collection_PatientRegistration")
-
-#         if search_type == "full_name" and search_value:
-#             query = (
-#                 collection_ref.order_by("FullName")
-#                 .start_at([search_value.upper()])
-#                 .end_at([search_value.upper() + "\uf8ff"])
-#             )
-#         elif search_type == "phone_number" and search_value:
-#             query = collection_ref.where("PhoneNumber", "==", int(search_value))
-#         elif search_type == "registration_id" and search_value:
-#             query = collection_ref.where(
-#                 "PatientRegistrationNumber", "==", str(search_value)
-#             )
-#         else:
-#             query = collection_ref.order_by("LogDateTime", direction="DESCENDING")
-
-#         # Add cursor if present
-#         if cursor:
-#             cursor_doc = collection_ref.document(cursor).get()
-#             if cursor_doc.exists:
-#                 query = query.start_after(cursor_doc)
-
-#         query = query.limit(limit)
-#         docs = query.get()
-
-#         next_cursor = docs[-1].id if len(docs) == limit else None
-
-#         results = [doc.to_dict() | {"doc_id": doc.id} for doc in docs]
-
-#         return {
-#             "success": True,
-#             "data": results,
-#             "next_cursor": next_cursor,
-#         }
-
-#     except Exception as e:
-#         logger.error(f"❌ Error: {e}")
-#         raise HTTPException(status_code=500, detail=str(e))
-
-
 # -------------------------Get Patient By Id-------------------------
 async def get_patient_by_id_service(patientId: str):
     global db

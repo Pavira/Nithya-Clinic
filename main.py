@@ -2,6 +2,8 @@ import threading
 import uvicorn
 import webview
 
+from app.api.v1.routes.drug_names import drug_names
+from app.api.v1.routes.drug_category import drug_category
 from app.api.v1.routes.dashboard import dashboard
 from app.api.v1.routes.appointments import prescription_pdf
 from app.api.v1.routes.appointments import appointments
@@ -48,6 +50,8 @@ app.include_router(patients.router, prefix="/api/v1/patients")
 app.include_router(appointments.router, prefix="/api/v1/appointments")
 app.include_router(prescription_pdf.router, prefix="/api/v1/appointments")
 app.include_router(dashboard.router, prefix="/api/v1/dashboard")
+app.include_router(drug_category.router, prefix="/api/v1/drug_category")
+app.include_router(drug_names.router, prefix="/api/v1/drug_names")
 
 
 # ---------- Static Files ----------
