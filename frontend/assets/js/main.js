@@ -151,6 +151,58 @@ function loadPage(relativePath, params = {}) {
           }
         });
       }
+      // -------------------------Drugs scripts-------------------------
+      if (relativePath === "drug_names/add_drug_names") {
+        // loadStyleOnce("admin/assets/css/drugs/add_drugs.css"); 
+        loadScriptOnce("/admin/assets/js/drug_names/add_drug_names.js", () => {
+          if (typeof initAddDrugsPage === "function") {
+            initAddDrugsPage(); // ✅ Safe call
+          }
+        });
+      }
+      if (relativePath === "drug_names/edit_drug_names") {
+        // loadStyleOnce("admin/assets/css/drugs/edit_drugs.css");
+        loadScriptOnce("/admin/assets/js/drug_names/edit_drug_names.js", () => {
+          if (typeof initEditDrugsPage === "function") {
+            initEditDrugsPage(); // ✅ Safe call
+          }
+        });
+      }
+      if (relativePath === "drug_names/view_drug_names") {
+        // loadStyleOnce("admin/assets/css/drugs/view_drugs.css");
+        loadScriptOnce("/admin/assets/js/drug_names/view_drug_names.js", () => {
+          if (typeof initViewDrugsPage === "function") {
+            initViewDrugsPage(); // ✅ Safe call
+          }
+        });
+      }
+      // -------------------------Drug Category scripts-------------------------
+      if (relativePath === "drug_category/add_drug_category") {
+        // loadStyleOnce("admin/assets/css/drugcategory/add_drug_category.css");
+        loadScriptOnce('/admin/assets/js/drug_category/add_drug_category.js', () => {
+          if (typeof initAddDrugCategoryPage === 'function') {
+            initAddDrugCategoryPage();
+          }
+        });
+      }
+      if (relativePath === "drug_category/edit_drug_category") {
+        // loadStyleOnce("admin/assets/css/drugcategory/edit_drug_category.css");
+        loadScriptOnce("/admin/assets/js/drug_category/edit_drug_category.js", () => {
+          if (typeof initEditDrugCategoryPage === "function") {
+            initEditDrugCategoryPage(); // ✅ Safe call
+          }
+        });
+      }
+      if (relativePath === "drug_category/view_drug_category") {
+        // loadStyleOnce("admin/assets/css/drugcategory/view_drug_category.css");
+        loadScriptOnce("/admin/assets/js/drug_category/view_drug_category.js", () => {
+          if (typeof initViewDrugCategoryPage === "function") {
+            initViewDrugCategoryPage(); // ✅ Safe call
+          }
+        });
+      }
+
+
     });
 }
 

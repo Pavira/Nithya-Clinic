@@ -19,7 +19,7 @@
     if (!isDisabled && !isActive) {
       li.addEventListener("click", (e) => {
         e.preventDefault();
-        fetchPatients(false, page);
+        fetchDrugNames(false, page);
       });
     }
     return li;
@@ -70,17 +70,16 @@
   paginationContainer.appendChild(createPageItem("Next", currentPage + 1, false, currentPage === totalPages));
 }
 
-
   // 🔁 PAGINATION STATE
   let paginationMap = new Map(); // pageNumber => cursor
   let currentPage = 1;
   let totalPages = 1;
   let pageSize = 10;
 
-  async function fetchPatients(isInitial = false, pageNumber = 1) {
+  async function fetchDrugNames(isInitial = false, pageNumber = 1) {
     const searchType = document.getElementById("search_type").value;
     const searchValue = document.getElementById("search_value").value.trim().toUpperCase();
-    const patientsTableBody = document.getElementById("patient-table-body");
+    const drugsTableBody = document.getElementById("drug-names-table-body");
 
     if (isInitial) {
       paginationMap.clear(); // 🔄 Reset all pagination
@@ -99,7 +98,7 @@
         limit: pageSize,
       });
 
-      const response = await fetch(`/api/v1/patients/view_and_search_patients?${queryParams}`, {
+      const response = await fetch(`/api/v1/drug_names/view_and_search_drug_names?${queryParams}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -120,13 +119,13 @@
       }
 
       const result = await response.json();
-      const patients = result.data?.data || [];
-      const nextCursor = result.data?.next_cursor || null;
-      const totalCount = result.data?.total_count || 0;
+      const drugs = result.data || [];
+      const nextCursor = result.next_cursor || null;
+      const totalCount = result.total_count || 0;
 
-      // Total Patient Count
-      const patientCountElement = document.getElementById("patient-count");
-      patientCountElement.textContent = totalCount;
+      // Total Drug Name Count
+      const drugCountElement = document.getElementById("drug-names-count");
+      drugCountElement.textContent = totalCount;
 
       totalPages = Math.ceil(totalCount / pageSize);
       currentPage = pageNumber;
@@ -137,41 +136,38 @@
       }
 
       // Render table
-      patientsTableBody.innerHTML = "";
-      if (patients.length === 0) {
-        patientsTableBody.innerHTML = "<tr><td colspan='6' class='text-center'>No patients found.</td></tr>";
+      drugsTableBody.innerHTML = "";
+      if (drugs.length === 0) {
+        drugsTableBody.innerHTML = "<tr><td colspan='6' class='text-center'>No drugs found.</td></tr>";
         return;
       }
 
-      patients.forEach((patient, index) => {
+      drugs.forEach((drug, index) => {
         const row = document.createElement("tr");
         const serialNumber = (currentPage - 1) * pageSize + index + 1;
         row.innerHTML = `
           <td>${serialNumber}</td>
-          <td>${patient.PatientRegistrationNumber || "N/A"}</td>
-          <td>${patient.FullName || "N/A"}</td>
-          <td>${patient.PhoneNumber || "N/A"}</td>
-          <td>${patient.PatientType || "N/A"}</td>
+          <td>${drug.DrugCategoryName || "N/A"}</td>
+          <td>${drug.DrugName || "N/A"}</td>          
           <td>
-            <button class="btn btn-sm btn-outline-secondary me-1" title="Edit Patient" onclick="loadPage('patients/edit_patients', {patient_id: '${patient.PatientRegistrationNumber}'})"><i class="bi bi-pencil"></i></button>
-            <button class="btn btn-sm btn-outline-warning me-1" title="View History" onclick="loadPage('appointments/view_appointment_history', {reg_no: '${patient.PatientRegistrationNumber}'})"><i class="bi bi-clock-history"></i></button>
-            <button class="btn btn-sm btn-outline-primary me-1" title="Book Appointment" onclick="loadPage('appointments/add_appointments', {patient_id: '${patient.PatientRegistrationNumber}', patient_name: '${patient.FullName}', patient_phone: '${patient.PhoneNumber}'})"><i class="bi bi-calendar-plus"></i></button>
+            <button class="btn btn-sm btn-outline-secondary me-1" title="Edit Drug" onclick="loadPage('drug_names/edit_drug_names', {drug_name_id: '${drug.DrugNameId}', drug_name: '${drug.DrugName}', drug_category_name: '${drug.DrugCategoryName}'})"><i class="bi bi-pencil"></i></button>          
           </td>
         `;
-        patientsTableBody.appendChild(row);
+        drugsTableBody.appendChild(row);
       });
 
       renderPagination(currentPage, totalPages);
 
     } catch (error) {
-      console.error("Error fetching patients:", error);
-      patientsTableBody.innerHTML = "<tr><td colspan='6' class='text-center text-danger'>Error loading patients.</td></tr>";
+      console.error("Error fetching drugs:", error);
+      drugsTableBody.innerHTML = "<tr><td colspan='6' class='text-center text-danger'>Error loading drugs.</td></tr>";
     } finally {
       hideLoader();
     }
   }
 
-  async function viewPatients() {
+
+  async function viewDrugNames() {
     const searchValueInput = document.getElementById("search_value");
     const searchTypeInput = document.getElementById("search_type");
 
@@ -180,17 +176,17 @@
       const type = searchTypeInput.value;
 
       if (value === "") {
-        fetchPatients(true, 1);
-      } else if (type && value.length > 2) {
-        fetchPatients(true, 1);
+        fetchDrugNames(true, 1);
+      } else if (type && value.length > 3) {
+        fetchDrugNames(true, 1);
       }
     }, 400);
 
     searchValueInput.addEventListener("input", handleSearch);
 
     // First load
-    await fetchPatients(true, 1);
+    await fetchDrugNames(true, 1);
   }
 
-  window.initViewPatientsPage = viewPatients;
+  window.initViewDrugsPage = viewDrugNames;
 })();

@@ -1,0 +1,42 @@
+<!-- drug_category/view_drug_category.html -->
+<!-- Header -->
+<div id="page-header-data"
+     data-title="Drug Category"
+     data-icon="file-earmark-medical"
+     data-subtitle="View Drug Category">
+</div>
+
+<!-- Add Patient Button -->
+<div class="d-flex justify-content-end align-items-center gap-2 mb-3 flex-wrap">
+  <button class="btn btn-primary nav-link-load" data-page="drug_category/add_drug_category">
+    <i class="bi bi-plus-circle me-1"></i> Add Drug Category
+  </button>
+</div>
+
+<!-- table Card -->
+<div class="table-card">
+
+  <!-- Drug Category Count -->
+<div class="mb-3">
+  <i class="bi bi-people-fill me-1"></i><span class="fw-bold">Total Drug Category Count: </span><span id="drug-category-count"></span>
+</div>
+
+<!-- Table -->
+<table class="table table-hover table-bordered align-middle mb-0" id="viewDrugCategoryTable">
+  <thead class="table-light">
+    <tr>
+      <th>S.No</th>
+      <th>Drug Category</th>
+      <th>Description</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody id="drug-category-table-body">
+    <!-- drug-category rows will be injected here -->
+  </tbody>
+</table>
+
+</div>
+
+
+
