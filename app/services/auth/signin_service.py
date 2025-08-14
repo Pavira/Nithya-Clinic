@@ -1,5 +1,7 @@
 # app/services/auth_service.py
 
+from time import perf_counter
+import time
 from fastapi import HTTPException
 import httpx
 from app.schemas.auth_schema import LoginRequest
@@ -16,19 +18,25 @@ FIREBASE_API_KEY = os.getenv("FIREBASE_API_KEY")
 
 
 def login_user_service(login_data: LoginRequest) -> dict:
+    start_time = time.perf_counter()
     print("🔐 Logging in user...")
-    print("Firebase Key:---", FIREBASE_API_KEY)
     try:
+        # Step 1: Firebase Auth
+        t1 = time.perf_counter()
         payload = {
             "email": login_data.email,
             "password": login_data.password,
             "returnSecureToken": True,
         }
 
-        logger.info(f"🔐 Attempting login for {login_data.email}")
+        # logger.info(f"🔐 Attempting login for {login_data.email}")
 
         url = f"https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={FIREBASE_API_KEY}"
         response = requests.post(url, json=payload, timeout=30)
+        print(f"⏱ Firebase Auth took {time.perf_counter() - t1:.3f}s")
+
+        # Step 2: Firestore get
+        t2 = time.perf_counter()
         response_data = response.json()
 
         if response.status_code != 200:
@@ -46,6 +54,10 @@ def login_user_service(login_data: LoginRequest) -> dict:
         user_ref = db.collection("users").document(uid)
         user_snapshot = user_ref.get()
 
+        print(f"⏱ Firestore get took {time.perf_counter() - t2:.3f}s")
+
+        # Step 3: Firestore set/update
+        t3 = time.perf_counter()
         if not user_snapshot.exists:
             logger.info(f"🆕 Creating Firestore user doc for UID: {uid}")
             user_ref.set(
@@ -64,8 +76,12 @@ def login_user_service(login_data: LoginRequest) -> dict:
             user_role = user_data.get("user_role", "Unknown Role")
             user_ref.update({"last_login": datetime.now(timezone.utc)})
 
-        logger.info(f"✅ Login successful for {email}")
-        logger.info(f"✅ User role-----: {user_role}")
+        print(f"⏱ Firestore set/update took {time.perf_counter() - t3:.3f}s")
+
+        print(f"⏱ Total login took {time.perf_counter() - start_time:.3f}s")
+
+        # logger.info(f"✅ Login successful for {email}")
+        # logger.info(f"✅ User role-----: {user_role}")
 
         return {
             "success": True,

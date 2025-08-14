@@ -9,7 +9,7 @@ router = APIRouter(tags=["Auth"])
 
 @router.post("/signin")
 def login_user(login_data: LoginRequest):
-    print("🔐 Processing login request...")
+    # print("🔐 Processing login request...")
     """
     API to login a user with email and password.
     """

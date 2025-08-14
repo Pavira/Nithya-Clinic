@@ -19,10 +19,14 @@ function getPrescriptionTableData() {
         const cells = row.querySelectorAll('td');
         const serial = parseInt(cells[0].innerText.trim());
         const drug = cells[1].innerText.trim();
-        const dosage = cells[2].innerText.trim();
+        const frequency = cells[2].innerText.trim();
+        const duration_value = cells[3].innerText.trim();
+        const duration_unit = cells[4].innerText.trim();
+        const instruction = cells[6].innerText.trim();
+        
 
         // Extract timing badges
-        const timingBadges = Array.from(cells[3].querySelectorAll('.badge')).map(badge => badge.innerText.trim());
+        const timingBadges = Array.from(cells[5].querySelectorAll('.badge')).map(badge => badge.innerText.trim());
         const timingFlags = {
             M: timingBadges.includes('M'),
             A: timingBadges.includes('A'),
@@ -34,8 +38,11 @@ function getPrescriptionTableData() {
 
         tableData.push({
             serial,
-            drug,
-            dosage,
+            drug: drug === null || '' ? '' : drug,
+            frequency: frequency === null || '' ? '' : frequency,
+            duration_value: duration_value === null || '' ? '' : duration_value,
+            duration_unit: duration_unit === null || '' ? '' : duration_unit,
+            instruction: instruction === null || '' ? '' : instruction,          
             ...timingFlags
         });
     });
@@ -82,7 +89,7 @@ async function EditAppointmentForm() {
       const noOfImages = images.length;
       const noOfPrescriptions = prescriptionImages.length;
 
-      if(!consultationCategory || !appointmentCategory || description === ""){
+      if(!consultationCategory || !appointmentCategory){
         Swal.fire({
           icon: 'Warning',
           title: 'Warning',
@@ -218,41 +225,63 @@ async function initPrescription() {
     });
 
     document.getElementById('add-medicine-btn').addEventListener('click', function (e) {
-    e.preventDefault();
+      e.preventDefault();
 
-    const drug = document.getElementById('drug_name').value.trim();
-    const dosage = document.getElementById('dosage').value.trim();
-    if (!drug || !dosage) {
-        Swal.fire({
-            icon: 'warning',
-            title: 'Validation',
-            text: 'Please fill in all the required fields.',
-        })
-        return;
-    }
+      // function truncateText(text, limit = 15) {
+      //   return text.length > limit ? text.substring(0, limit) + "..." : text;
+      // }
 
-    // Get timing selection
-    const timingFlags = {};
-    document.querySelectorAll('.timing-btn').forEach(btn => {
-        timingFlags[btn.dataset.value] = btn.classList.contains('active');
-    });
+      // Get the real values
+      const drug = document.getElementById('drug_name').value.trim();
+      const frequency = document.getElementById('frequency').value.trim();
+      const duration_value = document.getElementById('duration_value').value.trim() || '';
+      const duration_unit = document.getElementById('duration_unit').value.trim() || '';
+      const instruction = document.getElementById('instruction').value.trim() || '';
 
-    const prescriptionItem = {
-        serial: prescriptionSerial++,
-        drug,
-        dosage,
-        ...timingFlags,
-    };
+      // Display values (truncated for frontend)
+      // const drugDisplay = truncateText(drugFull);
+      // const frequencyDisplay = truncateText(frequencyFull);
+      // const instructionDisplay = truncateText(instructionFull);
 
-    prescriptionList.push(prescriptionItem);
-    updatePrescriptionTable();
-    resetPrescriptionForm();
+      if (!drug || !duration_value) {
+          Swal.fire({
+              icon: 'warning',
+              title: 'Validation',
+              text: 'Please fill in all the required fields.',
+          })
+          return;
+      }
+
+      // Get timing selection
+      const timingFlags = {};
+      document.querySelectorAll('.timing-btn').forEach(btn => {
+          timingFlags[btn.dataset.value] = btn.classList.contains('active');
+      });
+
+      const prescriptionItem = {
+          serial: prescriptionSerial++,
+          drug,
+          frequency,
+          duration_value,
+          duration_unit,
+          instruction,
+          ...timingFlags,
+      };
+
+      prescriptionList.push(prescriptionItem);
+      updatePrescriptionTable();
+      resetPrescriptionForm();
     });
 
     function resetPrescriptionForm() {
        // Reset Select2 dropdown (drug name)
-      $('#drug_name').val(null).trigger('change');
-      document.getElementById('dosage').value = '';
+      // $('#drug_name').val(null).trigger('change');
+      document.getElementById('drug_name').value = '';
+      document.getElementById('duration_value').value = '';
+      document.getElementById('duration_unit').value = 'day(s)'; // Reset to default unit
+      frequencySelect = document.getElementById('frequency');
+      frequencySelect.innerHTML = `<option value="">Select Frequency</option>`;
+      document.getElementById('instruction').value = '';
       document.querySelectorAll('.timing-btn').forEach(btn => {
           btn.classList.remove('btn-success', 'active');
           btn.classList.add('btn-outline-secondary');
@@ -290,12 +319,15 @@ async function initPrescription() {
           <tr>
               <td>${index + 1}</td>
               <td>${item.drug}</td>
-              <td>${item.dosage}</td>
+              <td>${item.frequency}</td>
+              <td>${item.duration_value}</td>
+              <td>${item.duration_unit}</td>
               <td>${timingDisplay || '<em>No Timing</em>'}</td>
+              <td>${item.instruction || ''}</td>
               <td>
-              <button type="button" class="btn btn-sm btn-danger delete-btn" data-index="${index}">
-                  <i class="bi bi-trash"></i>
-              </button>
+                <button type="button" class="btn btn-sm btn-danger delete-btn" data-index="${index}">
+                    <i class="bi bi-trash"></i>
+                </button>
               </td>
           </tr>
           `;
@@ -519,10 +551,62 @@ function formatDateForDatetimeLocalInput(dateStr) {
 }
 // ---------------------------
 
+function micfunction() {
+  document.querySelectorAll('.micButton').forEach(button => {
+    let targetId = button.getAttribute('data-target');
+    let textarea = document.getElementById(targetId);
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      alert("Your browser does not support Speech Recognition.");
+      return;
+    }
+
+    let recognition = new SpeechRecognition();
+    recognition.lang = "en-IN";
+    recognition.continuous = false;
+    recognition.interimResults = false;
+
+    recognition.onresult = function(event) {
+      const transcript = event.results[0][0].transcript;
+      insertAtCursor(textarea, transcript + " ");
+    };
+
+    recognition.onerror = function(event) {
+      console.error("Speech recognition error:", event.error);
+      button.classList.remove("listening");
+    };
+
+    recognition.onstart = function() {
+      button.classList.add("listening"); // Show mic active
+    };
+
+    recognition.onend = function() {
+      button.classList.remove("listening"); // Remove active state
+    };
+
+    button.addEventListener('click', () => {
+      recognition.start();
+    });
+
+    // Function to insert text at cursor position
+    function insertAtCursor(field, text) {
+      const start = field.selectionStart;
+      const end = field.selectionEnd;
+      field.value = field.value.substring(0, start) + text + field.value.substring(end);
+      field.selectionStart = field.selectionEnd = start + text.length;
+      field.focus();
+    }
+  });
+}
+
+
 // ------------------Init Edit Appointments Page ------------------
 async function initEditAppointmentsPage() {
 
-    showLoader();   
+    showLoader();
+    // Initialize Mic Function  
+    micfunction();
 
     try {
         console.log("Appointment ID:-"+ window.pageParams?.appointment_id);
@@ -594,11 +678,19 @@ async function initEditAppointmentsPage() {
 
           $('#drug_name').hide();
           $('#drug_name').next('.select2-container').hide();
-          document.getElementById("dosage").style.display = 'none';
+          document.getElementById("duration_value").style.display = 'none';
+          document.getElementById("duration_value_label").style.display = 'none';
+          document.getElementById("duration_value").style.display = 'none';
+          document.getElementById("frequency_label").style.display = 'none';
+          document.getElementById("frequency").style.display = 'none';
+          document.getElementById("instruction_label").style.display = 'none'; 
+          document.getElementById("instruction").style.display = 'none';
+          document.getElementById("duration_unit_label").style.display = 'none';
+          document.getElementById("duration_unit").style.display = 'none';
           document.getElementById("timing_label").style.display = 'none';
           document.getElementById("timing-buttons").style.display = 'none';         
           document.getElementById("drug_name_label").style.display = 'none';
-          document.getElementById("dosage_label").style.display = 'none';
+          document.getElementById("duration_value_label").style.display = 'none';
           document.getElementById("add-medicine-btn").style.display = 'none';
           document.getElementById('timing-buttons').innerHTML = '';
           
@@ -624,11 +716,18 @@ async function initEditAppointmentsPage() {
             document.getElementById("diagnosis").value = diagnosis || '';
             $('#drug_name').hide();
             $('#drug_name').next('.select2-container').hide();
-            document.getElementById("dosage").style.display = 'none';
+            document.getElementById("duration_value_label").style.display = 'none';
+            document.getElementById("duration_value").style.display = 'none';
+            document.getElementById("frequency_label").style.display = 'none';
+            document.getElementById("frequency").style.display = 'none';
+            document.getElementById("instruction_label").style.display = 'none'; 
+            document.getElementById("instruction").style.display = 'none';
+            document.getElementById("duration_unit_label").style.display = 'none';
+            document.getElementById("duration_unit").style.display = 'none';
             document.getElementById("timing_label").style.display = 'none';
             document.getElementById("timing-buttons").style.display = 'none';         
             document.getElementById("drug_name_label").style.display = 'none';
-            document.getElementById("dosage_label").style.display = 'none';
+            document.getElementById("duration_value_label").style.display = 'none';
             document.getElementById("add-medicine-btn").style.display = 'none';
             document.getElementById('timing-buttons').innerHTML = '';
 
@@ -668,8 +767,11 @@ async function initEditAppointmentsPage() {
             <tr>
               <td>${index + 1}</td>
               <td>${item.drug}</td>
-              <td>${item.dosage}</td>
+              <td>${item.frequency}</td> 
+              <td>${item.duration_value}</td>
+              <td>${item.duration_unit}</td>
               <td>${timings.join(", ")}</td>
+              <td>${item.instruction || ''}</td>
               <td>"N/A"</td>
             </tr>
           `;
@@ -770,6 +872,7 @@ async function initEditAppointmentsPage() {
           document.getElementById("drug_name").addEventListener("change", async () => {
             const selectedDrug = document.getElementById("drug_name").value.trim();
             const categoryId = drugMap.get(selectedDrug);
+            console.log("Selected Drug:", categoryId);
 
             if (!categoryId) {
               console.warn("No category found for drug:", selectedDrug);
@@ -785,10 +888,9 @@ async function initEditAppointmentsPage() {
           // Function to fetch category descriptions based on selected drug
           async function fetchCategoryDescriptions(categoryId) {
             const token = localStorage.getItem("token");
-            const notesSelect = document.getElementById("notes");
+            const notesSelect = document.getElementById("frequency");
 
-            notesSelect.innerHTML = `<option value="">Select Note</option>`;
-
+            notesSelect.innerHTML = `<option value="">Select Frequency</option>`;
             showLoader();
 
             try {
@@ -808,7 +910,7 @@ async function initEditAppointmentsPage() {
               const descriptions = result.data || [];
 
               // Clear existing options
-              notesSelect.innerHTML = `<option value="">Select Note</option>`;
+              notesSelect.innerHTML = `<option value="">Select Frequency</option>`;
 
               descriptions.forEach((desc, index) => {
                 const option = document.createElement("option");
@@ -837,7 +939,7 @@ async function initEditAppointmentsPage() {
 
       const handleSearch = debounce(() => {
         const value = drugNameInput.value.trim();
-        if (value === "" || value.length > 3) {
+        if (value.length > 3) {
           fetchDrugNames();
         }
       }, 400);

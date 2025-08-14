@@ -1,3 +1,38 @@
+// 🕒 Format to "22:37 31/07/2025"
+function formatAppointmentDateTime(input) {
+  const date = new Date(input);
+
+  const pad = (n) => String(n).padStart(2, '0');
+
+  const hours = pad(date.getHours());
+  const minutes = pad(date.getMinutes());
+  const day = pad(date.getDate());
+  const month = pad(date.getMonth() + 1); // Months are 0-based
+  const year = date.getFullYear();
+
+  return `${hours}:${minutes} ${day}/${month}/${year}`;
+}
+
+// 📅 Format to "31-07-2025"
+function formatReviewDate(input) {
+  const date = new Date(input);
+
+  const pad = (n) => String(n).padStart(2, '0');
+
+  const day = pad(date.getDate());
+  const month = pad(date.getMonth() + 1);
+  const year = date.getFullYear();
+
+  return `${day}-${month}-${year}`;
+}
+
+// Example usage:
+console.log(formatAppointmentDateTime("31 July 2025 at 22:37:38 UTC+5:30"));
+// 👉 "22:37 31/07/2025"
+
+console.log(formatReviewDate("31 July 2025 at 22:37:38 UTC+5:30"));
+// 👉 "31-07-2025"
+
 
 // --------------------------Show Prescription PDFFunction-------------------------
 async function getPrescription(appointmentId) {
@@ -38,34 +73,89 @@ async function getPrescription(appointmentId) {
       return; // stop further processing
     }
 
-    const consultationDatetime = formatDateTime(data.AppointmentDateTime);
+    const consultationDatetime = formatAppointmentDateTime(data.AppointmentDateTime);
     let reviewDatetime = '';  // Define once in a higher scope
 
     if (data.ReviewDate) {
-      reviewDatetime = formatDateTime(data.ReviewDate);
+      reviewDatetime = formatReviewDate(data.ReviewDate);
     }
 
     document.querySelector(".prescription-body").innerHTML = "";
 
     // Safeguard
     if (!Array.isArray(data.Prescription)) {
-      console.error("Prescription data missing or invalid");
+      console.log("No Prescription data ");
       data.Prescription = []; // default to empty
     }
+    
+    let prescriptionSectionHTML = '';
+    // Check if prescription list is empty
+if (data.Prescription.length === 0) {
+  prescriptionSectionHTML = `
+    <div class="section">
+      <strong class="rx">Rx</strong>
+      <div class="no-prescription">No Prescriptions Available</div>
+    </div>
+  `;
+} else {
+  const prescriptionTableBody = data.Prescription.map((item, index) => `
+    <tr>
+      <td>${index + 1}</td>
+      <td>
+        ${item.drug}
+        ${item.frequency ? `<br>${item.frequency}` : ""}
+        ${item.instruction ? `<br>${item.instruction}` : ""}
+      </td>
+      <td>${item.duration_value} ${item.duration_unit}</td>
+      <td>${item.M ? "✓" : ""}</td>
+      <td>${item.A ? "✓" : ""}</td>
+      <td>${item.E ? "✓" : ""}</td>
+      <td>${item.N ? "✓" : ""}</td>
+      <td>${item["B/F"] ? "✓" : ""}</td>
+      <td>${item["A/F"] ? "✓" : ""}</td>
+    </tr>
+  `).join("");
 
-    const prescriptionTableBody = data.Prescription.map((item, index) => `
-      <tr>
-        <td>${index + 1}</td>
-        <td>${item.drug}</td>
-        <td>${item.dosage}</td>
-        <td>${item.M ? "✓" : ""}</td>
-        <td>${item.A ? "✓" : ""}</td>
-        <td>${item.E ? "✓" : ""}</td>
-        <td>${item.N ? "✓" : ""}</td>
-        <td>${item["B/F"] ? "✓" : ""}</td>
-        <td>${item["A/F"] ? "✓" : ""}</td>
-      </tr>
-    `).join("");
+  prescriptionSectionHTML = `
+    <div class="section">
+      <strong class="rx">Rx</strong>
+      <table class="rx-table">
+        <thead>
+          <tr>
+            <th>S.No</th>
+            <th>Drug Name</th>
+            <th>Duration</th>
+            <th>M</th>
+            <th>A</th>
+            <th>E</th>
+            <th>N</th>
+            <th>B/F</th>
+            <th>A/F</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${prescriptionTableBody}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+    // const prescriptionTableBody = data.Prescription.map((item, index) => `
+    //   <tr>
+    //     <td>${index + 1}</td>
+    //     <td>${item.drug}
+    //     ${item.frequency ? `<br>${item.frequency}` : ""}
+    //     ${item.instruction ? `<br>${item.instruction}` : ""}</td>
+    //     <td>${item.duration_value} ${item.duration_unit}</td>
+    //     <td>${item.M ? "✓" : ""}</td>
+    //     <td>${item.A ? "✓" : ""}</td>
+    //     <td>${item.E ? "✓" : ""}</td>
+    //     <td>${item.N ? "✓" : ""}</td>
+    //     <td>${item["B/F"] ? "✓" : ""}</td>
+    //     <td>${item["A/F"] ? "✓" : ""}</td>
+    //   </tr>
+    // `).join("");
 
     // --------------------------PDF Template----------------------------------------- 
     // data.forEach((data, index) => {
@@ -138,8 +228,6 @@ async function getPrescription(appointmentId) {
                 <p>${ data.ClinicalFeature || ''}</p>
             </div>
 
-            <div class="page-divider"></div>
-
             <div class="section">
                 <strong>Diagnosis:</strong>
                 <p>${ data.Diagnosis || ''}</p>
@@ -154,39 +242,28 @@ async function getPrescription(appointmentId) {
 
             <div class="page-divider"></div>
 
-            <div class="section">
-                <strong class="rx">Rx</strong>
-                <table class="rx-table">
-                    <thead>
-                        <tr>
-                            <th>S.No</th>
-                            <th>Drug Name</th>
-                            <th>Dosage</th>
-                            <th>M</th>
-                            <th>A</th>
-                            <th>E</th>
-                            <th>N</th>
-                            <th>B/F</th>
-                            <th>A/F</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${prescriptionTableBody}
-                    </tbody>
-                </table>
+            <div class="section prescription-table-body">
+              ${prescriptionSectionHTML}
             </div>
+
             </div>
+            
             <!-- footer -->
              <div class="footer">
                 <div class="review-date">
                     Review Date: ${reviewDatetime || ''}
                 </div>
+                <div class="doctor-notes">
+                    <strong>Note:</strong>
+                    <p>*If you develop allergies from any medication consult your doctor or near by hospital immediately.<br>
+                    *Kindly bring this prescription record or softcopy of every visit</p>
+                </div>
                 <div class="page-divider"></div>
-                <p>
+                <p class="address">
                     Clinic: New No 4, 2nd Right on Raja Annamalai Road,Behind Adithya Kanakadhara<br>
                     Apartment, Saibaba Colony, Coimbatore 641011<br>
-                    Phone: 0422-2439601 / 0422-4707114 * Mob: +91 94878 79601<br>
-                    Email: drnithyadhollan@gmail.com * GST: 33ARYPN6845B1ZB
+                    Phone: 0422-2439601 / 0422-4707114 * Mob: +91 94878 79601 * Email:<br>
+                    drnithyadhollan@gmail.com * GST: 33ARYPN6845B1ZB
                 </p>
                 <div class="page-divider"></div>
                 <div class="consult-time">
@@ -196,13 +273,13 @@ async function getPrescription(appointmentId) {
             </div>
         </div>
 
-        
-
-    </div>   
+    </div>  
       `;
     // });
     // --------------------------PDF Template End--------------------------
-
+    // 🔄 Replace card body content
+    // document.querySelector(".prescription-table-body").innerHTML = prescriptionSectionHTML;
+    // <div class="prescription-table-body">${prescriptionSectionHTML}</div>
     // 🔄 Replace card body content
     document.querySelector(".prescription-body").innerHTML = prescriptionBodyHTML;
     // Show the modal (Bootstrap 5)
@@ -542,25 +619,53 @@ async function initAppointmentHistory() {
   }
 }
 
+// ----------------- Download PDF Functions ------------------- //
 function downloadPdf() {
   document.getElementById("downloadPdfBtn").addEventListener("click", function () {
     const element = document.querySelector(".prescription-body");
     const opt = {
-      margin: 0,
+      // margin: 0,
       filename: 'prescription.pdf',
       image: { type: 'jpeg', quality: 0.98 },
       html2canvas: { scale: 2 , useCORS: true},
       jsPDF: { unit: 'cm', format: 'a4', orientation: 'portrait' },
-      pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+      pagebreak: { mode: ['css', 'legacy'] }
     };
 
     html2pdf().set(opt).from(element).save();
   });
 }
 
+// ----------------- Print PDF Functions ------------------- //
+function printPdf() {
+  document.getElementById("printPdfBtn").addEventListener("click", function () {
+    const element = document.querySelector(".prescription-body");
+    const opt = {
+      // margin: 0,
+      filename: 'prescription.pdf',
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true },
+      jsPDF: { unit: 'cm', format: 'a4', orientation: 'portrait' },
+      pagebreak: { mode: [ 'css', 'legacy'] }
+    };
+
+    html2pdf()
+      .set(opt)
+      .from(element)
+      .toPdf()
+      .get('pdf')
+      .then(function (pdf) {
+        pdf.autoPrint();
+        window.open(pdf.output('bloburl'), '_blank');
+      });
+  });
+}
+
+
 
 initAppointmentHistory();
 downloadPdf();
+printPdf();
 
 
 

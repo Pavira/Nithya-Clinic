@@ -40,7 +40,7 @@ async def add_drug_category(payload: DrugCategory):
 
             # Build new category data
             drug_data = {
-                "DrugCategoryId": new_category_id,
+                "DrugCategoryId": str(new_category_id),
                 "DrugCategoryName": payload.drugCategoryName.upper(),
                 "Description": payload.description,
             }
