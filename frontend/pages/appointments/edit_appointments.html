@@ -76,10 +76,15 @@
         <h5 class="text-success border-bottom pb-2">Appointment Information</h5>
       </div>
 
-      <div class="col-12">
-        <label for="description" class="form-label">Description Details*</label>
-        <textarea class="form-control" id="description" rows="3" placeholder="Write purpose, symptoms, etc..." required></textarea>
+      <div class="col-11">
+        <label for="description" class="form-label">Description Details</label>
+        <textarea class="form-control" id="description" rows="3" placeholder="Write purpose, symptoms, etc..."></textarea>
       </div>
+
+      <div class="col-1 mt-2" style="display: flex; align-items: center; justify-content: center;">
+        <button class="micButton" type="button" data-target="description"><i class="bi bi-mic-fill"></i></button>
+      </div>
+
 
       <div class="col-md-6">
         <label for="start_datetime" class="form-label">Start Date & Time*</label>
@@ -150,26 +155,50 @@
         <button type="submit" class="btn btn-success" id="save_vitals"><i class="bi bi-patch-plus me-1"></i>Save Vitals</button>
       </div>
 
-      <!-- History -->
-       <div class="col-md-12">
-        <label for="history" class="form-label" id="history_label" >History</label>
-        <textarea class="form-control" id="history" rows="3" placeholder="Describe the details of History..." ></textarea>
-       </div>
-      <!-- Clinical Feature -->
-       <div class="col-md-12 mt-2">
-        <label for="clinical_feature" class="form-label" id="clinical_feature_label" >Clinical Feature</label>
-        <textarea class="form-control" id="clinical_feature" rows="3" placeholder="Describe the details of Clinical Feature..." ></textarea>
-       </div>
-       <!-- Diagnosis -->
-       <div class="col-12 mt-2">
-        <label for="diagnosis" class="form-label" id="diagnosis_label">Diagnosis</label>
-        <textarea class="form-control" id="diagnosis" rows="3" placeholder="Describe the details of Diagnosis..." ></textarea>
-       </div>
-       <!-- Investigation -->
-       <div class="col-12 mt-2">
-        <label for="investigation" class="form-label" id="investigation_label">Investigation</label>
-        <textarea class="form-control" id="investigation" rows="3" placeholder="Describe the details of Investigation..." ></textarea>
-       </div>
+     <!-- History -->
+<div class="col-md-11">
+  <label for="history" class="form-label" id="history_label">History</label>
+  <textarea class="form-control" id="history" rows="3" placeholder="Describe the details of History..."></textarea>
+</div>
+<div class="col-1 mt-2" style="display: flex; align-items: center; justify-content: center;">
+  <button class="micButton" type="button" data-target="history">
+    <i class="bi bi-mic-fill"></i>
+  </button>
+</div>
+
+
+<!-- Clinical Feature -->
+<div class="col-md-11 mt-2">
+  <label for="clinical_feature" class="form-label" id="clinical_feature_label">Clinical Feature</label>
+  <textarea class="form-control" id="clinical_feature" rows="3" placeholder="Describe the details of Clinical Feature..."></textarea>
+</div>
+<div class="col-1 mt-2" style="display: flex; align-items: center; justify-content: center;">
+  <button class="micButton" type="button" data-target="clinical_feature">
+    <i class="bi bi-mic-fill"></i>
+  </button>
+</div>
+
+<!-- Diagnosis -->
+<div class="col-11 mt-2">
+  <label for="diagnosis" class="form-label" id="diagnosis_label">Diagnosis</label>
+  <textarea class="form-control" id="diagnosis" rows="3" placeholder="Describe the details of Diagnosis..."></textarea>
+</div>
+<div class="col-1 mt-2" style="display: flex; align-items: center; justify-content: center;">
+  <button class="micButton" type="button" data-target="diagnosis">
+    <i class="bi bi-mic-fill"></i>
+  </button>
+</div>
+
+<!-- Investigation -->
+<div class="col-11 mt-2">
+  <label for="investigation" class="form-label" id="investigation_label">Investigation</label>
+  <textarea class="form-control" id="investigation" rows="3" placeholder="Describe the details of Investigation..."></textarea>
+</div>
+<div class="col-1 mt-2" style="display: flex; align-items: center; justify-content: center;">
+  <button class="micButton" type="button" data-target="investigation">
+    <i class="bi bi-mic-fill"></i>
+  </button>
+</div>
 
        <!--------------------------- Prescription ------------------------------>
         <div class="d-flex justify-content-center align-items-center">
@@ -183,15 +212,25 @@
         </div>
 
         <div class="col-md-3">
-          <label for="notes" class="form-label">Notes</label>
-          <select class="form-select" id="notes" required>
+          <label for="frequency" class="form-label" id="frequency_label">Frequency</label>
+          <select class="form-select" id="frequency" required>
             <!-- Options will be populated dynamically -->
           </select> <!-- ✅ CLOSE THIS -->
         </div>
 
-        <div class="col-md-3">
-          <label for="dosage" id="dosage_label" class="form-label">Duration</label>
-          <input type="text" class="form-control" id="dosage" >
+        <div class="col-md-2">
+          <label for="duration_value" id="duration_value_label" class="form-label">Duration</label>
+          <input type="text" class="form-control" placeholder="Duration" id="duration_value" >
+        </div>
+
+        <div class="col-md-1">
+          <label for="duration_unit" id="duration_unit_label" class="form-label">Units</label>
+          <select class="form-select" id="duration_unit" required>
+            <option selected>day(s)</option>
+            <option>week(s)</option>
+            <option>month(s)</option>
+            <option>year(s)</option>
+          </select>
         </div>
 
         <div class="col-md-3">
@@ -199,6 +238,10 @@
             <div id="timing-buttons" class="d-flex flex-wrap gap-1"></div>
         </div>
 
+        <div class="col-md-6 mt-2">
+          <label for="instruction" id="instruction_label" class="form-label">Instructions</label>
+          <input type="text" class="form-control" placeholder="Write any specific instructions" id="instruction" >
+        </div>
 
         <!-- Add Medicine Button -->
         <div class="d-flex justify-content-center align-items-center mt-2">
@@ -206,14 +249,17 @@
         </div>
 
         <!-- Prescription Table -->
-        <div class="table-responsive mt-3">
+        <div class="table-responsive mt-3" id="prescription-table-wrapper">
         <table class="table table-bordered table-sm align-middle text-center" id="prescription-table">
             <thead class="table-light">
             <tr>
                 <th>S.No</th>
                 <th>Drug Name</th>
-                <th>Dosage</th>
+                <th>Frequency</th>
+                <th>Duration</th>
+                <th>Units</th>
                 <th>Timing</th>
+                <th>Instructions</th>
                 <th>Actions</th>
             </tr>
             </thead>

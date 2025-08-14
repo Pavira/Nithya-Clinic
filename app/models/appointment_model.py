@@ -9,7 +9,7 @@ class AppointmentModel(BaseModel):
     # PhoneNumber: int = Field(..., alias="phone_number")
     Department: str = Field(..., alias="consultation_category")
     AppointmentCategory: str = Field(..., alias="appointment_category")
-    AppointmentInformation: str = Field(..., alias="description")
+    AppointmentInformation: Optional[str] = Field(..., alias="description")
     AppointmentDateTime: datetime = Field(..., alias="appointment_datetime")
     User: str = Field(..., alias="user")
 
@@ -34,7 +34,7 @@ class VitalsModel(BaseModel):
 class UpdateAppointmentModel(BaseModel):
     ConsultationCategory: str = Field(..., alias="consultation_category")
     AppointmentCategory: str = Field(..., alias="appointment_category")
-    Description: str = Field(..., alias="description")
+    Description: Optional[str] = Field(..., alias="description")
     Height: Optional[float] = Field(0, alias="height")
     Weight: Optional[float] = Field(0, alias="weight")
     BMI: Optional[float] = Field(0, alias="bmi")
@@ -47,10 +47,6 @@ class UpdateAppointmentModel(BaseModel):
     DoctorFees: float = Field(..., alias="doctor_fees")
     ReviewDate: Optional[datetime] = Field(None, alias="review_datetime")
     Prescription: Optional[list] = Field(default_factory=list, alias="allPrescriptions")
-    # ImageURLs: Optional[list] = Field(default_factory=list, alias="images")
-    # MedPrescImages: Optional[list] = Field(
-    #     default_factory=list, alias="prescription_images"
-    # )
     NoOfImages: Optional[int] = Field(0, alias="noOfImages")
     NoOfMedImages: Optional[int] = Field(0, alias="noOfPrescriptions")
 

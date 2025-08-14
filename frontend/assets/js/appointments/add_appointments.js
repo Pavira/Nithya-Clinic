@@ -178,6 +178,8 @@ async function checkAppointment() {
     console.log("Check Appointment:", result); 
 }
 
+
+
 async function initAppointmentPage() {
 
     showLoader();
@@ -208,8 +210,93 @@ async function initAppointmentPage() {
         hideLoader();
     }
 }
+// Check if browser supports SpeechRecognition
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+if (!SpeechRecognition) {
+    alert("Your browser does not support Speech Recognition. Try Chrome or Edge.");
+} else {
+    const recognition = new SpeechRecognition();
+    recognition.continuous = false; // Stop after speaking
+    recognition.interimResults = true; // Show speech as you speak
+    recognition.lang = "en-IN"; // Language (change if needed)
+
+    const micButton = document.getElementById("micButton");
+    const transcriptOutput = document.getElementById("transcript");
+
+    micButton.addEventListener("click", () => {
+        recognition.start();
+        transcriptOutput.innerText = "Listening...";
+    });
+
+    recognition.onresult = (event) => {
+        let transcript = "";
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+            transcript += event.results[i][0].transcript;
+        }
+        transcriptOutput.innerText = transcript;
+    };
+
+    recognition.onerror = (event) => {
+        console.error("Speech Recognition Error:", event.error);
+    };
+
+    recognition.onend = () => {
+        console.log("Speech recognition ended.");
+    };
+}
+
+function initspeech() {
+  const micButton = document.getElementById("micButton");
+  const descriptionField = document.getElementById("description");
+
+  // Speech Recognition setup
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  let recognition;
+  if (SpeechRecognition) {
+    recognition = new SpeechRecognition();
+    recognition.lang = "en-IN"; // Change language if needed
+    recognition.continuous = false;
+    recognition.interimResults = false;
+
+    recognition.onresult = function(event) {
+      const transcript = event.results[0][0].transcript;
+      insertAtCursor(descriptionField, transcript + " ");
+    };
+
+    recognition.onerror = function(event) {
+      console.error("Speech recognition error:", event.error);
+      micButton.classList.remove("listening");
+    };
+
+    recognition.onstart = function() {
+      micButton.classList.add("listening"); // Show mic active
+    };
+
+    recognition.onend = function() {
+      micButton.classList.remove("listening"); // Remove active state
+    };
+  } else {
+    alert("Your browser does not support Speech Recognition.");
+  }
+
+  micButton.addEventListener("click", () => {
+    if (recognition) {
+      recognition.start();
+    }
+  });
+
+  // Function to insert text at cursor position
+  function insertAtCursor(field, text) {
+    const start = field.selectionStart;
+    const end = field.selectionEnd;
+    field.value = field.value.substring(0, start) + text + field.value.substring(end);
+    field.selectionStart = field.selectionEnd = start + text.length;
+    field.focus();
+  }
+}
 
 
 initAppointmentPage();
-
+initspeech();
 AppointmentForm();

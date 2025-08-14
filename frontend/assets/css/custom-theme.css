@@ -182,21 +182,25 @@ body {
     z-index: 1;
   }
 
-/* =====================Prescription Container======================== */
+/* =====================Prescription Container Styling======================== */
 
 .prescription-container {
     display: flex;
     width: 21cm; /* A4 width */
-    max-height: 29.7cm; 
-    /* min-height: 29.7cm;  */
-    margin: auto;
+    /* max-height: 29.7cm;  */
+    margin: 5px;
     background-color: #fff;
     box-shadow: 0 0 0.5cm rgba(0, 0, 0, 0.1);
     box-sizing: border-box;
     font-family: 'Segoe UI', sans-serif;
     padding: 0.8cm;
-    overflow: hidden;
+    /* overflow: hidden; */
 }
+/* Always start a new page before this element */
+/* .page-break {
+    page-break-before: always; 
+    break-before: page; 
+} */
 
 .modal-dialog-scrollable .modal-content  {
   max-height: none !important;
@@ -330,28 +334,51 @@ body {
 
 .rx-table th, .rx-table td {
     border: 1px solid #000;
-    padding: 4px 6px;
-    text-align: center;
+    padding: 2px;
+    text-align: left;
+}
+.rx-table td {
+    line-height: 1.2; 
 }
 
 .review-date {
-    margin-bottom: 20px;
     font-size: 13px;
 }
 
 .footer {
-    font-size: 14px;
+    font-size: 13px;
     font-style: italic;
 }
 
 .consult-time {
     padding: 7px;
-    font-size: 14px;
+    font-size: 13px;
     margin-top: 6px;
     font-style: italic;
     color: #fff;
     background-color: #004080;
 }
+
+.doctor-notes {
+    background-color: #d1e7ff; /* light blue background */
+    padding: 7px;
+    font-size: 11px;
+    margin-top: 5px;
+    line-height: 1.5;
+}
+
+.doctor-notes strong {
+    display: block;
+    font-weight: bold;
+    font-size: 14px;
+    color: #0d6efd; /* Bootstrap primary blue */
+}
+
+.doctor-notes p {
+    margin: 0;
+    font-style: italic;
+}
+
 /* =====================Prescription Container======================== */
 
 footer {
@@ -377,10 +404,31 @@ footer a:hover {
   .select2-selection__arrow {
     height: 36px !important;
   }
-  /* =====================Drug Name======================== */
+  /* =====================Drug Name end======================== */
 
-  /* #image-body img {
-    max-width: 100%;
-    border-radius: 8px;
-    box-shadow: 0 0 5px rgba(0,0,0,0.1);
-  } */
+/* Mic Design */
+.micButton {
+  width: 50px;
+  height: 50px;
+  border: 2px solid black;
+  border-radius: 50%;
+  background-color: white;
+  color: black;
+  font-size: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.micButton.listening {
+  background-color: red;
+  color: white;
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7); }
+  70% { box-shadow: 0 0 0 10px rgba(255, 0, 0, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0); }
+}
+
+

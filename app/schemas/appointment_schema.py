@@ -9,7 +9,7 @@ class AppointmentSchema(BaseModel):
     # phone_number: int
     consultation_category: str
     appointment_category: str
-    description: str
+    description: Optional[str] = ""
     appointment_datetime: str
     user: str
 
@@ -28,7 +28,7 @@ class VitalsSchema(BaseModel):
 class UpdateAppointmentSchema(BaseModel):
     consultation_category: str
     appointment_category: str
-    description: str
+    description: Optional[str] = ""
     height: Optional[float] = 0
     weight: Optional[float] = 0
     bmi: Optional[float] = 0
@@ -41,8 +41,6 @@ class UpdateAppointmentSchema(BaseModel):
     doctor_fees: float
     review_datetime: Optional[datetime] = None
     allPrescriptions: Optional[list] = []
-    # images: Optional[list] = []
-    # prescription_images: Optional[list] = []
     noOfImages: Optional[int] = 0
     noOfPrescriptions: Optional[int] = 0
 
