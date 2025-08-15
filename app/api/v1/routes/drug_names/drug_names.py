@@ -1,3 +1,4 @@
+import time
 from app.utils.logger import logger
 from fastapi import APIRouter, HTTPException, status, Request
 from pydantic import BaseModel, Field
@@ -97,15 +98,29 @@ async def view_and_search_drug_names(
     """
     API to view and search drug names.
     """
+    start_time = time.perf_counter()
     try:
         # Get total patient count from count document
         drug_count_doc = db.collection("Count").document("count").get()
-        if drug_count_doc.exists:
-            total_docs = drug_count_doc.to_dict().get("DrugNamesCount", 0)
-        else:
-            total_docs = 0
+        total_docs = (
+            drug_count_doc.to_dict().get("DrugNamesCount", 0)
+            if drug_count_doc.exists
+            else 0
+        )
+        # if drug_count_doc.exists:
+        #     total_docs = drug_count_doc.to_dict().get("DrugNamesCount", 0)
+        # else:
+        #     total_docs = 0
 
-        collection_ref = db.collection("Drug_Names")
+        fields = [
+            "DrugCategoryName",
+            "DrugCategoryId",
+            "DrugCategoryName",
+            "LogDateTime",
+        ]
+
+        collection_ref_field = db.collection("Drug_Names")
+        collection_ref = collection_ref_field.select(fields)
 
         print("total_docs", total_docs)
 
@@ -113,23 +128,27 @@ async def view_and_search_drug_names(
         if search_type == "drug_name" and search_value:
             query = (
                 collection_ref.order_by("DrugName")
-                .start_at([search_value.upper()])
-                .end_at([search_value.upper() + "\uf8ff"])
+                .start_at([search_value])
+                .end_at([search_value + "\uf8ff"])
             )
         elif search_type == "drug_category" and search_value:
             query = (
                 collection_ref.order_by("DrugCategoryName")
-                .start_at([search_value.upper()])
-                .end_at([search_value.upper() + "\uf8ff"])
+                .start_at([search_value])
+                .end_at([search_value + "\uf8ff"])
             )
         else:
             query = collection_ref.order_by("LogDateTime", direction="DESCENDING")
 
         # Apply cursor for pagination
         if cursor:
-            cursor_doc = collection_ref.document(cursor).get()
+            cursor_doc = collection_ref_field.document(cursor).get()
             if cursor_doc.exists:
                 query = query.start_after(cursor_doc)
+            else:
+                logger.warning(
+                    f"⚠️ Cursor doc {cursor} not found. Starting from beginning."
+                )
 
         query = query.limit(limit)
         docs = query.get()
@@ -138,6 +157,9 @@ async def view_and_search_drug_names(
         # Determine next cursor
         next_cursor = docs[-1].id if len(docs) == limit else None
         results = [doc.to_dict() | {"doc_id": doc.id} for doc in docs]
+
+        elapsed_time = time.perf_counter() - start_time
+        print(f"⏱ Service execution time for Drug Name: {elapsed_time:.4f} seconds")
 
         return {
             "success": True,

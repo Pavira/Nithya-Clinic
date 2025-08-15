@@ -16,6 +16,13 @@ function showLoader() {
 function hideLoader() {
   document.getElementById("signin-loader").classList.add("d-none");
 }
+// function showLoader() {
+//   document.getElementById("loader-overlay").style.display = "flex";
+// }
+
+// function hideLoader() {
+//   document.getElementById("loader-overlay").style.display = "none";
+// }
 
 //--------------------------Login Form Submission------------------
 document.addEventListener("DOMContentLoaded", () => {

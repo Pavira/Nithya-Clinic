@@ -99,6 +99,7 @@
         limit: pageSize,
       });
 
+      const startTime = performance.now();
       const response = await fetch(`/api/v1/patients/view_and_search_patients?${queryParams}`, {
         method: "GET",
         headers: {
@@ -106,6 +107,9 @@
           Authorization: `Bearer ${token}`,
         },
       });
+      
+      const endTime = performance.now();
+      console.log(`⏱ API call took ${(endTime - startTime).toFixed(2)} ms`);
 
       if (response.status === 401) {
         Swal.fire({
