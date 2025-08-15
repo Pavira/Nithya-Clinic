@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, BackgroundTasks
 from app.schemas.auth_schema import LoginRequest
 from app.services.auth.signin_service import login_user_service, reset_password_service
 from app.utils.response import not_found_response, success_response
@@ -8,12 +8,14 @@ router = APIRouter(tags=["Auth"])
 
 
 @router.post("/signin")
-def login_user(login_data: LoginRequest):
+def login_user(login_data: LoginRequest, background_tasks: BackgroundTasks):
     # print("🔐 Processing login request...")
     """
     API to login a user with email and password.
     """
-    result = login_user_service(login_data)
+    result = login_user_service(
+        login_data=login_data, background_tasks=background_tasks
+    )
 
     if result.get("success") is False:
         print("❌ Login failed for", result.get("message"))

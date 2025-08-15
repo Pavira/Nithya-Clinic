@@ -1,3 +1,4 @@
+import logging
 from typing import Optional
 
 from fastapi import Query
@@ -123,6 +124,7 @@ async def view_and_search_patients_service(
     cursor: Optional[str] = Query(None),
     limit: int = 10,
 ):
+    start_time = time.perf_counter()
     try:
         # Get total patient count from count document
         patient_count_doc = db.collection("Count").document("count").get()
@@ -131,14 +133,24 @@ async def view_and_search_patients_service(
         else:
             total_docs = 0
 
-        collection_ref = db.collection("collection_PatientRegistration")
+        # 1) Build base query with projection (select only what the table needs)
+        fields = [
+            "PatientRegistrationNumber",
+            "FullName",
+            "PhoneNumber",
+            "PatientType",
+            "LogDateTime",
+        ]
+
+        collection_ref_field = db.collection("collection_PatientRegistration")
+        collection_ref = collection_ref_field.select(fields)
 
         # Build query based on search type
         if search_type == "full_name" and search_value:
             query = (
                 collection_ref.order_by("FullName")
-                .start_at([search_value.upper()])
-                .end_at([search_value.upper() + "\uf8ff"])
+                .start_at([search_value])
+                .end_at([search_value + "\uf8ff"])
             )
         elif search_type == "phone_number" and search_value:
             query = collection_ref.where("PhoneNumber", "==", int(search_value))
@@ -151,7 +163,7 @@ async def view_and_search_patients_service(
 
         # Apply cursor for pagination
         if cursor:
-            cursor_doc = collection_ref.document(cursor).get()
+            cursor_doc = collection_ref_field.document(cursor).get()
             if cursor_doc.exists:
                 query = query.start_after(cursor_doc)
 
@@ -162,6 +174,9 @@ async def view_and_search_patients_service(
         # Determine next cursor
         next_cursor = docs[-1].id if len(docs) == limit else None
         results = [doc.to_dict() | {"doc_id": doc.id} for doc in docs]
+
+        elapsed_time = time.perf_counter() - start_time
+        print(f"⏱ Service execution time: {elapsed_time:.4f} seconds")
 
         return {
             "success": True,

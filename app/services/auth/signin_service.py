@@ -2,7 +2,7 @@
 
 from time import perf_counter
 import time
-from fastapi import HTTPException
+from fastapi import BackgroundTasks, HTTPException
 import httpx
 from app.schemas.auth_schema import LoginRequest
 from app.utils.exceptions import InvalidLoginCredentials, UserNotFoundError
@@ -17,11 +17,23 @@ load_dotenv()
 FIREBASE_API_KEY = os.getenv("FIREBASE_API_KEY")
 
 
-def login_user_service(login_data: LoginRequest) -> dict:
+def update_last_login(user_id: str):
+    """Run this in the background to avoid blocking login."""
+    try:
+        print(f"🔐 Updating last_login for {user_id}")
+        user_ref = db.collection("users").document(user_id)
+        user_ref.update({"last_login": datetime.now(timezone.utc)})
+    except Exception as e:
+        print(f"⚠️ Failed to update last_login for {user_id}: {e}")
+
+
+def login_user_service(
+    background_tasks: BackgroundTasks, login_data: LoginRequest
+) -> dict:
     start_time = time.perf_counter()
     print("🔐 Logging in user...")
     try:
-        # Step 1: Firebase Auth
+        # Step 1: Firebase Auth  # 1️⃣ Firebase Auth login
         t1 = time.perf_counter()
         payload = {
             "email": login_data.email,
@@ -50,31 +62,37 @@ def login_user_service(login_data: LoginRequest) -> dict:
         uid = response_data["localId"]
         email = response_data["email"]
 
-        # Ensure Firestore user exists — or create if not
+        # Ensure Firestore user exists — or create if not  # 2️⃣ Get user role & display name from Firestore (can also be cached)
         user_ref = db.collection("users").document(uid)
         user_snapshot = user_ref.get()
+        user_data = user_snapshot.to_dict()
+        display_name = user_data.get("display_name", "Unknown User")
+        user_role = user_data.get("user_role", "Unknown Role")
 
         print(f"⏱ Firestore get took {time.perf_counter() - t2:.3f}s")
 
-        # Step 3: Firestore set/update
+        # Step 3: Firestore set/update  3️⃣ Schedule Firestore update in background
         t3 = time.perf_counter()
-        if not user_snapshot.exists:
-            logger.info(f"🆕 Creating Firestore user doc for UID: {uid}")
-            user_ref.set(
-                {
-                    "email": email,
-                    "display_name": "New User",  # Replace with dynamic if needed
-                    "created_time": datetime.now(timezone.utc),
-                    "last_login": datetime.now(timezone.utc),
-                }
-            )
-            display_name = "New User"
-            user_role = "Unknown Role"
-        else:
-            user_data = user_snapshot.to_dict()
-            display_name = user_data.get("display_name", "Unknown User")
-            user_role = user_data.get("user_role", "Unknown Role")
-            user_ref.update({"last_login": datetime.now(timezone.utc)})
+
+        background_tasks.add_task(update_last_login, uid)
+
+        # if not user_snapshot.exists:
+        #     logger.info(f"🆕 Creating Firestore user doc for UID: {uid}")
+        #     user_ref.set(
+        #         {
+        #             "email": email,
+        #             "display_name": "New User",  # Replace with dynamic if needed
+        #             "created_time": datetime.now(timezone.utc),
+        #             "last_login": datetime.now(timezone.utc),
+        #         }
+        #     )
+        #     display_name = "New User"
+        #     user_role = "Unknown Role"
+        # else:
+        #     user_data = user_snapshot.to_dict()
+        #     display_name = user_data.get("display_name", "Unknown User")
+        #     user_role = user_data.get("user_role", "Unknown Role")
+        #     user_ref.update({"last_login": datetime.now(timezone.utc)})
 
         print(f"⏱ Firestore set/update took {time.perf_counter() - t3:.3f}s")
 

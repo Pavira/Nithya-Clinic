@@ -210,41 +210,7 @@ async function initAppointmentPage() {
         hideLoader();
     }
 }
-// Check if browser supports SpeechRecognition
-const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
-if (!SpeechRecognition) {
-    alert("Your browser does not support Speech Recognition. Try Chrome or Edge.");
-} else {
-    const recognition = new SpeechRecognition();
-    recognition.continuous = false; // Stop after speaking
-    recognition.interimResults = true; // Show speech as you speak
-    recognition.lang = "en-IN"; // Language (change if needed)
-
-    const micButton = document.getElementById("micButton");
-    const transcriptOutput = document.getElementById("transcript");
-
-    micButton.addEventListener("click", () => {
-        recognition.start();
-        transcriptOutput.innerText = "Listening...";
-    });
-
-    recognition.onresult = (event) => {
-        let transcript = "";
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-            transcript += event.results[i][0].transcript;
-        }
-        transcriptOutput.innerText = transcript;
-    };
-
-    recognition.onerror = (event) => {
-        console.error("Speech Recognition Error:", event.error);
-    };
-
-    recognition.onend = () => {
-        console.log("Speech recognition ended.");
-    };
-}
 
 function initspeech() {
   const micButton = document.getElementById("micButton");

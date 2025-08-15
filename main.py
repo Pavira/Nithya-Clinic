@@ -33,7 +33,7 @@ app = FastAPI(
 
 # ---------- Middleware ----------
 app.add_middleware(LoggingMiddleware)
-app.add_middleware(AuthMiddleware)
+# app.add_middleware(AuthMiddleware)
 
 # ---------- Exception Handlers ----------
 app.add_exception_handler(AppException, app_exception_handler)

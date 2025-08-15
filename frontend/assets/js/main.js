@@ -373,13 +373,23 @@ function isTokenExpired(token) {
 }
 
 //---------Loader Functionality---------
+// function showLoader() {
+//   document.getElementById("global-loader").classList.remove("d-none");
+// }
+
+// function hideLoader() {
+//   document.getElementById("global-loader").classList.add("d-none");
+// }
+
 function showLoader() {
-  document.getElementById("global-loader").classList.remove("d-none");
+  document.getElementById("loader-overlay").style.display = "flex";
 }
 
 function hideLoader() {
-  document.getElementById("global-loader").classList.add("d-none");
+  document.getElementById("loader-overlay").style.display = "none";
 }
+
+
 //----------Loader Functionality End---------
 
 // On page load

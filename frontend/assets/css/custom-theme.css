@@ -431,4 +431,208 @@ footer a:hover {
   100% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0); }
 }
 
+/* ------------Loader------------- */
+/* * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
+#loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(-45deg, #1d3557, #457b9d, #a8dadc, #f1faee);
+    background-size: 400% 400%;
+    animation: gradientBG 6s ease infinite;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.loader-content {
+    text-align: center;
+    color: white;
+}
+
+.logo {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    margin: 0 auto 20px;
+    animation: pulse 1.5s infinite;
+}
+
+.loading-text {
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+    background: linear-gradient(90deg, #fff, #ddd, #fff);
+    background-size: 200% 200%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shimmer 2s infinite;
+}
+
+.progress-bar {
+    width: 200px;
+    height: 6px;
+    background: rgba(255,255,255,0.3);
+    border-radius: 5px;
+    overflow: hidden;
+    margin: 0 auto;
+}
+
+.progress {
+    width: 0%;
+    height: 100%;
+    background: white;
+    animation: loadProgress 3s ease-out forwards;
+}
+
+@keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.1); opacity: 0.7; }
+}
+
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+@keyframes loadProgress {
+    to { width: 100%; }
+} */
+
+/* :root {
+  --background: #121621;
+  --duration: 3s;
+  --primary: rgba(39, 94, 254, 1);
+  --primary-light: #2f71ff;
+  --primary-rgba: rgba(39, 94, 254, 0);
+} */
+
+/* Fullscreen overlay */
+#loader-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.9);
+  /* background: #6997DB;  */
+  z-index: 9999;
+}
+
+#global-loader {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+  display: flex;
+  gap: 50px;
+  align-items: flex-end;
+  animation: loader 5s linear infinite;
+}
+
+.box-wrap {
+  position: relative;
+}
+
+.box {
+  width: 60px;
+  height: 60px;
+  background: #A294F9;
+  /* background: white;  */
+  border-radius: 50%;
+  animation: bounceRotate 0.6s ease-in-out infinite;
+}
+
+.shadow {
+  width: 50px;
+  height: 5px;
+  background: #000;
+  opacity: 0.15;
+  position: absolute;
+  bottom: -12px;
+  left: 5px;
+  border-radius: 50%;
+  animation: shadowScale 0.6s ease-in-out infinite;
+}
+
+@keyframes loader {
+  0% { transform: translate(0, -50%); }
+  100% { transform: translate(calc(100vw - 300px), -50%); }
+}
+
+/* Higher bounce + smooth delay */
+@keyframes bounceRotate {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-50px) rotate(45deg);
+  }
+}
+/* Shadow moves opposite + scales */
+@keyframes shadowScale {
+  0%, 100% {
+    transform: translateX(0) scale(1, 1);
+    opacity: 0.15;
+  }
+  50% {
+    transform: translateX(-20px) scale(1.4, 1);
+    opacity: 0.25;
+  }
+}
+
+/* @keyframes shadowScale {
+  0%, 100% {
+    transform: scale(1, 1);
+  }
+  50% {
+    transform: scale(1.4, 1);
+    opacity: 0.25;
+  }
+} */
+
+
+/* Delay each ball and shadow */
+.box-wrap:nth-child(1) .box,
+.box-wrap:nth-child(1) .shadow { animation-delay: 0s; }
+
+.box-wrap:nth-child(2) .box,
+.box-wrap:nth-child(2) .shadow { animation-delay: 0.1s; }
+
+.box-wrap:nth-child(3) .box,
+.box-wrap:nth-child(3) .shadow { animation-delay: 0.2s; }
+
+.box-wrap:nth-child(4) .box,
+.box-wrap:nth-child(4) .shadow { animation-delay: 0.3s; }
+
+.box-wrap:nth-child(5) .box,
+.box-wrap:nth-child(5) .shadow { animation-delay: 0.4s; }
+
+.box-wrap:nth-child(6) .box,
+.box-wrap:nth-child(6) .shadow { animation-delay: 0.4s; }
+
+.box-wrap:nth-child(7) .box,
+.box-wrap:nth-child(7) .shadow { animation-delay: 0.3s; }
+
+.box-wrap:nth-child(8) .box,
+.box-wrap:nth-child(8) .shadow { animation-delay: 0.2s; }
+
+.box-wrap:nth-child(9) .box,
+.box-wrap:nth-child(9) .shadow { animation-delay: 0.1s; }
+
+.box-wrap:nth-child(10) .box,
+.box-wrap:nth-child(10) .shadow { animation-delay: 0s; }
