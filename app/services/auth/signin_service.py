@@ -43,7 +43,8 @@ def login_user_service(
 
         # logger.info(f"🔐 Attempting login for {login_data.email}")
 
-        url = f"https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={FIREBASE_API_KEY}"
+        url = f"https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyAMZlRPgaZAwGsKiFBPfkpBT4n90C6MPyo"
+        # url = f"https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={FIREBASE_API_KEY}"
         response = requests.post(url, json=payload, timeout=30)
         print(f"⏱ Firebase Auth took {time.perf_counter() - t1:.3f}s")
 
@@ -119,7 +120,7 @@ def login_user_service(
 
 
 async def reset_password_service(email: str):
-    url = f"https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key={FIREBASE_API_KEY}"
+    url = f"https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=AIzaSyAMZlRPgaZAwGsKiFBPfkpBT4n90C6MPyo"
     payload = {"requestType": "PASSWORD_RESET", "email": email}
 
     try:
