@@ -116,6 +116,7 @@ async def view_and_search_drug_names(
             "DrugCategoryName",
             "DrugCategoryId",
             "DrugCategoryName",
+            "DrugName",
             "LogDateTime",
         ]
 

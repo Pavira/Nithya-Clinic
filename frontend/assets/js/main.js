@@ -403,16 +403,16 @@ window.onload = () => {
     // loadPage("auth/signin");
     return;
   } 
-  else if (isTokenExpired(token)) {
-    Swal.fire({
-      icon: 'warning',
-      title: 'Session Expired',
-      text: 'Your session has expired. Please sign in again.',
-    }).then(() => {
-      localStorage.removeItem("token");
-      window.location.href = "/"; // or your login page
-    });
-  }
+  // else if (isTokenExpired(token)) {
+  //   Swal.fire({
+  //     icon: 'warning',
+  //     title: 'Session Expired',
+  //     text: 'Your session has expired. Please sign in again.',
+  //   }).then(() => {
+  //     localStorage.removeItem("token");
+  //     window.location.href = "/"; // or your login page
+  //   });
+  // }
   else {
     loadLayoutComponents();
     loadPage("dashboard/dashboard");

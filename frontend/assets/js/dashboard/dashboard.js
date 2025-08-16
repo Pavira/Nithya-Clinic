@@ -63,5 +63,42 @@ async function initDashboardPage(){
     }
 }
 
+function uploadData() {
+    const token = localStorage.getItem("token");
+    showLoader();
+    fetch(`/api/v1/dashboard/upload`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+        },
+    }).then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            console.log("Data uploaded successfully.");
+        } else {
+            console.error("Data upload failed:", data.message);
+        }
+    })
+    .catch(err => {
+        console.error("Error uploading data:", err);
+    })
+    .finally(() => {
+        hideLoader();
+    });
+}
+
+function upload(){
+    document.addEventListener("click", function (e) {
+        const button = e.target.closest("#upload");
+        if (button) {
+            e.preventDefault(); // 🛑 Prevent default form submission
+            uploadData();
+        }
+    });
+    
+}
+
 
 initDashboardPage();
+upload();
