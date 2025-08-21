@@ -18,7 +18,6 @@ dist/
 
 # Firebase credentials (secret file)
 app/db/firebase_config.json
-firebase_config.json
 
 # Uvicorn/Poetry
 uv.lock
