@@ -106,6 +106,8 @@ async def create_appointment_service(appointment_data: AppointmentSchema):
 
 
 # -------------------------View Appointment-------------------------
+
+# -----------------------------Final version----------------------
 # async def get_appointment_service(
 #     status: str = None,
 #     date: str = None,
@@ -114,76 +116,64 @@ async def create_appointment_service(appointment_data: AppointmentSchema):
 # ):
 #     global db
 #     try:
-#         # appointment_ref = db.collection("collection_PatientAppointment")
+#         tz = pytz.timezone("Asia/Kolkata")
 
-#         # 🔍 Date filter
+#         # ✅ Base collection
+#         appointment_ref = db.collection("collection_PatientAppointment")
+
+#         # ✅ Date filter (indexed range query)
 #         if date:
-#             print("📅 Filtering by date:", date)
 #             date_obj = datetime.strptime(date, "%Y-%m-%d")
-#             tz = pytz.timezone("Asia/Kolkata")
 #             start_dt = tz.localize(date_obj)
 #             end_dt = start_dt + timedelta(days=1)
+#             appointment_ref = appointment_ref.where(
+#                 "AppointmentDateTime", ">=", start_dt
+#             ).where("AppointmentDateTime", "<", end_dt)
 
-#             print("Appointment Start date:", start_dt, "End date:", end_dt)
-
-#             appointment_ref = (
-#                 db.collection("collection_PatientAppointment")
-#                 .where("AppointmentDateTime", ">=", start_dt)
-#                 .where("AppointmentDateTime", "<", end_dt)
-#             )
-
-#         active_count = 0
-#         closed_count = 0
-#         cancelled_count = 0
-
-#         for doc in appointment_ref.stream():
-#             data = doc.to_dict()
-#             if data["AppointmentStatus"] == "Active":
-#                 active_count += 1
-#             elif data["AppointmentStatus"] == "Closed":
-#                 closed_count += 1
-#             elif data["AppointmentStatus"] == "Cancelled":
-#                 cancelled_count += 1
-
-#         print(
-#             "🎯 Active appointments count:",
-#             active_count,
-#             "Closed appointments count:",
-#             closed_count,
-#             "Cancelled appointments count:",
-#             cancelled_count,
-#         )
-
-#         # 🔍 Status filter
+#         # ✅ Status filter (combine with date in index)
 #         if status:
-#             # print("🎯 Filtering by status:", status)
 #             appointment_ref = appointment_ref.where("AppointmentStatus", "==", status)
 
-#         # Fetch all documents after applying Firestore filters
-#         docs = appointment_ref.get()
+#         # ✅ Hard limit for safety (max per day is ~100, but keeping 200 buffer)
+#         docs = appointment_ref.limit(200).stream()
 
-#         # 🔍 Post-query filter (for partial text search)
 #         appointments = []
+#         active_count = closed_count = cancelled_count = 0
+
+#         # ✅ Single pass for counting + optional search filtering
 #         for doc in docs:
 #             data = doc.to_dict()
 #             data["id"] = doc.id
 
-#             # Apply search locally
+#             # Count statuses
+#             status_val = data.get("AppointmentStatus")
+#             if status_val == "Active":
+#                 active_count += 1
+#             elif status_val == "Closed":
+#                 closed_count += 1
+#             elif status_val == "Cancelled":
+#                 cancelled_count += 1
+
+#             # Search filtering
 #             if search_type and search_value:
-#                 value = search_value
-
+#                 val = str(search_value).strip().upper()
 #                 match = False
-#                 # if search_type == "phone_number":
-#                 #     match = value in str(data.get("PhoneNumber", ""))
-#                 if search_type == "full_name":
-#                     match = value in str(data.get("FullName", "")).upper()
-#                 elif search_type == "registration_id":
-#                     match = value in str(data.get("PatientRegistrationNumber", ""))
 
-#                 if match:
-#                     appointments.append(data)
-#             else:
-#                 appointments.append(data)
+#                 if search_type == "full_name":
+#                     match = val in str(data.get("FullName", "")).upper()
+#                 elif search_type == "registration_id":
+#                     match = (
+#                         val in str(data.get("PatientRegistrationNumber", "")).upper()
+#                     )
+
+#                 if not match:
+#                     continue
+
+#             appointments.append(data)
+
+#         print("🎯 Active appointments count:", active_count)
+#         print("🎯 Closed appointments count:", closed_count)
+#         print("🎯 Cancelled appointments count:", cancelled_count)
 
 #         return {
 #             "appointments": appointments,
@@ -192,10 +182,11 @@ async def create_appointment_service(appointment_data: AppointmentSchema):
 #             "cancelled_count": cancelled_count,
 #         }
 
-
 #     except Exception as e:
 #         logger.error(f"❌ Error fetching appointments: {e}")
-#         raise not_found_response()
+#         raise HTTPException(status_code=500, detail="Error fetching appointments")
+
+
 async def get_appointment_service(
     status: str = None,
     date: str = None,
@@ -218,39 +209,34 @@ async def get_appointment_service(
                 "AppointmentDateTime", ">=", start_dt
             ).where("AppointmentDateTime", "<", end_dt)
 
-        # ✅ Status filter (combine with date in index)
-        if status:
-            appointment_ref = appointment_ref.where("AppointmentStatus", "==", status)
-
-        # ✅ Only fetch needed fields for speed
-        # appointment_ref = appointment_ref.select(
-        #     "FullName",
-        #     "PatientRegistrationNumber",
-        #     "AppointmentStatus",
-        #     "AppointmentCategory",
-        #     "AppointmentInformation",
-        #     "AppointmentDateTime",
-        # )
-
-        # ✅ Hard limit for safety (max per day is ~100, but keeping 200 buffer)
+        # ✅ Hard limit for safety
         docs = appointment_ref.limit(200).stream()
+
+        all_docs = list(docs)  # materialize so we can iterate twice
 
         appointments = []
         active_count = closed_count = cancelled_count = 0
 
-        # ✅ Single pass for counting + optional search filtering
-        for doc in docs:
+        for doc in all_docs:
             data = doc.to_dict()
-            data["id"] = doc.id
-
-            # Count statuses
             status_val = data.get("AppointmentStatus")
+
+            # Count statuses (✅ independent of filter)
             if status_val == "Active":
                 active_count += 1
             elif status_val == "Closed":
                 closed_count += 1
             elif status_val == "Cancelled":
                 cancelled_count += 1
+
+        # ✅ Now apply status filter only for returned appointments
+        for doc in all_docs:
+            data = doc.to_dict()
+            data["id"] = doc.id
+
+            # Filter by status (only for list, not counts)
+            if status and data.get("AppointmentStatus") != status:
+                continue
 
             # Search filtering
             if search_type and search_value:

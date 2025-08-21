@@ -1,5 +1,6 @@
 # app/services/auth_service.py
 
+import sys
 from time import perf_counter
 import time
 from fastapi import BackgroundTasks, HTTPException
@@ -13,7 +14,19 @@ from datetime import datetime, timezone
 from dotenv import load_dotenv
 from app.db.firebase_client import db
 
-load_dotenv()
+
+def resource_path(relative_path):
+    """Get absolute path to resource, works for dev and PyInstaller exe"""
+    try:
+        base_path = sys._MEIPASS  # PyInstaller temp folder
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
+
+
+# load_dotenv()
+load_dotenv(resource_path(".env"))
 FIREBASE_API_KEY = os.getenv("FIREBASE_API_KEY")
 
 
@@ -43,8 +56,8 @@ def login_user_service(
 
         # logger.info(f"🔐 Attempting login for {login_data.email}")
 
-        url = f"https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyAMZlRPgaZAwGsKiFBPfkpBT4n90C6MPyo"
-        # url = f"https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={FIREBASE_API_KEY}"
+        # url = f"https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyAMZlRPgaZAwGsKiFBPfkpBT4n90C6MPyo"
+        url = f"https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={FIREBASE_API_KEY}"
         response = requests.post(url, json=payload, timeout=30)
         print(f"⏱ Firebase Auth took {time.perf_counter() - t1:.3f}s")
 

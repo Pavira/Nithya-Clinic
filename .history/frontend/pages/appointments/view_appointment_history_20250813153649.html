@@ -1,0 +1,120 @@
+<!-- view_patient_history.html -->
+
+<!-- Header Metadata for JS to render page title -->
+<div id="page-header-data"
+     data-title="Patient Appointments History"
+     data-icon="hourglass-split"
+     data-subtitle="View all appointments history of the patient">
+</div>
+
+<!-- Back  Button -->
+<div class="d-flex justify-content-end align-items-center gap-2 mb-3 flex-wrap">
+  <button class="btn btn-danger" onclick="goBack()">
+    <i class="bi bi-arrow-left-circle me-1"></i> Back
+  </button>
+</div>
+
+<!-- Appointment History Card -->
+<div class="card shadow-sm border-0">
+  <div class="card-body">
+    
+    <!-- Dynamically populated -->
+
+  </div>
+</div>
+
+<!-- Prescription Modal -->
+<div class="modal fade" id="prescriptionModal" tabindex="-1" aria-labelledby="prescriptionModalLabel" aria-hidden="true" >
+  <div class="modal-dialog modal-dialog-scrollable ">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="prescriptionModalLabel">Prescription</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body prescription-body">
+        <!-- Dynamically injected prescription HTML will go here -->
+      </div>
+      <div class="modal-footer">       
+        <button id="downloadPdfBtn" class="btn btn-success">Download Prescription</button>    
+        <button id="printPdfBtn" class="btn btn-primary">Print</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Image Modal -->
+<div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true" >
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="imageModalLabel">Image</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="image-body">
+        <!-- Dynamically injected image HTML will go here -->
+      </div>
+      <!-- <div class="modal-footer">
+        <button id="downloadimageBtn" class="btn btn-success">Download Image</button>
+      </div> -->
+    </div>
+  </div>
+</div>
+
+
+<!-- <form id="add-appointment-form">
+      <div class="row">
+      <div class="col-12">
+        <h6 class="text-primary border-bottom pb-2">Appointment Number :- <span id="appointment_no"></span></h6>
+      </div>
+
+      <div class="col-md-4">
+        <label for="reg_no" class="form-label">Registration Number</label>
+        <input type="text" class="form-control bg-light" id="reg_no" placeholder="e.g., REG12345" required readonly>
+      </div>
+
+      <div class="col-md-4">
+        <label for="full_name" class="form-label">Full Name</label>
+        <input type="text" class="form-control bg-light" id="full_name" required readonly>
+      </div>
+
+      <div class="col-md-4">
+        <label for="start_datetime" class="form-label">Start Date & Time</label>
+        <input type="datetime-local" class="form-control" id="start_datetime" required readonly>
+      </div>
+
+      <div class="col-md-6 mt-2">
+        <label for="consultation_category" class="form-label">Consultation Category</label>
+        <input type="text" class="form-control" id="consultation_category" required readonly>
+      </div>
+
+      <div class="col-md-6 mt-2">
+        <label for="appointment_category" class="form-label">Appointment Category</label>
+        <input type="text" class="form-control" id="appointment_category" required readonly>  
+      </div>
+
+      <div class="col-12 mt-2">
+        <label for="description" class="form-label">Description Details</label>
+        <textarea class="form-control" id="description" rows="3" placeholder="Write purpose, symptoms, etc..." required readonly></textarea>
+      </div>
+
+      <div class="col-md-6 mt-2">
+        <label for="doctor_fees" class="form-label">Doctor Fees</label>
+        <input type="text" class="form-control" id="doctor_fees" required readonly>
+      </div>
+
+      <div class="col-md-6 mt-2">
+        <label for="appointment_status" class="form-label">Appointment Status</label>
+        <input type="text" class="form-control" id="appointment_status" required readonly>  
+      </div>
+
+      <div id="registration_info"></div>
+
+
+      <div class=" d-flex justify-content-center align-items-center mt-2">
+        <button type="submit" class="btn btn-primary">
+          <i class="bi bi-file-earmark-pdf me-1"></i> View PDF
+        </button>
+      </div>
+      </div>
+      
+    </form> -->

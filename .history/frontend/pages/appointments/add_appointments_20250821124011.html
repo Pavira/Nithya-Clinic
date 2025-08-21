@@ -1,0 +1,103 @@
+<!-- add_appointments.html -->
+
+<!-- Header Metadata for JS to render page title -->
+<div id="page-header-data"
+     data-title="Add Appointment"
+     data-icon="calendar-plus"
+     data-subtitle="Create a new appointment for a registered patient">
+</div>
+
+<!-- Back  Button -->
+<div class="d-flex justify-content-end align-items-center gap-2 mb-3 flex-wrap">
+  <button class="btn btn-danger" onclick="loadPage('patients/view_patients')">
+    <i class="bi bi-arrow-left-circle me-1"></i> Back
+  </button>
+</div>
+
+<!-- Add Appointment Form Card -->
+<div class="card shadow-sm border-0">
+  <div class="card-body">
+    <form id="add-appointment-form">
+      <div class="row">
+        <!-- 🟦 Patient Information -->
+      <div class="col-12">
+        <h5 class="text-primary border-bottom pb-2">Patient Information</h5>
+      </div>
+
+      <div class="col-md-4">
+        <label for="reg_no" class="form-label">Registration Number</label>
+        <input type="text" class="form-control bg-light" id="reg_no" placeholder="e.g., REG12345" required readonly>
+      </div>
+
+      <div class="col-md-4">
+        <label for="full_name" class="form-label">Full Name</label>
+        <input type="text" class="form-control bg-light" id="full_name" required readonly>
+      </div>
+
+      <div class="col-md-4">
+        <label for="phone" class="form-label">Phone Number</label>
+        <input type="tel" class="form-control bg-light" id="phone" required readonly>
+      </div>
+
+      <!-- 🟨 Appointment Category -->
+      <div class="col-12 mt-4">
+        <h5 class="text-warning border-bottom pb-2">Appointment Category*</h5>
+      </div>
+
+      <div class="col-md-6">
+        <label for="consultation_category" class="form-label">Consultation Category*</label>
+        <select class="form-select" id="consultation_category" required>
+          <option selected>General</option>
+<option>Chemical Peel</option>
+<option>MNRF</option>
+<option>LHR</option>
+<option>RF</option>
+<option>Excimer</option>
+<option>Cryotherapy</option>
+<option>Paring</option>
+<option>Tattoo Removal</option>
+<option>Biopsy</option>
+<option>Miscellaneous</option>
+
+        </select>
+      </div>
+
+      <div class="col-md-6">
+        <label for="appointment_category" class="form-label">Appointment Category*</label>
+        <select class="form-select" id="appointment_category" required>
+          <option selected disabled value="">Select...</option>
+          <option>Out Patient</option>
+          <option>Out Patient + Procedure</option>
+        </select>
+      </div>
+
+      <!-- 🟩 Appointment Information -->
+      <div class="col-12 mt-4">
+        <h5 class="text-success border-bottom pb-2">Appointment Information</h5>
+      </div>
+
+      <div class="col-11">
+        <label for="description" class="form-label">Description Details</label>
+        <textarea class="form-control" id="description" rows="3" placeholder="Write purpose, symptoms, etc..."></textarea>
+      </div>
+
+      <div class="col-1 mt-2" style="display: flex; align-items: center; justify-content: center;">
+        <button id="micButton" class="micButton" type="button"><i class="bi bi-mic-fill"></i></button>
+      </div>
+
+      <div class="col-md-6 mt-2">
+        <label for="start_datetime" class="form-label">Start Date & Time*</label>
+        <input type="datetime-local" class="form-control" id="start_datetime" required>
+      </div>
+
+      <!-- Submit Button -->
+      <div class=" d-flex justify-content-end mt-4">
+        <button type="submit" class="btn btn-success">
+          <i class="bi bi-check2-circle me-1"></i> Book Appointment
+        </button>
+      </div>
+      </div>
+      
+    </form>
+  </div>
+</div>

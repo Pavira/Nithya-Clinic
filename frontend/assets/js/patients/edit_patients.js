@@ -1,7 +1,129 @@
+    //------------ Validate Patient Form -------------
+function validatePatientForm() {
+  const fullName = document.getElementById("fullName").value;
+  const phoneNumber = document.getElementById("phoneNumber").value;
+  const dob = document.getElementById("dob").value;
+  const gender = document.querySelector('input[name="gender"]:checked')?.value;
+  const marital = document.querySelector('input[name="martial"]:checked')?.value;
+  // const ageText = document.getElementById("age").value;  // e.g. "5 years"
+  // const age = parseInt(ageText);
+  const address = document.getElementById("address").value;
+  const profession = document.getElementById("profession").value; 
+  const treatment_type = document.getElementById("treatmentType").value;
+  const purposeOfVisit = document.getElementById("purposeOfVisit").value;
+  const referredBy = document.getElementById("referredBy").value;
+  const phonePattern = /^[0-9]{10}$/;
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const email = document.getElementById("email").value;
+  const aadharNumber = document.getElementById("aadhar").value;
+  const aadharPattern = /^[0-9]{12}$/;
+  
+
+  if (!fullName || !phoneNumber || !dob || !gender || !marital || !profession || !treatment_type || !purposeOfVisit) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Validation',
+      text: 'Please fill in all the required fields.',
+    });
+    // if (!phonePattern.test(phoneNumber)) {
+    //   alert("Please enter a valid email and phone number.");
+    //   return false;
+    // }
+    return false;
+  }
+  if (email && !emailPattern.test(email)) {
+    // const toast = new bootstrap.Toast(document.getElementById('emailToast'));
+    // toast.show();
+    Swal.fire({
+      icon: 'warning',
+      title: 'Validation',
+      text: 'Please enter a valid email address.',
+    });
+    return false;
+  }
+  if (phoneNumber && !phonePattern.test(phoneNumber)) {
+    // const toast = new bootstrap.Toast(document.getElementById('phoneToast'));
+    // toast.show();
+    Swal.fire({
+      icon: 'warning',
+      title: 'Validation',
+      text: 'Please enter a valid 10-digit phone number.',
+    });
+    return false;
+  }
+  if (aadharNumber && !aadharPattern.test(aadharNumber)) {
+    // const toast = new bootstrap.Toast(document.getElementById('phoneToast'));
+    // toast.show();
+    Swal.fire({
+      icon: 'warning',
+      title: 'Validation',
+      text: 'Please enter a valid 12-digit Aadhar number.',
+    });
+    return false;
+  }
+
+
+  // Additional validation can be added here
+  return true;
+}
+
+// -----------Check Duplicate Patient -----------
+async function checkkDuplicatePatient(fullName, phoneNumber) {
+  console.log("Checking for duplicate patient...");
+
+  try {
+    const token = localStorage.getItem("token");
+    const url = `/api/v1/patients/check_duplicate_patient?full_name=${encodeURIComponent(fullName)}&phone_number=${phoneNumber}`;
+    
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (response.status === 401) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Session Expired',
+          text: 'Your session has expired. Please sign in again.',
+        }).then(() => {
+          localStorage.removeItem("token");
+          window.location.href = "/"; // or your login page
+        });
+        return; // stop further processing
+      }
+
+    const result = await response.json();
+    console.log("Duplicate check result:", result);
+
+    if (response.ok && result.data === true) {
+      return false; // Duplicate found
+    } else if (response.ok && result.data === false) {
+      return true; // No duplicate
+    } else {
+      Swal.fire({
+        icon: 'error',
+        title: '⛔ Error checking duplicate patient',
+      });
+    }
+  } catch (err) {
+    Swal.fire({
+      icon: 'error',
+      title: '⛔ Server error. Try again later.',
+    });
+    console.error(err);
+  }
+}
 
     // ---------------Update Patient Functionality ---------------
     document.getElementById("updateButton").addEventListener("click", async (e) => {
         e.preventDefault(); 
+
+        // ----------- Validate Form Data -----------
+        console.log("Validating patient form...");
+        if (!validatePatientForm()) 
+            return validatePatientForm();
 
         // ----------- Collect Form Data -----------
         console.log("Collecting patient form data...");
@@ -74,7 +196,6 @@
         } else {
             alert("❌ Failed to update user: " + updateResult.message);
         }
-
         }catch(err){
             alert("Server error. Try again later.");
             console.error(err);

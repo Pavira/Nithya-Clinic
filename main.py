@@ -1,3 +1,7 @@
+import sys
+import threading
+import uvicorn
+import webview
 from app.api.v1.routes.drug_names import drug_names
 from app.api.v1.routes.drug_category import drug_category
 from app.api.v1.routes.dashboard import dashboard
@@ -20,9 +24,22 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 import os
 
+
+def resource_path(relative_path):
+    """Get absolute path to resource, works for dev and for PyInstaller EXE"""
+    try:
+        base_path = sys._MEIPASS  # When running as .exe
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
+
+
 # ---------- Configuration ----------
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-FRONTEND_DIR = os.path.abspath(os.path.join(BASE_DIR, "../../frontend"))
+# FRONTEND_DIR = os.path.abspath(os.path.join(BASE_DIR, "../../frontend"))
+FRONTEND_DIR = resource_path("frontend")
+
 
 # ---------- App Setup ----------
 app = FastAPI(
@@ -51,9 +68,26 @@ app.include_router(drug_names.router, prefix="/api/v1/drug_names")
 
 
 # ---------- Static Files ----------
-app.mount("/admin", StaticFiles(directory="frontend/", html=True), name="admin")
+app.mount("/admin", StaticFiles(directory=FRONTEND_DIR, html=True), name="admin")
 
 
 @app.get("/", include_in_schema=False)
 def serve_signin():
-    return FileResponse("frontend/pages/auth/signin.html")
+    # return FileResponse("frontend/pages/auth/signin.html")
+    return FileResponse(os.path.join(FRONTEND_DIR, "pages/auth/signin.html"))
+
+
+# ---------- Run FastAPI in a thread ----------
+def start_server():
+    uvicorn.run(app, host="127.0.0.1", port=8000, log_level="info")
+
+
+# ---------- Entry point ----------
+if __name__ == "__main__":
+    # Run FastAPI in a background thread
+    server_thread = threading.Thread(target=start_server, daemon=True)
+    server_thread.start()
+
+    # Open WebView as desktop app
+    webview.create_window("Nithya Clinic", "http://127.0.0.1:8000/")
+    webview.start()
