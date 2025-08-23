@@ -18,7 +18,7 @@ class VitalsSchema(BaseModel):
     height: Optional[float] = 0
     weight: Optional[float] = 0
     bmi: Optional[float] = 0
-    blood_pressure: Optional[str] = "0/0"
+    blood_pressure: Optional[str] = "0"
     pulse: Optional[float] = 0
 
     def to_dict(self):
@@ -32,7 +32,7 @@ class UpdateAppointmentSchema(BaseModel):
     height: Optional[float] = 0
     weight: Optional[float] = 0
     bmi: Optional[float] = 0
-    blood_pressure: Optional[str] = "0/0"
+    blood_pressure: Optional[str] = ""
     pulse: Optional[float] = 0
     history: Optional[str] = ""
     clinical_feature: Optional[str] = ""

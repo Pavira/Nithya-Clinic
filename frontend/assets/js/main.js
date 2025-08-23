@@ -573,7 +573,26 @@ if (data.Prescription.length === 0) {
     let prescriptionBodyHTML = `
     
     <div class="prescription-container">
-        <div class="left-panel">
+      <div class="top-panel">
+    <!-- 🔥 Two sections: left-info and right-info -->
+    <div class="top-left">
+        <h1>Dermatology Clinic</h1>
+        <p class="address">
+            Clinic: New No 4, 2nd Right on Raja Annamalai Road, Behind Adithya Kanakadhara Apartment, Saibaba Colony, Coimbatore 641011<br>
+            Phone: 0422-2439601 / 0422-4707114 * Mob: +91 94878 79601 * Email: drnithyadhollan@gmail.com * GST: 33ARYPN6845B1ZB
+        </p>
+    </div>
+    <div class="top-right">
+        <p class="doctor-info">
+            <strong>Dr. Nithya D, MD (DVL), DNB</strong><br>
+            Consultant Dermatologist<br>
+            Reg. No. 84140
+        </p>
+    </div>
+</div>
+
+      <div class="bottom-panel">
+        <div class="left-panel">          
             <h5>PROCEDURES</h5>
             <ul>  
                 <li>CHEMICAL PEELING<br><span>(for treatment of acne,<br> facial pigmentation and <br> acne scars)</span></li>
@@ -594,12 +613,7 @@ if (data.Prescription.length === 0) {
         <div class="right-panel">
             <div class="right-content">
             
-            <div class="header">
-                <h1>Dermatology Clinic</h1>
-                <p>Dr. Nithya D, MD (DVL), DNB<br>
-                   Consultant Dermatologist<br>
-                   Reg. No. 84140</p>
-            </div>
+            
             <div class="custom-divider"></div>
 
             <div class="info-row">
@@ -632,24 +646,20 @@ if (data.Prescription.length === 0) {
                 <p>${ data.History || ''}</p>
             </div>
 
-            <div class="page-divider"></div>
-
             <div class="section">
                 <strong>Clinical Features:</strong>
                 <p>${ data.ClinicalFeature || ''}</p>
             </div>
 
             <div class="section">
-                <strong>Diagnosis:</strong>
-                <p>${ data.Diagnosis || ''}</p>
-            </div>
-
-            <div class="page-divider"></div>
-
-            <div class="section">
                 <strong>Investigation:</strong>
                 <p>${ data.Investigation || ''}</p>
             </div>
+
+            <div class="section">
+                <strong>Diagnosis:</strong>
+                <p>${ data.Diagnosis || ''}</p>
+            </div> 
 
             <div class="page-divider"></div>
 
@@ -668,22 +678,13 @@ if (data.Prescription.length === 0) {
                     <strong>Note:</strong>
                     <p>*If you develop allergies from any medication consult your doctor or near by hospital immediately.<br>
                     *Kindly bring this prescription record or softcopy of every visit</p>
-                </div>
-                <div class="page-divider"></div>
-                <p class="address">
-                    Clinic: New No 4, 2nd Right on Raja Annamalai Road,Behind Adithya Kanakadhara<br>
-                    Apartment, Saibaba Colony, Coimbatore 641011<br>
-                    Phone: 0422-2439601 / 0422-4707114 * Mob: +91 94878 79601 * Email:<br>
-                    drnithyadhollan@gmail.com * GST: 33ARYPN6845B1ZB
-                </p>
-                <div class="page-divider"></div>
+                </div>     
                 <div class="consult-time">
-                    Consulting Time: 10.00 am to 1.00 pm & 3.00 pm to 7.00 pm | Monday to Saturday<br>
-                    [Sunday Holiday]
+                    Consulting Time: 10.30 am to 1.30 pm & 4.30 pm to 7.30 pm | Monday to Saturday [Sunday Holiday]
                 </div>
             </div>
         </div>
-
+      </div>
     </div>  
       `;
     // });
@@ -738,12 +739,12 @@ if (data.Prescription.length === 0) {
 // }
 
 // ----------------- Print PDF Functions ------------------- //
-// function printPdf() {
+
   document.getElementById("printPdfBtn").addEventListener("click", function () {
     const element = document.querySelector(".prescription-body");
 
     // Grab the form where appointment_no lives
-    const form = document.querySelector("#appointment_no")?.closest("form");
+    const form = document.querySelector("#appointment_no")?.closest("form");  
 
     // Get all inputs inside the form
     const inputs = form?.querySelectorAll("input.form-control.bg-light");
@@ -756,12 +757,8 @@ if (data.Prescription.length === 0) {
     const safeName = patientName.replace(/[^a-z0-9]/gi, "_");
     const fileName = `${safeName}_${appointmentNumber}.pdf`;
 
-    console.log(patientName);
-    console.log(appointmentNumber);
-    console.log(fileName);
-
     const opt = {
-      margin: [0.5, 0.5, 0.5, 0.5], // top, left, bottom, right
+      // margin: [0.5, 0.5, 0.5, 0.5], 
       filename: fileName,
       image: { type: 'jpeg', quality: 0.98 },
       html2canvas: { scale: 2, useCORS: true, scrollY: 0 },
@@ -777,6 +774,78 @@ if (data.Prescription.length === 0) {
       .then(function (pdf) {
         pdf.autoPrint();
         window.open(pdf.output('bloburl'), '_blank');
-      });
+    });
   });
-// }
+
+//---------------Fetch instructions ------------------
+async function fetchInstructions() {
+  console.log("Fetching instructions...");
+  showLoader();
+  try {
+    const token = localStorage.getItem("token");
+    const response = await fetch(`/api/v1/appointments/fetch_instructions`, {     
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (response.status === 401) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Session Expired',
+        text: 'Your session has expired. Please sign in again.',
+      }).then(() => {
+        localStorage.removeItem("token");
+        window.location.href = "/";
+      });
+      return [];
+    }
+
+    const result = await response.json();
+    localStorage.setItem("instruction_list", JSON.stringify(result.data));
+    return result.data || [];
+  } catch (err) {
+    console.error(err);
+    return [];
+  } finally {
+    hideLoader();
+  }
+} 
+
+// ------------------ Fetch Drug Names ------------------
+async function fetchDrugNames() {
+  showLoader();
+  try {
+    const token = localStorage.getItem("token");
+    const response = await fetch(`/api/v1/drug_names/fetch_drug_names`, {     
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (response.status === 401) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Session Expired',
+        text: 'Your session has expired. Please sign in again.',
+      }).then(() => {
+        localStorage.removeItem("token");
+        window.location.href = "/";
+      });
+      return [];
+    }
+
+    const result = await response.json();
+    localStorage.setItem("drug_list", JSON.stringify(result.data));
+    return result.data || [];
+  } catch (err) {
+    console.error(err);
+    return [];
+  } finally {
+    hideLoader();
+  }
+}

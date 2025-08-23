@@ -1,8 +1,8 @@
 <!-- Header -->
 <div id="page-header-data"
-     data-title="Add Drug Category"
+     data-title="Add Template"
      data-icon="bag-plus-fill"
-     data-subtitle="Register new drug categories into the system">
+     data-subtitle="Register new template into the system">
 </div>
 
 <!-- Back Button -->
@@ -21,16 +21,16 @@
         <div class="row gy-4 gx-3 align-items-end">
 
           <!-- Drug Category Name -->
-          <div class="col-md-6">
+          <!-- <div class="col-md-6">
             <label class="form-label">Drug Category*</label>
             <input type="text" class="form-control" name="drugCategoryName" id="drugCategoryName" placeholder="Enter Drug Category" maxlength="50" style="text-transform: uppercase;" required>
-          </div>
+          </div> -->
 
           <!-- Description with Add Button -->
-          <div class="col-md-6 d-flex align-items-end">
+          <div class="col-md-12 d-flex align-items-end">
             <div class="w-100">
-              <label class="form-label">Description*</label>
-              <input type="text" class="form-control" name="description[]" id="description" placeholder="Enter Description" required>
+              <label class="form-label">Template*</label>
+              <input type="text" class="form-control" name="description" id="description" placeholder="Enter Description" required>
             </div>
             <button type="button" class="btn btn-outline-primary ms-2" id="addRowBtn" title="Add another row">
               <i class="bi bi-plus-circle"></i>
@@ -40,9 +40,9 @@
       </div>
 
       <!-- Submit Button -->
-      <div class="d-flex justify-content-end mt-4 gap-2">
+      <div class="d-flex justify-content-center mt-4 gap-2">
         <button type="submit" class="btn btn-success">
-          <i class="bi bi-bag-plus-fill me-2"></i>Add Category
+          <i class="bi bi-bag-plus-fill me-2"></i>Add Template
         </button>
       </div>
     </form>

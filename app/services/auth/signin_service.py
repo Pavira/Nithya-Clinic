@@ -27,7 +27,9 @@ def resource_path(relative_path):
 
 # load_dotenv()
 load_dotenv(resource_path(".env"))
-FIREBASE_API_KEY = os.getenv("FIREBASE_API_KEY")
+FIREBASE_API_KEY = os.getenv(
+    "FIREBASE_API_KEY", "AIzaSyAMZlRPgaZAwGsKiFBPfkpBT4n90C6MPyo"
+)
 
 
 def update_last_login(user_id: str):
@@ -79,7 +81,7 @@ def login_user_service(
         # Ensure Firestore user exists — or create if not  # 2️⃣ Get user role & display name from Firestore (can also be cached)
         user_ref = db.collection("users").document(uid)
         user_snapshot = user_ref.get()
-        user_data = user_snapshot.to_dict()
+        user_data = user_snapshot.to_dict() or {}
         display_name = user_data.get("display_name", "Unknown User")
         user_role = user_data.get("user_role", "Unknown Role")
 

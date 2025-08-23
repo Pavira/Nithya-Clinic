@@ -31,6 +31,7 @@ function deleteDrugCategory(categoryId) {
         })
         .then((data) => {
           Swal.fire('Deleted!', 'The drug category has been deleted.', 'success');
+          fetchInstructions();
           // ✅ Optionally reload list or page
           setTimeout(() => {
             loadPage('drug_category/view_drug_category');
@@ -80,29 +81,28 @@ function viewDrugCategoryFunction() {
                     const row = document.createElement("tr");
 
                     // Check if description is an array
-                    let descriptionText = "";
-                    if (Array.isArray(category.Description) && category.Description.length > 0) {
-                        descriptionText = `${category.Description[0]}...`;
-                    } else if (typeof category.Description === "string") {
-                        descriptionText = category.Description;
-                    }
+                    // let descriptionText = "";
+                    // if (Array.isArray(category.Description) && category.Description.length > 0) {
+                    //     descriptionText = `${category.Description[0]}...`;
+                    // } else if (typeof category.Description === "string") {
+                    //     descriptionText = category.Description;
+                    // }
 
                     row.innerHTML = `
                         <td>${index + 1}</td>
-                        <td>${category.DrugCategoryName}</td>
-                        <td>${descriptionText}</td>
+                        <td>${category.Description}</td>
                         <td>
-                            <button class="btn btn-sm btn-outline-secondary me-1" title="Edit Drug Category" onclick="loadPage('drug_category/edit_drug_category', {category_id: '${category.DrugCategoryId}', category_name: '${category.DrugCategoryName}', description: '${encodeURIComponent(JSON.stringify(category.Description))}'})"><i class="bi bi-pencil"></i></button>
+                            <button class="btn btn-sm btn-outline-secondary me-1" title="Edit Drug Category" onclick="loadPage('drug_category/edit_drug_category', {category_id: '${category.DrugCategoryId}', description: '${category.Description}'})"><i class="bi bi-pencil"></i></button>
                             <button class="btn btn-sm btn-outline-danger" title="Delete Drug Category" onclick="deleteDrugCategory('${category.DrugCategoryId}')"><i class="bi bi-trash"></i></button>
                         </td>
                     `;
                     viewDrugCategoryTableBody.appendChild(row);
                 });
             }else if (data.data && data.data.length === 0) {
-                viewDrugCategoryTableBody.innerHTML = "<tr><td colspan='3' class='text-center'>No drug categories found.</td></tr>";
+                viewDrugCategoryTableBody.innerHTML = "<tr><td colspan='3' class='text-center'>No Templates found.</td></tr>";
             }
             else {
-                console.error("Error fetching drug categories:", data.message);
+                console.error("Error fetching Templates:", data.message);
             }
         })
         .catch(error => console.error("Error:", error))

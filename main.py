@@ -1,7 +1,15 @@
+import builtins
+import logging
+import shutil
+import subprocess
 import sys
+import tempfile
 import threading
 import uvicorn
 import webview
+import time
+import webbrowser
+
 from app.api.v1.routes.drug_names import drug_names
 from app.api.v1.routes.drug_category import drug_category
 from app.api.v1.routes.dashboard import dashboard
@@ -23,6 +31,18 @@ from app.utils.exceptions import AppException
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 import os
+
+
+log_file = os.path.join(os.path.dirname(__file__), "app.log")
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    handlers=[logging.FileHandler(log_file, encoding="utf-8")],
+)
+logger = logging.getLogger("app")
+
+# Redirect print → logger.info
+builtins.print = lambda *args, **kwargs: logger.info(" ".join(map(str, args)))
 
 
 def resource_path(relative_path):
@@ -71,10 +91,15 @@ app.include_router(drug_names.router, prefix="/api/v1/drug_names")
 app.mount("/admin", StaticFiles(directory=FRONTEND_DIR, html=True), name="admin")
 
 
+# @app.get("/", include_in_schema=False)
+# def serve_signin():
+#     # return FileResponse("frontend/pages/auth/signin.html")
+#     return FileResponse(os.path.join(FRONTEND_DIR, "pages/auth/signin.html"))
+
+
 @app.get("/", include_in_schema=False)
 def serve_signin():
-    # return FileResponse("frontend/pages/auth/signin.html")
-    return FileResponse(os.path.join(FRONTEND_DIR, "pages/auth/signin.html"))
+    return FileResponse(resource_path("frontend/pages/auth/signin.html"))
 
 
 # ---------- Run FastAPI in a thread ----------
@@ -82,12 +107,96 @@ def start_server():
     uvicorn.run(app, host="127.0.0.1", port=8000, log_level="info")
 
 
+def find_exe(candidates):
+    for path in candidates:
+        if os.path.isfile(path):
+            return path
+    for name in ("chrome", "chrome.exe"):
+        p = shutil.which(name)
+        if p:
+            return p
+    return None
+
+
+def open_chrome_maximized(url: str):
+    chrome_candidates = [
+        r"C:\Program Files\Google\Chrome\Application\chrome.exe",
+        r"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe",
+    ]
+    chrome = find_exe(chrome_candidates)
+
+    # Use a separate profile so new windows don't affect normal user data
+    user_data_dir = os.path.join(tempfile.gettempdir(), "nithya_clinic_chrome_profile")
+    os.makedirs(user_data_dir, exist_ok=True)
+
+    if chrome:
+        args = [
+            chrome,
+            "--start-maximized",  # open window maximized (like F11)
+            f"--user-data-dir={user_data_dir}",
+            url,
+        ]
+        subprocess.Popen(args, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        return True
+
+    # fallback to default browser
+    webbrowser.open(url)
+    return False
+
+
 # ---------- Entry point ----------
+# if __name__ == "__main__":
+#     # Start FastAPI in a background thread
+#     server_thread = threading.Thread(target=start_server, daemon=True)
+#     server_thread.start()
+#     time.sleep(2)
+
+#     url = "http://127.0.0.1:8000/"
+
+#     if sys.platform.startswith("win"):
+#         open_chrome_maximized(url)
+#     else:
+#         webbrowser.open(url)
+
+#     while True:
+#         time.sleep(1)
+
+
+# ---------- Entry point ----------
+# -----------------For Local host ----------------
 if __name__ == "__main__":
-    # Run FastAPI in a background thread
+    # Start FastAPI in a background thread
     server_thread = threading.Thread(target=start_server, daemon=True)
     server_thread.start()
 
-    # Open WebView as desktop app
-    webview.create_window("Nithya Clinic", "http://127.0.0.1:8000/")
-    webview.start()
+    # Give server a moment to start
+    time.sleep(2)
+
+    # Open browser in fullscreen mode
+    url = "http://127.0.0.1:8000/"
+    try:
+        # Try to launch Chrome in fullscreen (kiosk) mode
+        os.system(f"start chrome --start-fullscreen {url}")
+    except Exception:
+        # Fallback: open default browser
+        webbrowser.open(url)
+
+    # Keep the script alive
+    while True:
+        time.sleep(1)
+
+# -------------For EXE-------------
+# if __name__ == "__main__":
+#     # Run FastAPI in a background thread
+#     server_thread = threading.Thread(target=start_server, daemon=True)
+#     server_thread.start()
+
+#     # Open WebView as desktop app
+#     webview.create_window(
+#         "Nithya Clinic",
+#         "http://127.0.0.1:8000/",
+#         width=1200,
+#         height=800,
+#         resizable=True,
+#     )
+#     webview.start()

@@ -12,90 +12,85 @@ router = APIRouter(tags=["Drug Category"])
 
 # -------------Add Drug Category----------------
 class DrugCategory(BaseModel):
-    drugCategoryName: str = Field(..., example="ANTIBIOTICS")
-    description: List[str] = Field(
-        ...,
-        example=["Used for bacterial infections", "Common in post-surgery treatment"],
-    )
+    # drugCategoryName: str = Field(..., example="ANTIBIOTICS")
+    descriptions: List[str] = Field(..., alias="descriptions")
 
 
 @router.post("/add_drug_category")
 async def add_drug_category(payload: DrugCategory):
     """
-    Add a new Drug Category to Firestore using a transaction.
+    Add a new Template to Firestore using a transaction.
     Ensures unique ID and consistent count updates.
     """
     try:
+
+        descriptions = payload.descriptions
         count_doc_ref = db.collection("Count").document("count")
         drug_collection_ref = db.collection("Drug_Category")
+
+        transaction = db.transaction()
 
         @firestore.transactional
         def transaction_function(transaction):
             # Fetch current count (or initialize if not exists)
             count_snapshot = count_doc_ref.get(transaction=transaction)
-            count_data = count_snapshot.to_dict() or {}
-
-            current_count = count_data.get("DrugCategoryCount", 0)
-            new_category_id = current_count + 1
-
-            # Build new category data
-            drug_data = {
-                "DrugCategoryId": str(new_category_id),
-                "DrugCategoryName": payload.drugCategoryName.upper(),
-                "Description": payload.description,
-            }
-
-            # Create new document with ID = new_category_id
-            transaction.set(
-                drug_collection_ref.document(str(new_category_id)), drug_data
+            current_count = (
+                count_snapshot.to_dict().get("DrugCategoryCount", 0)
+                if count_snapshot.exists
+                else 0
             )
 
-            # Update the count
-            transaction.set(
-                count_doc_ref, {"DrugCategoryCount": new_category_id}, merge=True
+            # for i, (name) in enumerate(zip(drug_names)):
+            for i, name in enumerate(descriptions):
+                new_count = current_count + i + 1
+                doc_id = str(new_count)
+
+                doc_data = {
+                    "DrugCategoryId": doc_id,
+                    "Description": name,
+                    "LogDateTime": firestore.SERVER_TIMESTAMP,
+                }
+
+                doc_ref = drug_collection_ref.document(doc_id)
+                transaction.set(doc_ref, doc_data)
+
+            # Update counter
+            transaction.update(
+                count_doc_ref, {"DrugNamesCount": current_count + len(descriptions)}
             )
 
-            return drug_data
-
-        # Start and run transaction
-        transaction = db.transaction()
-        saved_data = transaction_function(transaction)
+        transaction_function(transaction)
 
         return {
             "success": True,
-            # "message": f"Category '{payload.drugCategoryName}' added successfully.",
-            # "data": saved_data,
         }
 
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to add drug category: {str(e)}",
+            detail=f"Failed to add template: {str(e)}",
         )
 
 
 # -------------Edit Drug Category----------------
 class DrugCategory(BaseModel):
     drugCategoryId: str
-    drugCategoryName: str = Field(..., example="ANTIBIOTICS")
-    description: List[str] = Field(
-        ...,
-        example=["Used for bacterial infections", "Common in post-surgery treatment"],
-    )
+    # drugCategoryName: str = Field(..., example="ANTIBIOTICS")
+    description: str = Field(..., alias="description")
 
 
 # -------------Edit Drug Category----------------
 @router.post("/edit_drug_category")
 async def edit_drug_category(payload: DrugCategory):
     """
-    Edit an existing Drug Category in Firestore using a transaction.
+    Edit an existing Templates in Firestore using a transaction.
     """
     try:
-        print(f"Editing drug category with ID: {payload.drugCategoryId}")
+        print(f"Editing template with ID: {payload.drugCategoryId}")
         if not payload.drugCategoryId:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Drug Category ID is required.",
+                detail="template ID is required.",
             )
         drug_collection_ref = db.collection("Drug_Category")
         drug_doc_ref = drug_collection_ref.document(payload.drugCategoryId)
@@ -107,14 +102,14 @@ async def edit_drug_category(payload: DrugCategory):
             if not drug_snapshot.exists:
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND,
-                    detail=f"Drug category with ID {payload.drugCategoryId} not found.",
+                    detail=f"template with ID {payload.drugCategoryId} not found.",
                 )
 
             # Update the document with new data
             transaction.update(
                 drug_doc_ref,
                 {
-                    "DrugCategoryName": payload.drugCategoryName.upper(),
+                    # "DrugCategoryName": payload.drugCategoryName.upper(),
                     "Description": payload.description,
                 },
             )

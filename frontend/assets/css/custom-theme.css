@@ -187,13 +187,14 @@ body {
 .prescription-container {
     display: flex;
     width: 21cm; /* A4 width */
+    flex-direction: column;  /* 🔥 NEW: Stack top and bottom sections vertically */
     /* max-height: 29.7cm;  */
-    margin: 5px;
+    /* margin: 5px; */
     background-color: #fff;
     box-shadow: 0 0 0.5cm rgba(0, 0, 0, 0.1);
     box-sizing: border-box;
     font-family: 'Segoe UI', sans-serif;
-    padding: 0.8cm;
+    padding: 0.5cm;
     /* overflow: hidden; */
 }
 /* Always start a new page before this element */
@@ -217,25 +218,74 @@ body {
   padding-right: 200px;
 }
 
+.top-panel {
+    display: flex;               /* 🔥 Make two columns */
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 5px;
+    /* gap: 10px;                   Space between columns */
+}
+
+/* Left section (Clinic name + address) */
+.top-left {
+    width: 75%;                 /* ✅ Change to 90% if you want more space */
+}
+
+.top-left h1 {
+    font-size: 26px;
+    color: #004080;
+    font-style: italic;
+    margin: 0 0 4px 0;
+}
+
+.address {
+    font-size: 9px;
+    color: #555;
+    margin: 0;
+    line-height: 1.4;
+    font-style: italic;
+}
+
+/* Right section (Doctor details) */
+.top-right {
+    width: 25%;                 /* ✅ Change to 10% if needed */
+    text-align: right;
+}
+
+.doctor-info {
+    font-size: 12px;
+    font-style: italic;
+    margin: 0;
+}
+
+/* 🔥 NEW: Flex for left/right panels */
+.bottom-panel {
+    display: flex;
+    width: 100%;
+    gap: 10px; /* Optional spacing */
+}
+
 .left-panel {
     width: 20%;
     background-color: #f7f7f7;
     padding: 4px;
     border: 3px solid #ccc;
     box-sizing: border-box;
+    /* margin-top: 60px; */
     /* padding-bottom: 20px; */
 }
 
 .left-panel h5 {
-    margin-top: 60px;
-    margin-bottom: 30px;
+    margin-top: 20px;
+    margin-bottom: 20px;
     font-style: italic;
+    font-size: 18px;
 }
 
 .left-panel ul {
     list-style: none;
     padding-left: 2px;
-    font-size: 13px;
+    font-size: 12px;
     font-style: italic;
 }
 
@@ -267,63 +317,44 @@ body {
 }
 
 
-.header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 0;
-}
 
-.header h1 {
-    font-size: 30px;  
-    color: #004080;
-    font-style: italic;
-    margin-bottom: 0;
-}
-
-.header p {
-    font-size: 13px;
-    text-align: right;
-    font-style: italic;
-    margin-bottom: 0;
-}
 
 .custom-divider {
   border-top: 3px solid;
   /* margin: 16px 0; */
-  margin-bottom: 10px;
-  margin-top: 10px;
+  margin-bottom: 5px;
+  margin-top: 5px;
 }
 .page-divider {
   border-top: 1px solid;
-  margin: 10px 0 10px 0;
+  margin: 5px 0 5px 0;
 }
 
 .info-row {
     display: flex;
     justify-content: space-between;
-    font-size: 13px;
-    margin: 3px 0;
+    font-size: 11px;
+    /* margin: 3px 0; */
 }
 
 .vitals {
     display: flex;
-    gap: 16px;
-    font-size: 13px;
-    margin: 8px 0;
+    gap: 30px;
+    font-size: 11px;
+    margin: 5px 0;
     flex-wrap: wrap;
 }
 
 .section {
-    margin-top: 12px;
-    font-size: 13px;
+    margin-top: 5px;
+    font-size: 11px;
 }
 
 .section p {
     margin: 4px 0 0 0;
 }
 .rx{
-    font-size: 24px;
+    font-size: 20px;
     font-style: italic;
 
 }
@@ -331,8 +362,8 @@ body {
 .rx-table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 8px;
-    font-size: 13px;
+    margin-top: 5px;
+    font-size: 12px;
 }
 .rx-table th {
     background-color: #e2e2e2;
@@ -357,9 +388,9 @@ body {
 }
 
 .consult-time {
-    padding: 7px;
-    font-size: 13px;
-    margin-top: 6px;
+    padding: 5px;
+    font-size: 11px;
+    margin-top: 5px;
     font-style: italic;
     color: #fff;
     background-color: #004080;
@@ -367,9 +398,9 @@ body {
 
 .doctor-notes {
     background-color: #d1e7ff; /* light blue background */
-    padding: 7px;
-    font-size: 11px;
-    margin-top: 5px;
+    padding: 5px;
+    font-size: 10px;
+    /* margin-top: 5px; */
     line-height: 1.5;
 }
 

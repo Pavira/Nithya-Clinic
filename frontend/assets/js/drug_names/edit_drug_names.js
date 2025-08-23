@@ -1,4 +1,7 @@
 function initEditDrugsPage(){
+  console.log("Drug Id://////////",window.pageParams?.drug_name_id);
+  console.log("Drug Name://////////",window.pageParams?.drug_name);
+
     showDrugNameDetails();
     editDrugNameFunction();
 }
@@ -6,10 +9,11 @@ function initEditDrugsPage(){
   // Populate category details (from encoded data)
   function showDrugNameDetails() {
     const drug_name = window.pageParams?.drug_name;
-    const drug_category_name = window.pageParams?.drug_category_name;
+    
+    // const drug_category_name = window.pageParams?.drug_category_name;
 
     // Set the category name
-    document.getElementById('drugCategory').value = drug_category_name || '';
+    // document.getElementById('drugCategory').value = drug_category_name || '';
     document.getElementById('drugName').value = drug_name || '';
   }
 
@@ -23,7 +27,7 @@ function editDrugNameFunction() {
 
     const formData = new FormData(form);
     const drugName = formData.get('drugName');
-    const drugCategoryName = formData.get("drugCategory");              // string
+    // const drugCategoryName = formData.get("drugCategory");              // string
 
     if (!window.pageParams?.drug_name_id) {
       Swal.fire({
@@ -36,11 +40,11 @@ function editDrugNameFunction() {
 
     console.log("Drug Id:", window.pageParams?.drug_name_id);
 
-    if (!drugName || !drugCategoryName) {
+    if (!drugName) {
       Swal.fire({
         icon: 'warning',
         title: 'Validation Error',
-        text: 'Please enter both drug name and category.',
+        text: 'Please enter drug name',
       });
       return;
     }
@@ -63,14 +67,25 @@ function editDrugNameFunction() {
       body: JSON.stringify(requestData)
     })
     .then(response => response.json())
+    
     .then(data => {
+      hideLoader();
       if (data.success) {
         Swal.fire({
           icon: 'success',
           title: 'Success',
           text: `${drugName} has been updated successfully!`,
+          confirmButtonText: "OK"
+        }).then((result) => {
+          if (result.isConfirmed) {
+            // Clear local cache so new data is fetched
+            // localStorage.removeItem("drug_list");
+            fetchDrugNames();
+
+            // Load the page after confirmation
+            loadPage("drug_names/view_drug_names");
+          }
         });
-        loadPage('drug_names/view_drug_names'); // Redirect to view page
       } else {
         Swal.fire({
           icon: 'error',
@@ -80,6 +95,7 @@ function editDrugNameFunction() {
       }
     })
     .catch(error => {
+      hideLoader();
       console.error('Error:', error);
       Swal.fire({
         icon: 'error',
@@ -87,9 +103,9 @@ function editDrugNameFunction() {
         text: error.message || 'An unexpected error occurred.'
       });
     })
-    .finally(() => {
-      hideLoader();
-    })
+    // .finally(() => {
+    //   hideLoader();
+    // })
   });
 }
 
@@ -124,6 +140,8 @@ document.getElementById('delete-drug-name-btn').addEventListener('click', functi
         })
         .then((data) => {
           Swal.fire('Deleted!', 'The Drug Name has been deleted.', 'success');
+          // localStorage.removeItem("drug_list");
+          fetchDrugNames();
           // ✅ Optionally reload list or page
           setTimeout(() => {
             loadPage('drug_names/view_drug_names');

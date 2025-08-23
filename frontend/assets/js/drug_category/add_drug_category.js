@@ -1,5 +1,5 @@
 
-console.log("Add Drug Category Page Loaded");
+console.log("Add Template Page Loaded");
 function initAddDrugCategoryPage() {
   addRowBtnFunction();
   addCategoryFunction();
@@ -18,10 +18,10 @@ function addRowBtnFunction() {
       row.className = 'row gy-4 gx-3 align-items-end mt-2';
 
       row.innerHTML = `
-        <div class="col-md-6"></div>
-        <div class="col-md-6 d-flex align-items-end">
+        <div class="col-md-12 d-flex align-items-end">
           <div class="w-100">
-            <input type="text" class="form-control" name="description[]" id="description" placeholder="Enter Description" required>
+            <label class="form-label">Template*</label>
+            <input type="text" class="form-control" name="description" id="description" placeholder="Enter Description" required>
           </div>
           <button type="button" class="btn btn-outline-danger ms-2 removeRowBtn" title="Remove this row">
             <i class="bi bi-x-circle"></i>
@@ -52,26 +52,24 @@ function addCategoryFunction() {
 
   form.addEventListener('submit', function (e) {
     e.preventDefault();
-
     const formData = new FormData(form);
-    const drugCategoryName = formData.get("drugCategoryName");              // string
-    const description = formData.getAll("description[]").filter(Boolean);  // array of non-empty strings
+    const descriptions = [];
 
-    if (!drugCategoryName || description.length === 0) {
+    form.querySelectorAll(".row").forEach(row => {
+      const description = row.querySelector("input[name='description']").value.trim();
+     
+      if (description) {
+        descriptions.push(description);
+      }
+    });
+    if (descriptions.length === 0) {
       Swal.fire({
         icon: 'warning',
         title: 'Validation Error',
-        text: 'Please enter both drug category and at least one description.',
+        text: 'Please enter all the template.',
       });
       return;
     }
-
-    const requestData = {
-      drugCategoryName,
-      description
-    };
-
-    console.log("Request Data:", requestData);
 
     showLoader();
     const token = localStorage.getItem("token");
@@ -81,25 +79,39 @@ function addCategoryFunction() {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify(requestData)
+      body: JSON.stringify({descriptions})
     })
     .then(response => response.json())
     .then(data => {
+      hideLoader();
       if (data.success) {
         Swal.fire({
           icon: 'success',
           title: 'Success',
-          text: `${drugCategoryName} category added successfully!`,
-        });
+          text: `Template added successfully!`,
+          confirmButtonText: "OK"
+        }).then((result) => {
+      if (result.isConfirmed) {
+        // ✅ Update localStorage instead of clearing it
+            let localStorageInstructionList = JSON.parse(localStorage.getItem("instruction_list")) || [];
+
+            // ✅ Append only new descriptions that aren't already in the list
+            descriptions.forEach(desc => {
+              if (!localStorageInstructionList.includes(desc)) {
+                localStorageInstructionList.push(desc);
+              }
+            });
+
+            localStorage.setItem("instruction_list", JSON.stringify(localStorageInstructionList));
+        // ✅ Redirect or refresh page after update
         loadPage("drug_category/view_drug_category");
-        // form.reset();
-        // Optionally clear dynamically added rows
-        // document.querySelectorAll("#drug-category-rows .row.mt-2").forEach(row => row.remove());
+      }
+    });        
       } else {
         Swal.fire({
           icon: 'error',
           title: 'Error',
-          text: data.message || 'Failed to add drug category.'
+          text: data.message || 'Failed to add template.'
         });
       }
     })

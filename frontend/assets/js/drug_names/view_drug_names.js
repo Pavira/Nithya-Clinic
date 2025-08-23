@@ -77,6 +77,7 @@
   let pageSize = 10;
 
   async function fetchDrugNames(isInitial = false, pageNumber = 1) {
+    console.log("Fetching Drug Names...");  
     const searchType = document.getElementById("search_type").value;
     const searchValue = document.getElementById("search_value").value.trim().toUpperCase();
     const drugsTableBody = document.getElementById("drug-names-table-body");
@@ -147,10 +148,9 @@
         const serialNumber = (currentPage - 1) * pageSize + index + 1;
         row.innerHTML = `
           <td>${serialNumber}</td>
-          <td>${drug.DrugCategoryName || "N/A"}</td>
           <td>${drug.DrugName || "N/A"}</td>          
           <td>
-            <button class="btn btn-sm btn-outline-secondary me-1" title="Edit Drug" onclick="loadPage('drug_names/edit_drug_names', {drug_name_id: '${drug.DrugNameId}', drug_name: '${drug.DrugName}', drug_category_name: '${drug.DrugCategoryName}'})"><i class="bi bi-pencil"></i></button>          
+            <button class="btn btn-sm btn-outline-secondary me-1" title="Edit Drug" onclick="loadPage('drug_names/edit_drug_names', {drug_name_id: '${drug.DrugNameId}', drug_name: '${drug.DrugName}'})"><i class="bi bi-pencil"></i></button>          
           </td>
         `;
         drugsTableBody.appendChild(row);
@@ -168,6 +168,7 @@
 
 
   async function viewDrugNames() {
+    console.log("View Drug Names Page Loaded");
     const searchValueInput = document.getElementById("search_value");
     const searchTypeInput = document.getElementById("search_type");
 

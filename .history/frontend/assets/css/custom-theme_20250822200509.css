@@ -1,0 +1,645 @@
+:root {
+  --bs-primary: #6f42c1;
+  --bs-sidebar-width: 250px;
+}
+
+body {
+  font-family: "Segoe UI", sans-serif;
+  /* background-color: #f1f3f5 !important; */
+  background-color: #F5EFFF !important;
+}
+
+/* Sidebar styling */
+#sidebar {
+  /* background-color: #6f42c1; */
+  background-color: white;
+  /* opacity: 0.8; */
+  width: var(--bs-sidebar-width);
+  position: fixed;
+  overflow-y: auto;
+  /* height: 100vh; */
+  /* border-radius: 14px; */
+}
+
+/* Default sidebar link style */
+#sidebar .nav-link {
+  color: #000;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+/* Active/selected link style */
+#sidebar .nav-link.active {
+  /* background-color: #6f42c1; */
+  background-color: #A294F9;
+  color: white;
+  font-weight: bold;
+  border-radius: 12px;
+}
+
+/* Footer image at the bottom */
+.sidebar-footer-img {
+  margin-bottom: 50px;
+  width: 100%;
+  height: 250px; /* Adjust height as needed */
+  object-fit: cover; /* Ensures image covers the box without stretching */
+  /* opacity: 0.8; */
+  border-radius: 12px;
+
+}
+
+/* Navbar styling */
+#navbar {
+  /* background-color: white;
+  border-bottom: 1px solid #ddd; */
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  z-index: 1; /* Stay above everything */
+  background-color: white;
+  border-bottom: 1px solid #ddd;
+  display: flex;
+  align-items: center;
+  padding: 0 1rem;
+}
+
+/* Match the margin with sidebar width */
+.ms-sidebar {
+  margin-left: var(--bs-sidebar-width);
+}
+
+/* Let main-content start below fixed navbar */
+#main-content {
+  margin-top: 60px;
+  height: calc(100vh - 60px);
+  overflow-y: auto;
+}
+
+.page-header {
+  background-color: white;
+  padding: 20px;
+  border-radius: 0.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
+
+.page-header h2 {
+  margin: 0;
+}
+
+.table-card {
+  background-color: white;
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
+
+.custom-pagination .page-item .page-link {
+  color: #6c757d;
+  background-color: #fff;
+  border: 1px solid #dee2e6;
+  padding: 0.375rem 0.75rem;
+  margin: 0 0.2rem;
+  border-radius: 0.375rem;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.custom-pagination .page-item .page-link:hover {
+  background-color: #f1f3f5;
+  color: #0d6efd;
+  border-color: #0d6efd;
+}
+
+.custom-pagination .page-item.active .page-link {
+  background-color: #0d6efd;
+  border-color: #0d6efd;
+  color: white;
+  font-weight: 500;
+  box-shadow: 0 2px 4px rgba(13, 110, 253, 0.25);
+}
+
+.custom-pagination .page-item.disabled .page-link {
+  color: #adb5bd;
+  background-color: #f8f9fa;
+  border-color: #dee2e6;
+}
+
+/* .form-label {font-weight: bold;}  */
+
+/* status tabs */
+.status-tabs {
+  border-bottom: 1px solid #ddd;
+  overflow-x: auto;
+}
+
+.tab-buttons {
+  gap: 1rem;
+  border-bottom: 2px solid transparent;
+}
+
+.tab-btn {
+  background: none;
+  border: none;
+  font-weight: 500;
+  font-size: 1rem;
+  padding: 0.5rem 0;
+  position: relative;
+  transition: color 0.3s ease;
+  color: #444;
+}
+
+.tab-btn.active {
+  color: #0d6efd;
+}
+
+.tab-underline {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  width: 0;
+  background-color: #0d6efd;
+  transition: all 0.3s ease;
+}
+
+.bg-cover {
+    background-image: url('/admin/assets/images/image.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    /* position: relative; */
+  }
+
+  /* .login-overlay {
+    background-color: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(2px);
+    z-index: 0;
+  } */
+
+  .z-1 {
+    z-index: 1;
+  }
+
+/* =====================Prescription Container Styling======================== */
+
+.prescription-container {
+    display: flex;
+    width: 21cm; /* A4 width */
+    /* max-height: 29.7cm;  */
+    margin: 5px;
+    background-color: #fff;
+    box-shadow: 0 0 0.5cm rgba(0, 0, 0, 0.1);
+    box-sizing: border-box;
+    font-family: 'Segoe UI', sans-serif;
+    padding: 0.8cm;
+    /* overflow: hidden; */
+}
+/* Always start a new page before this element */
+/* .page-break {
+    page-break-before: always; 
+    break-before: page; 
+} */
+
+.subtext {
+  font-style: italic;
+  font-size: 0.9em;   /* smaller than normal text */
+  color: #555;        /* muted color */
+}
+
+.modal-dialog-scrollable .modal-content  {
+  max-height: none !important;
+  width: max-content !important;
+}
+.model-top{
+  display: flex !important;
+  padding-right: 200px;
+}
+
+.left-panel {
+    width: 20%;
+    background-color: #f7f7f7;
+    padding: 4px;
+    border: 3px solid #ccc;
+    box-sizing: border-box;
+    margin-top: 65px;
+    /* padding-bottom: 20px; */
+}
+
+.left-panel h5 {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    font-style: italic;
+}
+
+.left-panel ul {
+    list-style: none;
+    padding-left: 2px;
+    font-size: 13px;
+    font-style: italic;
+}
+
+.left-panel li {
+    margin-bottom: 17px;
+    /* line-height: 20px !important;  */
+    font-style: italic;
+}
+.MICRODERMABRASION {
+    font-size: 12px;
+}
+
+.left-panel li span {
+    font-size: 11px;
+    color: #555;
+}
+
+.right-panel {
+    width: 80%;
+    padding: 0 0 0 15px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* This pushes footer to bottom */
+}
+
+.right-content {
+    flex-grow: 1;
+}
+
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 0;
+}
+
+.header h1 {
+    font-size: 30px;  
+    color: #004080;
+    font-style: italic;
+    margin-bottom: 0;
+}
+
+.header p {
+    font-size: 13px;
+    text-align: right;
+    font-style: italic;
+    margin-bottom: 0;
+}
+
+.custom-divider {
+  border-top: 3px solid;
+  /* margin: 16px 0; */
+  margin-bottom: 10px;
+  margin-top: 10px;
+}
+.page-divider {
+  border-top: 1px solid;
+  margin: 10px 0 10px 0;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    margin: 3px 0;
+}
+
+.vitals {
+    display: flex;
+    gap: 16px;
+    font-size: 13px;
+    margin: 8px 0;
+    flex-wrap: wrap;
+}
+
+.section {
+    margin-top: 12px;
+    font-size: 13px;
+}
+
+.section p {
+    margin: 4px 0 0 0;
+}
+.rx{
+    font-size: 24px;
+    font-style: italic;
+
+}
+
+.rx-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 8px;
+    font-size: 13px;
+}
+.rx-table th {
+    background-color: #e2e2e2;
+}
+
+.rx-table th, .rx-table td {
+    border: 1px solid #000;
+    padding: 2px;
+    text-align: left;
+}
+.rx-table td {
+    line-height: 1.2; 
+}
+
+.review-date {
+    font-size: 13px;
+}
+
+.footer {
+    font-size: 13px;
+    font-style: italic;
+}
+
+.consult-time {
+    padding: 7px;
+    font-size: 13px;
+    margin-top: 6px;
+    font-style: italic;
+    color: #fff;
+    background-color: #004080;
+}
+
+.doctor-notes {
+    background-color: #d1e7ff; /* light blue background */
+    padding: 7px;
+    font-size: 11px;
+    margin-top: 5px;
+    line-height: 1.5;
+}
+
+.doctor-notes strong {
+    display: block;
+    font-weight: bold;
+    font-size: 14px;
+    color: #0d6efd; /* Bootstrap primary blue */
+}
+
+.doctor-notes p {
+    margin: 0;
+    font-style: italic;
+}
+
+/* =====================Prescription Container======================== */
+
+footer {
+  font-size: 0.95rem;
+}
+
+footer a:hover {
+  text-decoration: underline;
+}
+/* =====================Drug Name======================== */
+ /* Style Select2 dropdown to match form-select */
+  .select2-container--default .select2-selection--single {
+    height: 38px !important;
+    border: 1px solid #ddd !important;
+    border-radius: 6px !important;
+    padding: 4px 8px;
+  }
+
+  .select2-selection__rendered {
+    line-height: 28px !important;
+  }
+
+  .select2-selection__arrow {
+    height: 36px !important;
+  }
+  /* =====================Drug Name end======================== */
+
+/* Mic Design */
+.micButton {
+  width: 50px;
+  height: 50px;
+  border: 2px solid black;
+  border-radius: 50%;
+  background-color: white;
+  color: black;
+  font-size: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.micButton.listening {
+  background-color: red;
+  color: white;
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7); }
+  70% { box-shadow: 0 0 0 10px rgba(255, 0, 0, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0); }
+}
+
+/* ------------Loader------------- */
+/* * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+#loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(-45deg, #1d3557, #457b9d, #a8dadc, #f1faee);
+    background-size: 400% 400%;
+    animation: gradientBG 6s ease infinite;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.loader-content {
+    text-align: center;
+    color: white;
+}
+
+.logo {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    margin: 0 auto 20px;
+    animation: pulse 1.5s infinite;
+}
+
+.loading-text {
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+    background: linear-gradient(90deg, #fff, #ddd, #fff);
+    background-size: 200% 200%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shimmer 2s infinite;
+}
+
+.progress-bar {
+    width: 200px;
+    height: 6px;
+    background: rgba(255,255,255,0.3);
+    border-radius: 5px;
+    overflow: hidden;
+    margin: 0 auto;
+}
+
+.progress {
+    width: 0%;
+    height: 100%;
+    background: white;
+    animation: loadProgress 3s ease-out forwards;
+}
+
+@keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.1); opacity: 0.7; }
+}
+
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+@keyframes loadProgress {
+    to { width: 100%; }
+} */
+
+/* :root {
+  --background: #121621;
+  --duration: 3s;
+  --primary: rgba(39, 94, 254, 1);
+  --primary-light: #2f71ff;
+  --primary-rgba: rgba(39, 94, 254, 0);
+} */
+
+/* Fullscreen overlay */
+#loader-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.9);
+  /* background: #6997DB;  */
+  z-index: 9999;
+}
+
+#global-loader {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+  display: flex;
+  gap: 50px;
+  align-items: flex-end;
+  animation: loader 5s linear infinite;
+}
+
+.box-wrap {
+  position: relative;
+}
+
+.box {
+  width: 60px;
+  height: 60px;
+  background: #A294F9;
+  /* background: white;  */
+  border-radius: 50%;
+  animation: bounceRotate 0.6s ease-in-out infinite;
+}
+
+.box-shadow {
+  width: 50px;
+  height: 5px;
+  background: #000;
+  opacity: 0.15;
+  position: absolute;
+  bottom: -12px;
+  left: 5px;
+  border-radius: 50%;
+  animation: shadowScale 0.6s ease-in-out infinite;
+}
+
+@keyframes loader {
+  0% { transform: translate(0, -50%); }
+  100% { transform: translate(calc(100vw - 300px), -50%); }
+}
+
+/* Higher bounce + smooth delay */
+@keyframes bounceRotate {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-50px) rotate(45deg);
+  }
+}
+/* Shadow moves opposite + scales */
+@keyframes shadowScale {
+  0%, 100% {
+    transform: translateX(0) scale(1, 1);
+    opacity: 0.15;
+  }
+  50% {
+    transform: translateX(-20px) scale(1.4, 1);
+    opacity: 0.25;
+  }
+}
+
+/* @keyframes shadowScale {
+  0%, 100% {
+    transform: scale(1, 1);
+  }
+  50% {
+    transform: scale(1.4, 1);
+    opacity: 0.25;
+  }
+} */
+
+
+/* Delay each ball and shadow */
+.box-wrap:nth-child(1) .box,
+.box-wrap:nth-child(1) .box-shadow { animation-delay: 0s; }
+
+.box-wrap:nth-child(2) .box,
+.box-wrap:nth-child(2) .box-shadow { animation-delay: 0.1s; }
+
+.box-wrap:nth-child(3) .box,
+.box-wrap:nth-child(3) .box-shadow { animation-delay: 0.2s; }
+
+.box-wrap:nth-child(4) .box,
+.box-wrap:nth-child(4) .box-shadow { animation-delay: 0.3s; }
+
+.box-wrap:nth-child(5) .box,
+.box-wrap:nth-child(5) .box-shadow { animation-delay: 0.4s; }
+
+.box-wrap:nth-child(6) .box,
+.box-wrap:nth-child(6) .box-shadow { animation-delay: 0.4s; }
+
+.box-wrap:nth-child(7) .box,
+.box-wrap:nth-child(7) .box-shadow { animation-delay: 0.3s; }
+
+.box-wrap:nth-child(8) .box,
+.box-wrap:nth-child(8) .box-shadow { animation-delay: 0.2s; }
+
+.box-wrap:nth-child(9) .box,
+.box-wrap:nth-child(9) .box-shadow { animation-delay: 0.1s; }
+
+.box-wrap:nth-child(10) .box,
+.box-wrap:nth-child(10) .box-shadow { animation-delay: 0s; }

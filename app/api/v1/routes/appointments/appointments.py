@@ -10,7 +10,9 @@ from fastapi import (
     Query,
     Request,
     UploadFile,
+    status,
 )
+from grpc import Status
 
 from app.schemas.appointment_schema import (
     AppointmentSchema,
@@ -31,6 +33,7 @@ from app.services.appointments.appointment_service import (
     view_image_service,
     view_prescription_service,
 )
+from app.db.firebase_client import db
 
 router = APIRouter(tags=["Appointments"])
 
@@ -242,3 +245,22 @@ async def view_image(appointment_id: str):
     except Exception as e:
         logger.error(f"❌ Error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
+
+# ----------------------Fetch Instruction Only---------------------
+@router.get("/fetch_instructions")
+async def fetch_instruction():
+    try:
+        # Query only the Description field
+        collection_ref = db.collection("Drug_Category").select(["Description"])
+        docs = collection_ref.get()
+
+        # Create a list of only Description values
+        description = [doc.get("Description") for doc in docs if doc.get("Description")]
+
+        return {"success": True, "data": description}
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to fetch drug names: {str(e)}",
+        )

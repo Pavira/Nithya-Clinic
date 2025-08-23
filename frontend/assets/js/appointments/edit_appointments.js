@@ -613,6 +613,41 @@ function micfunction() {
   });
 }
 
+
+// ✅ Save new instruction to Firestore
+// async function saveNewInstruction(instruction) {
+//   try {
+//     const descriptions = [];
+//     if (instruction) {
+//         descriptions.push(instruction);
+//       }
+
+//     const token = localStorage.getItem("token");
+//     const response = await fetch(`/api/v1/drug_category/add_drug_category`, {
+//       method: "POST",
+//       headers: {
+//         "Content-Type": "application/json",
+//         Authorization: `Bearer ${token}`,
+//       },
+//       body: JSON.stringify({ descriptions })
+//     });
+
+//     const result = await response.json();
+//     if (result.success) {
+//       await Swal.fire("Added!", "New instruction added successfully!", "success");
+//       localStorage.removeItem("instruction_list");
+//       return true;
+//     } else {
+//       Swal.fire("Error", "Failed to add instruction", "error");
+//       return false;
+//     }
+//   } catch (err) {
+//     console.error("Error adding instruction:", err);
+//     Swal.fire("Error", "Something went wrong!", "error");
+//     return false;
+//   }
+// }
+
 // ------------------Init Edit Appointments Page ------------------
 async function initEditAppointmentsPage() {
   console.log("initEditAppointmentsPage");
@@ -627,7 +662,6 @@ async function initEditAppointmentsPage() {
         // ----------Fetch Vitals Data----------
         const vitals = await fetchVitalsData();        
 
-        // ----------Function For Closed Appointment----------
         const appointment_status = vitals.AppointmentStatus;
         const doctor_fees = vitals.DoctorFees;
         const review_datetime = vitals.ReviewDate;
@@ -654,8 +688,8 @@ async function initEditAppointmentsPage() {
         
         // ----------Function For Cancel Appointment Start----------
         if (appointment_status === "Cancelled") {
-            document.getElementById("cancelAppointment").style.display = "none";
-            document.getElementById("closeAppointment").style.display = "none";
+          document.getElementById("cancelAppointment").style.display = "none";
+          document.getElementById("closeAppointment").style.display = "none";
 
           document.getElementById("consultation_category").disabled = true;
           document.getElementById("appointment_category").disabled = true;
@@ -717,7 +751,8 @@ async function initEditAppointmentsPage() {
           document.getElementById("upload_images_label").style.display = 'none';
           document.getElementById("upload_prescriptions_label").style.display = 'none';
         }
-
+        // ----------Function For Cancel Appointment Ends----------
+        // ----------Function For Closed Appointment Start----------
         if(appointment_status === "Closed" ) {
             document.getElementById("cancelAppointment").disabled = true;
             document.getElementById("closeAppointment").disabled = true;
@@ -767,216 +802,389 @@ async function initEditAppointmentsPage() {
             document.getElementById("upload_prescriptions_label").style.display = 'none';
             
             const prescriptionTableBody = prescription.map((item, index) => {
-          const timings = [];
+            const timings = [];
 
-          if (item.M) timings.push("M");
-          if (item.A) timings.push("A");
-          if (item.E) timings.push("E");
-          if (item.N) timings.push("N");
-          if (item["B/F"]) timings.push("B/F");
-          if (item["A/F"]) timings.push("A/F");
+            if (item.M) timings.push("M");
+            if (item.A) timings.push("A");
+            if (item.E) timings.push("E");
+            if (item.N) timings.push("N");
+            if (item["B/F"]) timings.push("B/F");
+            if (item["A/F"]) timings.push("A/F");
 
-          return `
-            <tr>
-              <td>${index + 1}</td>
-              <td>${item.drug}</td>
-              <td>${item.frequency}</td> 
-              <td>${item.duration_value}</td>
-              <td>${item.duration_unit}</td>
-              <td>${timings.join(", ")}</td>
-              <td>${item.instruction || ''}</td>
-              <td>"N/A"</td>
-            </tr>
-          `;
-        }).join("");
+            return `
+              <tr>
+                <td>${index + 1}</td>
+                <td>${item.drug}</td>
+                <td>${item.frequency}</td> 
+                <td>${item.duration_value}</td>
+                <td>${item.duration_unit}</td>
+                <td>${timings.join(", ")}</td>
+                <td>${item.instruction || ''}</td>
+                <td>"N/A"</td>
+              </tr>
+            `;
+          }).join("");
 
-        document.getElementById("prescription-table-body").innerHTML = prescriptionTableBody;
-            }
-        
-        // ----------Function For Cancel Appointment End----------
-
-        document.getElementById("height").value= vitals.Height ?? '';
-        document.getElementById("weight").value= vitals.Weight ?? '';
-        document.getElementById("bmi").value= vitals.BMI ?? '';
-        document.getElementById("blood_pressure").value= vitals.BP ?? '';
-        document.getElementById("pulse").value= vitals.Pulse ?? '';
-
-
-        const patientId = window.pageParams?.patient_id;
-        const patientName = window.pageParams?.patient_name;
-        // const patientPhone = window.pageParams?.patient_phone;
-        const patientDepartment = window.pageParams?.patient_department;
-        const patientAppointmentCategory = window.pageParams?.patient_appointment_category;
-        const patientAppointmentInformation = window.pageParams?.patient_appointment_information;
-        const patientAppointmentDateTime = window.pageParams?.patient_appointment_datetime;
-        const formatedDateTime = window.pageParams?.formatted_datetime;
-        const user = window.pageParams?.user;
-        
-        // console.log(patientId);
-
-        // Fill the form
-        document.getElementById("reg_no").value = patientId === null ? "" : patientId;
-        document.getElementById("full_name").value = patientName === null ? "" : patientName;
-        // document.getElementById("phone").value = patientPhone === null ? "" : patientPhone;
-        document.getElementById("consultation_category").value = patientDepartment === null ? "" : patientDepartment;
-        document.getElementById("appointment_category").value = patientAppointmentCategory === null ? "" : patientAppointmentCategory;
-        document.getElementById("description").value = patientAppointmentInformation === null ? "" : patientAppointmentInformation;
-        document.getElementById("start_datetime").value = patientAppointmentDateTime === null ? "" : patientAppointmentDateTime;
-        document.getElementById("appointment-info").textContent = `This appointment was created on ${formatedDateTime} by ${user}.`;
-
-
-
-        // Drug Name Dropdown Initialization
-       const drugMap = new Map(); // key: DrugName, value: DrugCategoryId
-       async function fetchDrugNames() {
-        const token = localStorage.getItem("token");
-        const searchValue = document.getElementById("drug_name").value.trim().toUpperCase();
-        const datalist = document.getElementById("drug_name_options");
-
-        // showLoader();
-
-        try {
-          const queryParams = new URLSearchParams({
-            search_type: "drug_name",
-            search_value: searchValue,
-            limit: 10, // or whatever reasonable limit
-          });
-          console.log("view_and_search_drug_names");
-          const response = await fetch(`/api/v1/drug_names/view_and_search_drug_names?${queryParams}`, {     
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          });
-
-          if (response.status === 401) {
-            Swal.fire({
-              icon: 'warning',
-              title: 'Session Expired',
-              text: 'Your session has expired. Please sign in again.',
-            }).then(() => {
-              localStorage.removeItem("token");
-              window.location.href = "/";
-            });
-            return;
-          }
-
-          const result = await response.json();
-          const drugs = result.data || [];
-
-          // Clear previous options
-          datalist.innerHTML = "";
-          drugMap.clear();
-
-          // Add new options
-          drugs.forEach(drug => {
-            const option = document.createElement("option");
-            option.value = drug.DrugName || "";
-            datalist.appendChild(option);
-
-            // Store category ID for this drug
-            if (drug.DrugName && drug.DrugCategoryId) {
-              drugMap.set(drug.DrugName, drug.DrugCategoryId);
-            }
-          });
-
-          //Function to detect the selected drug 
-          document.getElementById("drug_name").addEventListener("change", async () => {
-            const selectedDrug = document.getElementById("drug_name").value.trim();
-            const categoryId = drugMap.get(selectedDrug);
-            // console.log("Selected Drug:", categoryId);
-
-            if (!categoryId) {
-              console.warn("No category found for drug:", selectedDrug);
-              return;
-            }
-
-            try {
-              await fetchCategoryDescriptions(categoryId);
-            } catch (err) {
-              console.error("Error loading category descriptions:", err);
-            }
-          });
-          // Function to fetch category descriptions based on selected drug
-          async function fetchCategoryDescriptions(categoryId) {
-            console.log("fetchCategoryDescriptions");
-            const token = localStorage.getItem("token");
-            const notesSelect = document.getElementById("frequency");
-
-            notesSelect.innerHTML = `<option value="">Select Frequency</option>`;
-            // showLoader();
-
-            try {
-              console.log(`/api/v1/drug_category/${categoryId}/descriptions`);
-              const response = await fetch(`/api/v1/drug_category/${categoryId}/descriptions`, {
-                method: "GET",
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${token}`,
-                },
-              });
-
-              if (!response.ok) {
-                throw new Error("Failed to fetch category descriptions");
+          document.getElementById("prescription-table-body").innerHTML = prescriptionTableBody;
               }
+          
+          // ----------Function For Closed Appointment End----------
 
-              const result = await response.json();
-              const descriptions = result.data || [];
+          // ----------Function For New Appointment Start----------
+          document.getElementById("height").value= vitals.Height ?? '';
+          document.getElementById("weight").value= vitals.Weight ?? '';
+          document.getElementById("bmi").value= vitals.BMI ?? '';
+          document.getElementById("blood_pressure").value= vitals.BP ?? '';
+          document.getElementById("pulse").value= vitals.Pulse ?? '';
 
-              // Clear existing options
-              notesSelect.innerHTML = `<option value="">Select Frequency</option>`;
+          const patientId = window.pageParams?.patient_id;
+          const patientName = window.pageParams?.patient_name;
+          // const patientPhone = window.pageParams?.patient_phone;
+          const patientDepartment = window.pageParams?.patient_department;
+          const patientAppointmentCategory = window.pageParams?.patient_appointment_category;
+          const patientAppointmentInformation = window.pageParams?.patient_appointment_information;
+          const patientAppointmentDateTime = window.pageParams?.patient_appointment_datetime;
+          const formatedDateTime = window.pageParams?.formatted_datetime;
+          const user = window.pageParams?.user;
+          
+          // console.log(patientId);
 
-              descriptions.forEach((desc, index) => {
-                const option = document.createElement("option");
-                option.value = desc; // or you can use `desc.id` if needed
-                option.textContent = desc;
-                notesSelect.appendChild(option);
-              });
+          // Fill the form
+          document.getElementById("reg_no").value = patientId === null ? "" : patientId;
+          document.getElementById("full_name").value = patientName === null ? "" : patientName;
+          // document.getElementById("phone").value = patientPhone === null ? "" : patientPhone;
+          document.getElementById("consultation_category").value = patientDepartment === null ? "" : patientDepartment;
+          document.getElementById("appointment_category").value = patientAppointmentCategory === null ? "" : patientAppointmentCategory;
+          document.getElementById("description").value = patientAppointmentInformation === null ? "" : patientAppointmentInformation;
+          document.getElementById("start_datetime").value = patientAppointmentDateTime === null ? "" : patientAppointmentDateTime;
+          document.getElementById("appointment-info").textContent = `This appointment was created on ${formatedDateTime} by ${user}.`;
 
-            } catch (err) {
-              console.error("Error fetching descriptions:", err);
-            } 
-            // finally {
-            //   hideLoader();
-            // }
+          //------------ Drug Name from local storage(Already stored in local storage)-----------
+          let localStorageDrugList = JSON.parse(localStorage.getItem("drug_list")) ?? [];
+
+          if (localStorageDrugList.length === 0) {
+            localStorageDrugList = await fetchDrugNames();
+            localStorage.setItem("drug_list", JSON.stringify(localStorageDrugList));
           }
 
+          populateDrugOptions(localStorageDrugList);
 
-        } catch (error) {
-          console.error("Error fetching drug names:", error);
-          // Optionally show error toast
-        } 
+          // Initialize Select2 for dynamic filtering
+          $("#drug_name").select2({
+            placeholder: "Select a drug",
+            allowClear: true,
+            width: "100%"
+          });
+
+                 // ✅ Force reset to placeholder after initializing
+$("#drug_name").val(null).trigger("change");  // <-- IMPORTANT
+
+          function populateDrugOptions(drugNames) {
+            const selectElement = document.getElementById("drug_name");
+            selectElement.innerHTML = ""; // Clear existing options
+
+            const fragment = document.createDocumentFragment();
+            drugNames.forEach((drug) => {
+              const option = document.createElement("option");
+              option.value = drug;
+              option.textContent = drug;
+              fragment.appendChild(option);
+            });
+
+            selectElement.appendChild(fragment);
+          }
+
+          // -------------------Instruction from the local storage ----------------------
+          let localStorageInstructionList = JSON.parse(localStorage.getItem("instruction_list")) ?? [];
+
+          if (localStorageInstructionList.length === 0) {
+            localStorageInstructionList = await fetchInstructions();            
+          }
+
+          populateInstructionOptions(localStorageInstructionList);
+
+          // Initialize Select2 for dynamic filtering
+          $("#instruction").select2({
+            placeholder: "Select a Instruction",
+            allowClear: true,
+            tags: true,  // ✅ Allow adding new instructions
+            width: "100%"
+          });
+
+       // ✅ Force reset to placeholder after initializing
+$("#instruction").val(null).trigger("change");  // <-- IMPORTANT
+
+// ✅ Remove the Swal confirmation inside select event
+$("#instruction").on("select2:select", function (e) {
+  const selectedValue = e.params.data.text;
+  const exists = localStorageInstructionList.includes(selectedValue);
+
+  // If it's a new value, just show "Add" button (optional)
+  if (!exists) {
+    $("#new-instruction-text").text(selectedValue);
+    $("#add-instruction-container").show();
+  } else {
+    $("#add-instruction-container").hide();
+  }
+});
+
+          // Listen for user typing in Select2 search box
+$(document).on("keyup", ".select2-search__field", function () {
+  const inputVal = $(this).val().trim().toLowerCase();
+  const exists = localStorageInstructionList.some(item => item.toLowerCase() === inputVal);
+
+  if (inputVal && !exists) {
+    $("#new-instruction-text").text(inputVal);
+    $("#add-instruction-container").show();
+  } else {
+    $("#add-instruction-container").hide();
+  }
+});
+
+// Add instruction button click
+$("#add-instruction-btn").on("click", async function (e) {
+  e.preventDefault();
+  const newInstruction = $("#new-instruction-text").text();
+
+  try {
+    showLoader();
+    const token = localStorage.getItem("token");
+    const response = await fetch("/api/v1/drug_category/add_drug_category", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({ descriptions: [newInstruction] })
+    });
+
+    const result = await response.json();
+    if (result.success) {
+      // Update local list and Select2
+      localStorageInstructionList.push(newInstruction);
+      localStorage.setItem("instruction_list", JSON.stringify(localStorageInstructionList));
+
+      const newOption = new Option(newInstruction, newInstruction, true, true);
+      $("#instruction").append(newOption).trigger("change");
+
+      $("#add-instruction-container").hide();
+      Swal.fire("Success", "Instruction added successfully!", "success");
+    } else {
+      Swal.fire("Error", result.message || "Failed to add instruction", "error");
+    }
+  } catch (err) {
+    console.error(err);
+    Swal.fire("Error", "Something went wrong", "error");
+  } finally {
+    hideLoader();
+  }
+});
+
+          // ✅ Handle adding new instruction dynamically
+          // $("#instruction").on("select2:select", async function(e) {
+          //   const selectedValue = e.params.data.text;
+          //   const exists = localStorageInstructionList.includes(selectedValue);
+
+          //   if (!exists) {
+          //     // Ask user for confirmation before adding to Firestore
+          //     const confirmAdd = await Swal.fire({
+          //       title: "Add New Instruction?",
+          //       text: `"${selectedValue}" is not in the list. Do you want to add it?`,
+          //       icon: "question",
+          //       showCancelButton: true,
+          //       confirmButtonText: "Yes, Add"
+          //     });
+
+          //     if (confirmAdd.isConfirmed) {
+          //       const added = await saveNewInstruction(selectedValue);
+          //       if (added) {
+          //         // ✅ Update local list and storage
+          //         localStorageInstructionList.push(selectedValue);
+          //         localStorage.setItem("instruction_list", JSON.stringify(localStorageInstructionList));
+          //       }
+          //     } else {
+          //       // Remove the unconfirmed tag
+          //       $('#instruction').find(`option[value="${selectedValue}"]`).remove();
+          //       $('#instruction').trigger('change');
+          //     }
+          //   }
+          // });
+
+          function populateInstructionOptions(instructions) {
+            const selectElement = document.getElementById("instruction");
+            selectElement.innerHTML = ""; // Clear existing options
+
+            const fragment = document.createDocumentFragment();
+            instructions.forEach((instruction) => {
+              const option = document.createElement("option");
+              option.value = instruction;
+              option.textContent = instruction;
+              fragment.appendChild(option);
+            });
+
+            selectElement.appendChild(fragment);
+          }
+
+          // ----------Function For New Appointment Ends----------
+      } catch (error) {
+        console.error(error);
+      }finally{
+        hideLoader();
+      }
+    }
+
+
+// ------------Fetching Durg Name Dropdown Start------------
+        // Drug Name Dropdown Initialization
+      //  const drugMap = new Map(); // key: DrugName, value: DrugCategoryId
+      //  async function fetchDrugNames() {
+      //   const token = localStorage.getItem("token");
+      //   const searchValue = document.getElementById("drug_name").value.trim().toUpperCase();
+      //   const datalist = document.getElementById("drug_name_options");
+
+      //   // showLoader();
+
+      //   try {
+      //     const queryParams = new URLSearchParams({
+      //       search_type: "drug_name",
+      //       search_value: searchValue,
+      //       limit: 10, // or whatever reasonable limit
+      //     });
+      //     console.log("view_and_search_drug_names");
+      //     const response = await fetch(`/api/v1/drug_names/view_and_search_drug_names?${queryParams}`, {     
+      //       method: "GET",
+      //       headers: {
+      //         "Content-Type": "application/json",
+      //         Authorization: `Bearer ${token}`,
+      //       },
+      //     });
+
+      //     if (response.status === 401) {
+      //       Swal.fire({
+      //         icon: 'warning',
+      //         title: 'Session Expired',
+      //         text: 'Your session has expired. Please sign in again.',
+      //       }).then(() => {
+      //         localStorage.removeItem("token");
+      //         window.location.href = "/";
+      //       });
+      //       return;
+      //     }
+
+      //     const result = await response.json();
+      //     const drugs = result.data || [];
+
+      //     // Clear previous options
+      //     datalist.innerHTML = "";
+      //     drugMap.clear();
+
+      //     // Add new options
+      //     drugs.forEach(drug => {
+      //       const option = document.createElement("option");
+      //       option.value = drug.DrugName || "";
+      //       datalist.appendChild(option);
+
+      //       // Store category ID for this drug
+      //       if (drug.DrugName && drug.DrugCategoryId) {
+      //         drugMap.set(drug.DrugName, drug.DrugCategoryId);
+      //       }
+      //     });
+
+      //     //Function to detect the selected drug 
+      //     document.getElementById("drug_name").addEventListener("change", async () => {
+      //       const selectedDrug = document.getElementById("drug_name").value.trim();
+      //       const categoryId = drugMap.get(selectedDrug);
+      //       // console.log("Selected Drug:", categoryId);
+
+      //       if (!categoryId) {
+      //         console.warn("No category found for drug:", selectedDrug);
+      //         return;
+      //       }
+
+      //       try {
+      //         await fetchCategoryDescriptions(categoryId);
+      //       } catch (err) {
+      //         console.error("Error loading category descriptions:", err);
+      //       }
+      //     });
+          // Function to fetch category descriptions based on selected drug
+        //   async function fetchCategoryDescriptions(categoryId) {
+        //     console.log("fetchCategoryDescriptions");
+        //     const token = localStorage.getItem("token");
+        //     const notesSelect = document.getElementById("frequency");
+
+        //     notesSelect.innerHTML = `<option value="">Select Frequency</option>`;
+        //     // showLoader();
+
+        //     try {
+        //       console.log(`/api/v1/drug_category/${categoryId}/descriptions`);
+        //       const response = await fetch(`/api/v1/drug_category/${categoryId}/descriptions`, {
+        //         method: "GET",
+        //         headers: {
+        //           "Content-Type": "application/json",
+        //           Authorization: `Bearer ${token}`,
+        //         },
+        //       });
+
+        //       if (!response.ok) {
+        //         throw new Error("Failed to fetch category descriptions");
+        //       }
+
+        //       const result = await response.json();
+        //       const descriptions = result.data || [];
+
+        //       // Clear existing options
+        //       notesSelect.innerHTML = `<option value="">Select Frequency</option>`;
+
+        //       descriptions.forEach((desc, index) => {
+        //         const option = document.createElement("option");
+        //         option.value = desc; // or you can use `desc.id` if needed
+        //         option.textContent = desc;
+        //         notesSelect.appendChild(option);
+        //       });
+
+        //     } catch (err) {
+        //       console.error("Error fetching descriptions:", err);
+        //     } 
+        //     // finally {
+        //     //   hideLoader();
+        //     // }
+        //   }
+
+
+        // } catch (error) {
+        //   console.error("Error fetching drug names:", error);
+        //   // Optionally show error toast
+        // } 
         // finally {
         //   hideLoader();
         // }
-      }
+      // }
 
-      const drugNameInput = document.getElementById("drug_name");
+      // const drugNameInput = document.getElementById("drug_name");
 
-      const handleSearch = debounce(() => {
-        const value = drugNameInput.value.trim();
-        if (value.length > 3) {
-          fetchDrugNames();
-        }
-      }, 400);
+      // const handleSearch = debounce(() => {
+      //   const value = drugNameInput.value.trim();
+      //   if (value.length > 3) {
+      //     fetchDrugNames();
+      //   }
+      // }, 400);
 
-      drugNameInput.addEventListener("input", handleSearch);
-            
-            
-        } 
-    catch (err) {
-        Swal.fire({
-            icon: 'error',
-            title: 'Failed!',
-            text: 'Server error: ' + err,
-        })
-        console.error(err);
-    }
-    finally {
-        hideLoader();
-    }
-}
+      // drugNameInput.addEventListener("input", handleSearch);        
+      //   } 
+      // catch (err) {
+      //     Swal.fire({
+      //         icon: 'error',
+      //         title: 'Failed!',
+      //         text: 'Server error: ' + err,
+      //     })
+      //     console.error(err);
+      // }
+      // finally {
+      //     hideLoader();
+      // }
+      
+
 
 // --------------------------View Patient History -------------------------
 async function viewPatientHistory() {
@@ -997,13 +1205,13 @@ async function viewPatientHistory() {
 }
 
 
-  $(document).ready(function() {
-    $('.searchable-select').select2({
-      placeholder: "Drug Name.....",
-      allowClear: true,
-      width: '100%'
-    });
-  });
+  // $(document).ready(function() {
+  //   $('.searchable-select').select2({
+  //     placeholder: "Drug Name.....",
+  //     allowClear: true,
+  //     width: '100%'
+  //   });
+  // });
 
 
 initEditAppointmentsPage();

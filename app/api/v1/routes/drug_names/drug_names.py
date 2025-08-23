@@ -15,27 +15,27 @@ router = APIRouter(tags=["Drug Names"])
 # -------------Add Drug Names----------------
 class DrugNames(BaseModel):
     drugNames: List[str] = Field(..., alias="drugNames")
-    drugCategoryIds: List[str] = Field(
-        ...,
-        alias="drugCategoryIds",
-    )
-    drugCategoryNames: List[str] = Field(
-        ...,
-        alias="drugCategoryNames",
-    )
+    # drugCategoryIds: List[str] = Field(
+    #     ...,
+    #     alias="drugCategoryIds",
+    # )
+    # drugCategoryNames: List[str] = Field(
+    #     ...,
+    #     alias="drugCategoryNames",
+    # )
 
 
 @router.post("/add_drug_names")
 async def add_drug_names(payload: DrugNames):
     try:
         drug_names = payload.drugNames
-        drug_categoryIds = payload.drugCategoryIds
-        drug_category_names = payload.drugCategoryNames
+        # drug_categoryIds = payload.drugCategoryIds
+        # drug_category_names = payload.drugCategoryNames
 
-        if len(drug_names) != len(drug_categoryIds):
-            raise HTTPException(
-                status_code=400, detail="Mismatched drug names and categories."
-            )
+        # if len(drug_names) != len(drug_categoryIds):
+        #     raise HTTPException(
+        #         status_code=400, detail="Mismatched drug names and categories."
+        #     )
 
         count_ref = db.collection("Count").document("count")
         drug_names_ref = db.collection("Drug_Names")
@@ -51,17 +51,16 @@ async def add_drug_names(payload: DrugNames):
                 else 0
             )
 
-            for i, (name, categoryId, categoryName) in enumerate(
-                zip(drug_names, drug_categoryIds, drug_category_names)
-            ):
+            # for i, (name) in enumerate(zip(drug_names)):
+            for i, name in enumerate(drug_names):
                 new_count = current_count + i + 1
                 doc_id = str(new_count)
 
                 doc_data = {
                     "DrugNameId": doc_id,
                     "DrugName": name.upper(),
-                    "DrugCategoryId": categoryId,
-                    "DrugCategoryName": categoryName.upper(),
+                    # "DrugCategoryId": categoryId,
+                    # "DrugCategoryName": categoryName.upper(),
                     "LogDateTime": firestore.SERVER_TIMESTAMP,
                 }
 
@@ -113,9 +112,9 @@ async def view_and_search_drug_names(
         #     total_docs = 0
 
         fields = [
-            "DrugCategoryName",
-            "DrugCategoryId",
-            "DrugCategoryName",
+            # "DrugCategoryName",
+            # "DrugCategoryId",
+            "DrugNameId",
             "DrugName",
             "LogDateTime",
         ]
@@ -132,12 +131,12 @@ async def view_and_search_drug_names(
                 .start_at([search_value])
                 .end_at([search_value + "\uf8ff"])
             )
-        elif search_type == "drug_category" and search_value:
-            query = (
-                collection_ref.order_by("DrugCategoryName")
-                .start_at([search_value])
-                .end_at([search_value + "\uf8ff"])
-            )
+        # elif search_type == "drug_category" and search_value:
+        #     query = (
+        #         collection_ref.order_by("DrugCategoryName")
+        #         .start_at([search_value])
+        #         .end_at([search_value + "\uf8ff"])
+        #     )
         else:
             query = collection_ref.order_by("LogDateTime", direction="DESCENDING")
 
@@ -172,6 +171,25 @@ async def view_and_search_drug_names(
     except Exception as e:
         logger.error(f"❌ Error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
+
+# -------------Fecth Drug Names Only----------------
+@router.get("/fetch_drug_names")
+def fetch_drug_names():
+    try:
+        # Query only the DrugName field
+        collection_ref = db.collection("Drug_Names").select(["DrugName"])
+        docs = collection_ref.get()
+
+        # Create a list of only DrugName values
+        drug_names = [doc.get("DrugName") for doc in docs if doc.get("DrugName")]
+
+        return {"success": True, "data": drug_names}
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to fetch drug names: {str(e)}",
+        )
 
 
 # -------------Edit Drug Name----------------

@@ -202,17 +202,23 @@
             <h6 class="pb-2 mt-2" id="prescription_heading" style="border-bottom: 1px solid #ccc; width: max-content; font-size: 14px; font-weight: bold;"> Prescription </h6>
         </div>
 
-        <div class="col-md-3">
+        <!-- <div class="col-md-3">
           <label for="drug_name" id="drug_name_label" class="form-label">Drug Name</label>
           <input type="text" class="form-control" id="drug_name" list="drug_name_options" placeholder="Drug Name">
           <datalist id="drug_name_options"></datalist>
+        </div> -->
+        <div class="col-md-3">
+          <label for="drug_name" id="drug_name_label" class="form-label">Drug Name</label>
+          <select type="text" class="form-control" id="drug_name" list="drug_name_options">
+            <option value="" selected disabled>Select a Drug Name</option>
+          </select>       
         </div>
 
         <div class="col-md-3">
           <label for="frequency" class="form-label" id="frequency_label">Frequency</label>
           <select class="form-select" id="frequency" required>
             <!-- Options will be populated dynamically -->
-          </select> <!-- ✅ CLOSE THIS -->
+          </select> 
         </div>
 
         <div class="col-md-2">
@@ -236,8 +242,15 @@
         </div>
 
         <div class="col-md-6 mt-2">
-          <label for="instruction" id="instruction_label" class="form-label">Instructions</label>
-          <input type="text" class="form-control" placeholder="Write any specific instructions" id="instruction" >
+          <label for="instruction" id="instruction_label" class="form-label">Select or Add Instructions</label>
+           <select id="instruction" class="form-select" >
+            <option value="" selected disabled>Select an Instruction</option>
+          </select>
+          <div id="add-instruction-container" class="mt-2" style="display: none;">
+            <button id="add-instruction-btn" class="btn btn-sm btn-primary">
+              Add "<span id="new-instruction-text"></span>"
+            </button>
+          </div>
         </div>
 
         <!-- Add Medicine Button -->
