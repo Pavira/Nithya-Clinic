@@ -1,0 +1,31 @@
+# Python cache
+__pycache__/
+*.py[co]
+
+# Virtual environment
+.venv/
+env/
+venv/
+
+# History
+.history/
+*.json
+firebase_config.json
+
+
+# Build artifacts
+build/
+dist/
+
+# Editor/OS files
+*.log
+.DS_Store
+
+
+# Firebase credentials (secret file)
+app/db/firebase_config.json
+firebase_config.json
+
+# Uvicorn/Poetry
+uv.lock
+.python-version

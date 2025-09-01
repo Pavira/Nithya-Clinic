@@ -1,0 +1,358 @@
+<!-- edit_appointments.html -->
+
+<!-- Header Metadata for JS to render page title -->
+<div id="page-header-data"
+     data-title="Edit Appointment"
+     data-icon="calendar-plus"
+     data-subtitle="Update an existing appointment">
+</div>
+
+<!-- Back  Button -->
+<div class="d-flex justify-content-end align-items-center gap-2 mb-3 flex-wrap">
+  <button class="btn btn-danger" onclick="loadPage('appointments/view_appointments')">
+    <i class="bi bi-arrow-left-circle me-1"></i> Back
+  </button>
+</div>
+
+<!-- Edit Appointment Form Card -->
+<div class="card shadow-sm border-0">
+  <div class="card-body">
+    <form id="edit-appointment-form">
+      <div class="row">
+        <!-- 🟦 Patient Information -->
+      <div class="col-12">
+        <h5 class="text-primary border-bottom pb-2">Patient Information</h5>
+      </div>
+
+      <div class="col-md-4">
+        <label for="reg_no" class="form-label">Registration Number</label>
+        <input type="text" class="form-control bg-light" id="reg_no" placeholder="e.g., REG12345" required readonly>
+      </div>
+
+      <div class="col-md-4">
+        <label for="full_name" class="form-label">Full Name</label>
+        <input type="text" class="form-control bg-light" id="full_name" required readonly>
+      </div>
+
+      <!-- <div class="col-md-4">
+        <label for="phone" class="form-label">Phone Number</label>
+        <input type="tel" class="form-control bg-light" id="phone" required readonly>
+      </div> -->
+
+      <!-- 🟨 Appointment Category -->
+      <div class="col-12 mt-4">
+        <h5 class="text-warning border-bottom pb-2">Appointment Category</h5>
+      </div>
+
+      <div class="col-md-6">
+        <label for="consultation_category" class="form-label">Consultation Category*</label>
+        <select class="form-select" id="consultation_category" required>
+          <option selected disabled value="">Select.....</option>
+            <option>General</option>
+            <option>Chemical Peel</option>
+            <option>MNRF</option>
+            <option>LHR</option>
+            <option>RF</option>
+            <option>Excimer</option>
+            <option>Crytherapy</option>
+            <option>Paring</option>
+            <option>Tatto Removal</option>
+            <option>Biopy</option>
+            <option>Miscellaneous</option>
+        </select>
+      </div>
+
+      <div class="col-md-6">
+        <label for="appointment_category" class="form-label">Appointment Category*</label>
+        <select class="form-select" id="appointment_category" required>
+          <option selected disabled value="">Select...</option>
+          <option>Out Patient</option>
+          <option>Out Patient + Procedure</option>
+        </select>
+      </div>
+
+      <!-- 🟩 Appointment Information -->
+      <div class="col-12 mt-4">
+        <h5 class="text-success border-bottom pb-2">Appointment Information</h5>
+      </div>
+
+      <div class="col-11">
+        <label for="description" class="form-label">Description Details</label>
+        <textarea class="form-control" id="description" rows="3" placeholder="Write purpose, symptoms, etc..."></textarea>
+      </div>
+
+      <div class="col-1 mt-2" style="display: flex; align-items: center; justify-content: center;">
+        <button class="micButton" type="button" data-target="description"><i class="bi bi-mic-fill"></i></button>
+      </div>
+
+
+      <div class="col-md-6">
+        <label for="start_datetime" class="form-label">Start Date & Time*</label>
+        <input type="datetime-local" class="form-control" id="start_datetime" disabled>
+      </div>
+
+      <div class="d-flex justify-content-center align-items-center mt-2">
+        <button type="submit" class="btn btn-success" id="view_appointment_history"><i class="bi bi-eye me-1"></i>View History</button>
+      </div>
+
+      <!-- 🟪 Doctor Details -->
+      <div class="col-12 mt-4">
+        <h5 class="text-danger border-bottom pb-2" id="investigation_heading">Investigation</h5>
+      </div>
+
+      <!-- Vitals -->
+      <div class="d-flex justify-content-center align-items-center">
+        <h6 class="pb-2" id="vitals_heading" style="border-bottom: 1px solid #ccc; width: max-content; font-size: 14px; font-weight: bold;">
+            Vitals
+        </h6>
+        </div>
+
+      <div class="col-md-2 mt-2">
+        <label for="weight" class="form-label" id="weight_label">Weight(kg)</label>
+        <input
+        type="text"
+        class="form-control"
+        id="weight"
+        inputmode="decimal"
+        pattern="^\d*\.?\d*$"
+        oninput="this.value = this.value.replace(/[^0-9.]/g, '')"
+        />
+
+      </div>
+      <div class="col-md-2 mt-2">
+        <label for="Height" class="form-label" id="height_label" >Height(cm)</label>
+        <input type="text" 
+            class="form-control" 
+            id="height" 
+            inputmode="decimal" 
+            pattern="^\d*\.?\d*$" 
+            oninput="this.value = this.value.replace(/[^0-9.]/g, '')">
+      </div>
+      <div class="col-md-2 mt-2">
+        <label for="BMI" class="form-label" id="bmi_label" >BMI(kg/m<sup>2)</sup></label>
+        <input type="text" class="form-control bg-light" id="bmi" readonly >
+      </div>
+
+      <div class="col-md-3 mt-2">
+        <label for="blood_pressure" class="form-label" id="blood_pressure_label">Blood Pressure(mmHg)</label>
+        <input type="text" 
+            class="form-control" 
+            id="blood_pressure">
+      </div>
+      <div class="col-md-3 mt-2">
+        <label for="pulse" class="form-label" id="pulse_label" >Pulse(bpm)</label>
+        <input type="text" 
+            class="form-control" 
+            id="pulse" 
+            inputmode="decimal" 
+            pattern="^\d*\.?\d*$" 
+            oninput="this.value = this.value.replace(/[^0-9.]/g, '')">
+      </div>
+      <div class="d-flex justify-content-center align-items-center mt-2">
+        <button type="submit" class="btn btn-success" id="save_vitals"><i class="bi bi-patch-plus me-1"></i>Save Vitals</button>
+      </div>
+
+     <!-- History -->
+<div class="col-md-11">
+  <label for="history" class="form-label" id="history_label">History</label>
+  <textarea class="form-control" id="history" rows="3" placeholder="Describe the details of History..."></textarea>
+</div>
+<div class="col-1 mt-2" style="display: flex; align-items: center; justify-content: center;">
+  <button class="micButton" type="button" data-target="history">
+    <i class="bi bi-mic-fill"></i>
+  </button>
+</div>
+
+
+<!-- Clinical Feature -->
+<div class="col-md-11 mt-2">
+  <label for="clinical_feature" class="form-label" id="clinical_feature_label">Clinical Feature</label>
+  <textarea class="form-control" id="clinical_feature" rows="3" placeholder="Describe the details of Clinical Feature..."></textarea>
+</div>
+<div class="col-1 mt-2" style="display: flex; align-items: center; justify-content: center;">
+  <button class="micButton" type="button" data-target="clinical_feature">
+    <i class="bi bi-mic-fill"></i>
+  </button>
+</div>
+
+<!-- Diagnosis -->
+<div class="col-11 mt-2">
+  <label for="diagnosis" class="form-label" id="diagnosis_label">Diagnosis</label>
+  <textarea class="form-control" id="diagnosis" rows="3" placeholder="Describe the details of Diagnosis..."></textarea>
+</div>
+<div class="col-1 mt-2" style="display: flex; align-items: center; justify-content: center;">
+  <button class="micButton" type="button" data-target="diagnosis">
+    <i class="bi bi-mic-fill"></i>
+  </button>
+</div>
+
+<!-- Investigation -->
+<div class="col-11 mt-2">
+  <label for="investigation" class="form-label" id="investigation_label">Investigation</label>
+  <textarea class="form-control" id="investigation" rows="3" placeholder="Describe the details of Investigation..."></textarea>
+</div>
+<div class="col-1 mt-2" style="display: flex; align-items: center; justify-content: center;">
+  <button class="micButton" type="button" data-target="investigation">
+    <i class="bi bi-mic-fill"></i>
+  </button>
+</div>
+
+       <!--------------------------- Prescription ------------------------------>
+        <div class="d-flex justify-content-center align-items-center">
+            <h6 class="pb-2 mt-2" id="prescription_heading" style="border-bottom: 1px solid #ccc; width: max-content; font-size: 14px; font-weight: bold;"> Prescription </h6>
+        </div>
+
+        <!-- <div class="col-md-3">
+          <label for="drug_name" id="drug_name_label" class="form-label">Drug Name</label>
+          <input type="text" class="form-control" id="drug_name" list="drug_name_options" placeholder="Drug Name">
+          <datalist id="drug_name_options"></datalist>
+        </div> -->
+        <div class="col-1 mt-2" style="display: flex; align-items: center; justify-content: center;">
+          <button class="micButton" type="button" data-target="drug_name">
+            <i class="bi bi-mic-fill"></i>
+          </button>
+        </div>
+        <div class="col-md-4">
+          <label for="drug_name" id="drug_name_label" class="form-label">Drug Name</label>
+          <select type="text" class="form-control" id="drug_name" list="drug_name_options">
+            <option value="" selected disabled>Select a Drug Name</option>
+          </select>       
+        </div>
+
+        <!-- <div class="col-md-3">
+          <label for="frequency" class="form-label" id="frequency_label">Frequency</label>
+          <select class="form-select" id="frequency" required>
+            Options will be populated dynamically
+          </select> 
+        </div> -->
+
+        <div class="col-md-2">
+          <label for="duration_value" id="duration_value_label" class="form-label">Duration</label>
+          <input type="text" class="form-control" placeholder="Duration" id="duration_value" >
+        </div>
+
+        <div class="col-md-2">
+          <label for="duration_unit" id="duration_unit_label" class="form-label">Units</label>
+          <select class="form-select" id="duration_unit" required>
+            <option selected>day(s)</option>
+            <option>week(s)</option>
+            <option>month(s)</option>
+            <option>year(s)</option>
+          </select>
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label" id="timing_label">Timing</label>
+            <div id="timing-buttons" class="d-flex flex-wrap gap-1"></div>
+        </div>
+
+        <div class="col-md-11 mt-2">
+          <label for="instruction" id="instruction_label" class="form-label">Select or Add Instructions</label>
+           <select id="instruction" class="form-select" >
+            <option value="" selected disabled>Select an Instruction</option>
+          </select>
+          <div id="add-instruction-container" class="mt-2" style="display: none;">
+            <button id="add-instruction-btn" class="btn btn-sm btn-primary">
+              Add "<span id="new-instruction-text"></span>"
+            </button>
+          </div>
+        </div>
+        <div class="col-1 mt-2" style="display: flex; align-items: center; justify-content: center;">
+          <button class="micButton" type="button" data-target="instruction">
+            <i class="bi bi-mic-fill"></i>
+          </button>
+        </div>
+
+        <!-- Add Medicine Button -->
+        <div class="d-flex justify-content-center align-items-center mt-2">
+            <button type="submit" class="btn btn-success" id="add-medicine-btn"><i class="bi bi-patch-plus me-1"></i>Add Medicine</button>
+        </div>
+
+        <!-- Prescription Table -->
+        <div class="table-responsive mt-3" id="prescription-table-wrapper">
+        <table class="table table-bordered table-sm align-middle text-center" id="prescription-table">
+            <thead class="table-light">
+            <tr>
+                <th>S.No</th>
+                <th>Drug Name</th>
+                <th>Frequency</th>
+                <th>Duration</th>
+                <th>Units</th>
+                <th>Timing</th>
+                <th>Instructions</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody id="prescription-table-body">
+            <!-- Dynamically added rows go here -->
+            </tbody>
+        </table>
+        </div>
+        
+        <!-- Divider -->
+        <div style="height: 0.5px; background-color: #ddd; margin: 20px,0;"></div>
+
+        <!-- Doctor Fees -->
+        <div class="col-md-6 mt-2">
+            <label for="doctor_fees" class="form-label" id="doctor_fees_label">Doctor Fees*</label>
+            <input type="text" 
+            class="form-control"
+            id="doctor_fees"
+            inputmode="decimal"
+            pattern="^\d*\.?\d*$"
+            oninput="this.value = this.value.replace(/[^0-9.]/g, '')" 
+            required>
+        </div>
+
+        <!-- Review Date -->
+        <div class="col-md-6 mt-2">
+            <label for="review_datetime" id="review_datetime_label" class="form-label">Review Date & Time</label>
+            <input type="datetime-local" class="form-control" id="review_datetime" >
+        </div>
+
+        <!-- Multiple Image Upload -->
+        <div class="col-md-6 mt-4 mb-4">
+            <label for="upload_images_label" id="upload_images_label" class="form-label fw-bold">Upload Images</label>
+            <input 
+            type="file" 
+            class="form-control" 
+            id="upload_images" 
+            name="upload_images" 
+            accept="image/*" 
+            multiple
+            >
+        </div>
+
+        <!-- Update Prescription Button -->
+        <div class="col-md-6 mt-4 mb-4">
+            <label for="upload_prescriptions_label" id="upload_prescriptions_label" class="form-label fw-bold">Update Prescription</label>
+            <input 
+            type="file" 
+            class="form-control" 
+            id="upload_prescriptions" 
+            name="upload_prescriptions" 
+            accept="image/*" 
+            multiple
+            >
+        </div>
+
+
+      <!----------------------Buttons  ------------------>
+      <!-- Submit Button -->
+      <div class=" d-flex justify-content-between align-items-center mt-4 flex-wrap">
+        <!-- Left-aligned Text -->
+        <p id="appointment-info" class="text mb-2 mb-md-0"></p>
+        <!-- Cancel Buttons -->
+        <div class="d-flex" id="cancel-close-buttons"></div>
+            <button type="submit" class="btn btn-danger" name="cancel" id="cancelAppointment"><i class="bi bi-x-circle me-1"></i> Cancel Appointment</button>
+        <!-- Close Buttons -->
+            <button type="submit" class="btn btn-success" name="close" id="closeAppointment"><i class="bi bi-check2-circle me-1"></i> Close Appointment
+        </button>
+        </div>
+      </div>
+      
+    </div>
+      
+    </form>
+  </div>
+</div>
