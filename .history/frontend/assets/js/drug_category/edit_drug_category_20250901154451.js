@@ -136,9 +136,9 @@ function editCategoryFunction() {
           title: 'Success',
           text: `Template updated successfully!`,
           confirmButtonText: "OK"
-        }).then(async (result) => {
+        }).then((result) => {
           if (result.isConfirmed) {
-            // await fetchInstructions();
+            await fetchInstructions();
             loadPage("drug_category/view_drug_category");
           }
         });
@@ -202,8 +202,8 @@ document.getElementById('delete-drug-category-btn').addEventListener('click', fu
           confirmButtonText: "OK"
         }).then(async (result) => {
           if (result.isConfirmed) {
-            // await fetchInstructions();
-            loadPage("drug_category/view_drug_category");
+            await fetchInstructions();
+            loadPage('drug_category/view_and_search_drug_category');
           }
         });
         })

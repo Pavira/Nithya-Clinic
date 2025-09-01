@@ -136,9 +136,9 @@ function editCategoryFunction() {
           title: 'Success',
           text: `Template updated successfully!`,
           confirmButtonText: "OK"
-        }).then(async (result) => {
+        }).then((result) => {
           if (result.isConfirmed) {
-            // await fetchInstructions();
+            fetchInstructions();
             loadPage("drug_category/view_drug_category");
           }
         });
@@ -196,16 +196,18 @@ document.getElementById('delete-drug-category-btn').addEventListener('click', fu
         .then((data) => {
           // Swal.fire('', 'The template has been deleted.', 'success');
           Swal.fire({
-          icon: 'danger',
+          icon: '',
           title: 'Deleted!',
           text: `The template has been deleted.!`,
           confirmButtonText: "OK"
-        }).then(async (result) => {
+        }).then((result) => {
           if (result.isConfirmed) {
-            // await fetchInstructions();
+            fetchInstructions();
             loadPage("drug_category/view_drug_category");
           }
         });
+          loadPage('drug_category/view_and_search_drug_category');
+          // ✅ Optionally reload list or page
         })
         .catch((error) => {
           console.error(error);

@@ -203,7 +203,7 @@ document.getElementById('delete-drug-category-btn').addEventListener('click', fu
         }).then(async (result) => {
           if (result.isConfirmed) {
             // await fetchInstructions();
-            loadPage("drug_category/view_drug_category");
+            loadPage('drug_category/view_and_search_drug_category');
           }
         });
         })
