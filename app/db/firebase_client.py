@@ -84,14 +84,6 @@ def initialize_firebase():
         db = firestore.client()
         bucket = storage.bucket()
 
-        # 🔥 Firestore test after db is initialized
-        # try:
-        #     test_doc = db.collection("test").document("ping")
-        #     test_doc.set({"ping": "pong"})
-        #     print("✅ Firestore connection working")
-        # except Exception as e:
-        #     print("❌ Firestore connection failed:", e)
-
     except json.JSONDecodeError:
         print("❌ Error decoding FIREBASE_CONFIG JSON.")
     except Exception as e:

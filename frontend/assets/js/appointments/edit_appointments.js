@@ -28,8 +28,11 @@ function getPrescriptionTableData() {
         const timing_a  = parseInt(cells[5].innerText.trim()) || 0;
         const timing_e  = parseInt(cells[6].innerText.trim()) || 0;
         const timing_n  = parseInt(cells[7].innerText.trim()) || 0;
-        const timing_bf = parseInt(cells[8].innerText.trim()) || 0;
-        const timing_af = parseInt(cells[9].innerText.trim()) || 0;
+        // const timing_bf = parseInt(cells[8].innerText.trim()) || 0;
+        // const timing_af = parseInt(cells[9].innerText.trim()) || 0;
+        const timing_bf = cells[8].querySelector(".bi-check-lg") ? 1 : 0;
+        const timing_af = cells[9].querySelector(".bi-check-lg") ? 1 : 0;
+    
         
         const instruction = cells[10].innerText.trim();
         
@@ -244,18 +247,43 @@ async function initPrescription() {
   document.querySelectorAll('.timing-toggle').forEach(button => {
     button.addEventListener('click', function() {
       const target = this.getAttribute('data-target');
-      const hiddenInput = document.getElementById(target === 'bf' ? 'before_food' : 'after_food');
+      const bfButton = document.getElementById('bf-btn');
+      const afButton = document.getElementById('af-btn');
+      const beforeFoodInput = document.getElementById('before_food');
+      const afterFoodInput = document.getElementById('after_food');
+      // const hiddenInput = document.getElementById(target === 'bf' ? 'before_food' : 'after_food');
 
       if (this.classList.contains('btn-success')) {
         // Deactivate
         this.classList.remove('btn-success');
         this.classList.add('btn-outline-secondary');
-        hiddenInput.value = 0;
+        beforeFoodInput.value = 0;
+        afterFoodInput.value = 0
+        // Enable both buttons
+        bfButton.disabled = false;
+        afButton.disabled = false;
+        // hiddenInput.value = 0;
       } else {
         // Activate
         this.classList.remove('btn-outline-secondary');
         this.classList.add('btn-success');
-        hiddenInput.value = 1;
+        if (target === 'bf') {
+            beforeFoodInput.value = 1;
+            afterFoodInput.value = 0;
+        } else {
+            beforeFoodInput.value = 0;
+            afterFoodInput.value = 1;
+        }
+
+        // Disable the other button
+        if (target === 'bf') {
+            afButton.disabled = true;
+            bfButton.disabled = false;
+        } else {
+            bfButton.disabled = true;
+            afButton.disabled = false;
+        }
+        // hiddenInput.value = 1;
       }
     });
   });
@@ -272,7 +300,7 @@ async function initPrescription() {
       // const frequency = document.getElementById('frequency').value.trim();
       const duration_value = document.getElementById('duration_value').value.trim() || '';
       const duration_unit = document.getElementById('duration_unit').value.trim() || '';
-      const instruction = document.getElementById('instruction').value.trim() || '';
+      const instruction = document.getElementById('instruction').value.trim().toUpperCase() || '';
       const morning = document.getElementById('timing-m').value;
       const afternoon = document.getElementById('timing-a').value;
       const evening = document.getElementById('timing-e').value;
@@ -339,6 +367,7 @@ async function initPrescription() {
       document.querySelectorAll('.timing-toggle').forEach(btn => {
           btn.classList.remove('btn-success', 'active');
           btn.classList.add('btn-outline-secondary');
+          btn.disabled = false;  // Re-enable both buttons
       });
     }
 
@@ -375,10 +404,10 @@ async function initPrescription() {
               <td>${item.drug}</td>
               <td>${item.duration_value}</td>
               <td>${item.duration_unit}</td>
-              <td>${item.morning ? item.morning : ''}</td>
-              <td>${item.afternoon ? item.afternoon : ''}</td>
-              <td>${item.evening ? item.evening : ''}</td>
-              <td>${item.night ? item.night : ''}</td>
+              <td>${item.morning == 0 ? '' : item.morning}</td>
+              <td>${item.afternoon == 0 ? '' : item.afternoon}</td>
+              <td>${item.evening == 0 ? '' : item.evening}</td>
+              <td>${item.night == 0 ? '' : item.night}</td>
               <td>${item.before_food == 1 ? '<i class="bi bi-check-lg text-success"></i>' : ''}</td>
               <td>${item.after_food == 1 ? '<i class="bi bi-check-lg text-success"></i>' : ''}</td>
               <td>${item.instruction || ''}</td>
@@ -479,7 +508,7 @@ async function saveVitals() {
           Swal.fire({
             icon: 'success',
             title: 'Vitals Saved ',
-            text: `Height: ${height}CM, \n Weight: ${weight}KG, \n BMI: ${bmi} kg/m<sup>2</sup>, \n Blood Pressure: ${blood_pressure} mmHg, \n Pulse: ${pulse} bpm`,
+            text: `Height: ${height}CM, \n Weight: ${weight}KG, \n BMI: ${bmi} kg/m2, \n Blood Pressure: ${blood_pressure} mmHg, \n Pulse: ${pulse} bpm`,
             // confirmButtonText: 'OK',
           });       
         }
@@ -608,75 +637,99 @@ async function ActiveAppointmentFunctions(vitals) {
             width: "100%"
           });
 
-       // ✅ Force reset to placeholder after initializing
-      $("#instruction").val(null).trigger("change");  // <-- IMPORTANT
+        // ✅ Force reset to placeholder after initializing
+        $("#instruction").val(null).trigger("change");  // <-- IMPORTANT
 
-      // ✅ Remove the Swal confirmation inside select event
-      $("#instruction").on("select2:select", function (e) {
-        const selectedValue = e.params.data.text;
-        const exists = localStorageInstructionList.includes(selectedValue);
+        // ✅ Remove the Swal confirmation inside select event
+        $("#instruction").on("select2:select", function (e) {
+          const selectedValue = e.params.data.text.toUpperCase();  // Convert to UPPERCASE
+          const exists = localStorageInstructionList.includes(selectedValue);
 
-        // If it's a new value, just show "Add" button (optional)
-        if (!exists) {
-          $("#new-instruction-text").text(selectedValue);
-          $("#add-instruction-container").show();
-        } else {
-          $("#add-instruction-container").hide();
-        }
-      });
+          // If it's a new value, just show "Add" button (optional)
+          if (!exists) {
+            $("#new-instruction-text").text(selectedValue);
+            $("#add-instruction-container").show();
+          } else {
+            $("#add-instruction-container").hide();
+          }
+        });
 
         // Listen for user typing in Select2 search box
     $(document).on("keyup", ".select2-search__field", function () {
-      const inputVal = $(this).val().trim().toLowerCase();
-      const exists = localStorageInstructionList.some(item => item.toLowerCase() === inputVal);
+      // const inputVal = $(this).val().trim().toLowerCase();
+      // const exists = localStorageInstructionList.some(item => item.toLowerCase() === inputVal);
+      const searchBox = $(this);
 
-      if (inputVal && !exists) {
-        $("#new-instruction-text").text(inputVal);
-        $("#add-instruction-container").show();
-      } else {
-        $("#add-instruction-container").hide();
+      // Get the Select2 container
+      const container = searchBox.closest(".select2-container");
+
+      // From container, get the original <select>
+      const selectElement = container.prev("select");
+
+      // Now you can check ID/name to know which select triggered
+      const selectId = selectElement.attr("id");
+
+      // const inputVal = searchBox.val().trim().toUpperCase();
+
+      if (selectId === "instruction") {
+        let val = searchBox.val().toUpperCase();   // Convert to UPPERCASE
+        searchBox.val(val).trigger("input");
+
+        const inputVal = val.trim();
+
+        const exists = localStorageInstructionList.some(
+          item => item.toUpperCase() === inputVal
+        );
+
+
+          if (inputVal && !exists) {
+            $("#new-instruction-text").text(inputVal);
+            $("#add-instruction-container").show();
+          } else {
+            $("#add-instruction-container").hide();
+          }
       }
     });
+  
 
     // Add instruction button click
     $("#add-instruction-btn").on("click", async function (e) {
       e.preventDefault();
-      const newInstruction = $("#new-instruction-text").text();
+      const newInstruction = $("#new-instruction-text").text().toUpperCase().trim();  
+
+      try {
+        showLoader();
+        const token = localStorage.getItem("token");
+        const response = await fetch("/api/v1/drug_category/add_drug_category", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify({ descriptions: [newInstruction] })
+        });
       
-
-  try {
-    showLoader();
-    const token = localStorage.getItem("token");
-    const response = await fetch("/api/v1/drug_category/add_drug_category", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`
-      },
-      body: JSON.stringify({ descriptions: [newInstruction] })
+        const result = await response.json();
+        if (result.success) {
+          // Update local list and Select2
+          localStorageInstructionList.push(newInstruction);
+          localStorage.setItem("instruction_list", JSON.stringify(localStorageInstructionList));
+        
+          const newOption = new Option(newInstruction, newInstruction, true, true);
+          $("#instruction").append(newOption).trigger("change");
+        
+          $("#add-instruction-container").hide();
+          Swal.fire("Success", "Instruction added successfully!", "success");
+        } else {
+          Swal.fire("Error", result.message || "Failed to add instruction", "error");
+        }
+      } catch (err) {
+        console.error(err);
+        Swal.fire("Error", "Something went wrong", "error");
+      } finally {
+        hideLoader();
+      }
     });
-
-    const result = await response.json();
-    if (result.success) {
-      // Update local list and Select2
-      localStorageInstructionList.push(newInstruction);
-      localStorage.setItem("instruction_list", JSON.stringify(localStorageInstructionList));
-
-      const newOption = new Option(newInstruction, newInstruction, true, true);
-      $("#instruction").append(newOption).trigger("change");
-
-      $("#add-instruction-container").hide();
-      Swal.fire("Success", "Instruction added successfully!", "success");
-    } else {
-      Swal.fire("Error", result.message || "Failed to add instruction", "error");
-    }
-  } catch (err) {
-    console.error(err);
-    Swal.fire("Error", "Something went wrong", "error");
-  } finally {
-    hideLoader();
-  }
-});
 }
 
 async function ClosedAppointmentFunctions(vitals) {

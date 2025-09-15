@@ -48,7 +48,8 @@ async def add_drug_category(payload: DrugCategory):
 
                 doc_data = {
                     "DrugCategoryId": doc_id,
-                    "Description": name,
+                    "Description": name.upper(),
+                    # "Description_lower_case": name.lower(),
                     "LogDateTime": firestore.SERVER_TIMESTAMP,
                 }
 
@@ -71,6 +72,57 @@ async def add_drug_category(payload: DrugCategory):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to add template: {str(e)}",
         )
+
+
+# -------------------------Check Duplicate Bulk-------------------------
+class DrugCategoryRequest(BaseModel):
+    drugCategories: list[str]
+
+
+@router.post("/check_duplicates_bulk")
+async def check_duplicates_bulk(request: DrugCategoryRequest):
+    try:
+        duplicates = []
+        for name in request.drugCategories:
+            query = (
+                db.collection("Drug_Category")
+                .where("Description", "==", name.upper())
+                .get()
+            )
+            if len(query) > 0:
+                duplicates.append(name)
+
+        if duplicates:
+            return {"success": False, "duplicates": duplicates}
+        return {"success": True, "duplicates": []}
+
+    except Exception as e:
+        logger.error(f"❌ Failed bulk duplicate check: {str(e)}")
+        return {"success": False, "error": "Server error"}
+
+
+# -------------------------Check Duplicate PaDrug Name-------------------------
+@router.get("/check_duplicate_category")
+async def check_duplicate_drug_service(
+    description: str,
+):
+    # logger.info(f"Querying for name={full_name.upper()} phone={phone_number}")
+
+    try:
+        query = (
+            db.collection("Drug_Category")
+            .where("Description", "==", description.upper())
+            .get()
+        )
+
+        # Check if any documents match
+        if len(query) > 0:
+            return True  # Duplicate exists
+        else:
+            return False  # No duplicate
+
+    except Exception as e:
+        logger.error(f"❌ Failed to check duplicate Template: {str(e)}")
 
 
 # -------------Edit Drug Category----------------
@@ -141,22 +193,10 @@ async def view_and_search_drug_category(
     limit: int = 10,
 ):
     """
-    API to view and search Category Name.
+    API to view and search Category Name (separated logic for search vs normal listing).
     """
     start_time = time.perf_counter()
     try:
-        # Get total patient count from count document
-        drug_count_doc = db.collection("Count").document("count").get()
-        total_docs = (
-            drug_count_doc.to_dict().get("DrugCategoryCount", 0)
-            if drug_count_doc.exists
-            else 0
-        )
-        # if drug_count_doc.exists:
-        #     total_docs = drug_count_doc.to_dict().get("DrugNamesCount", 0)
-        # else:
-        #     total_docs = 0
-
         fields = [
             "Description",
             "DrugCategoryId",
@@ -166,56 +206,142 @@ async def view_and_search_drug_category(
         collection_ref_field = db.collection("Drug_Category")
         collection_ref = collection_ref_field.select(fields)
 
-        print("total_docs", total_docs)
+        # ------------------ 🔍 SEARCH MODE ------------------
+        if search_type and search_value:
+            if search_type == "category_name":
+                query = (
+                    collection_ref.order_by("Description")
+                    .start_at([search_value])
+                    .end_at([search_value + "\uf8ff"])
+                )
+            else:
+                query = collection_ref.order_by("LogDateTime", direction="DESCENDING")
 
-        # Build query based on search type
-        if search_type == "category_name" and search_value:
-            # search_value = search_value.lower()
-            query = (
-                collection_ref.order_by("Description")
-                .start_at([search_value])
-                .end_at([search_value + "\uf8ff"])
-            )
-        # elif search_type == "drug_category" and search_value:
-        #     query = (
-        #         collection_ref.order_by("DrugCategoryName")
-        #         .start_at([search_value])
-        #         .end_at([search_value + "\uf8ff"])
-        #     )
+            # if cursor:
+            #     cursor_doc = collection_ref_field.document(cursor).get()
+            #     if cursor_doc.exists:
+            #         query = query.start_after(cursor_doc)
+
+            # query = query.limit(limit)
+            docs = query.get()
+
+            results = [doc.to_dict() | {"doc_id": doc.id} for doc in docs]
+            next_cursor = docs[-1].id if len(docs) == limit else None
+
+            return {
+                "success": True,
+                "data": results,
+                "next_cursor": next_cursor,
+                "total_count": len(results),
+            }
+
+        # ------------------ 📄 NORMAL LISTING MODE ------------------
         else:
+            drug_count_doc = db.collection("Count").document("count").get()
+            total_docs = (
+                drug_count_doc.to_dict().get("DrugCategoryCount", 0)
+                if drug_count_doc.exists
+                else 0
+            )
+
             query = collection_ref.order_by("LogDateTime", direction="DESCENDING")
 
-        # Apply cursor for pagination
-        if cursor:
-            cursor_doc = collection_ref_field.document(cursor).get()
-            if cursor_doc.exists:
-                query = query.start_after(cursor_doc)
-            else:
-                logger.warning(
-                    f"⚠️ Cursor doc {cursor} not found. Starting from beginning."
-                )
+            if cursor:
+                cursor_doc = collection_ref_field.document(cursor).get()
+                if cursor_doc.exists:
+                    query = query.start_after(cursor_doc)
 
-        query = query.limit(limit)
-        docs = query.get()
+            query = query.limit(limit)
+            docs = query.get()
 
-        # print("docs===", docs)
-        # Determine next cursor
-        next_cursor = docs[-1].id if len(docs) == limit else None
-        results = [doc.to_dict() | {"doc_id": doc.id} for doc in docs]
+            results = [doc.to_dict() | {"doc_id": doc.id} for doc in docs]
+            next_cursor = docs[-1].id if len(docs) == limit else None
 
-        elapsed_time = time.perf_counter() - start_time
-        print(f"⏱ Service execution time for Drug Category: {elapsed_time:.4f} seconds")
-
-        return {
-            "success": True,
-            "data": results,
-            "next_cursor": next_cursor,
-            "total_count": total_docs,
-        }
+            return {
+                "success": True,
+                "data": results,
+                "next_cursor": next_cursor,
+                "total_count": total_docs,
+            }
 
     except Exception as e:
-        logger.error(f"❌ Error: {e}")
+        logger.error(f"❌ Error in view_and_search_drug_category: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
+
+# @router.get("/view_and_search_drug_category")
+# async def view_and_search_drug_category(
+#     search_type: Optional[str] = Query(None),
+#     search_value: Optional[str] = Query(None),
+#     cursor: Optional[str] = Query(None),
+#     limit: int = 10,
+# ):
+#     """
+#     API to view and search Category Name.
+#     """
+#     start_time = time.perf_counter()
+#     try:
+#         # Get total patient count from count document
+#         drug_count_doc = db.collection("Count").document("count").get()
+#         total_docs = (
+#             drug_count_doc.to_dict().get("DrugCategoryCount", 0)
+#             if drug_count_doc.exists
+#             else 0
+#         )
+
+#         fields = [
+#             "Description",
+#             "DrugCategoryId",
+#             "LogDateTime",
+#         ]
+
+#         collection_ref_field = db.collection("Drug_Category")
+#         collection_ref = collection_ref_field.select(fields)
+
+#         print("total_docs", total_docs)
+
+#         # Build query based on search type
+#         if search_type == "category_name" and search_value:
+#             # search_value = search_value.lower()
+#             query = (
+#                 collection_ref.order_by("Description")
+#                 .start_at([search_value])
+#                 .end_at([search_value + "\uf8ff"])
+#             )
+#         else:
+#             query = collection_ref.order_by("LogDateTime", direction="DESCENDING")
+
+#         # Apply cursor for pagination
+#         if cursor:
+#             cursor_doc = collection_ref_field.document(cursor).get()
+#             if cursor_doc.exists:
+#                 query = query.start_after(cursor_doc)
+#             else:
+#                 logger.warning(
+#                     f"⚠️ Cursor doc {cursor} not found. Starting from beginning."
+#                 )
+
+#         query = query.limit(limit)
+#         docs = query.get()
+
+#         # print("docs===", docs)
+#         # Determine next cursor
+#         next_cursor = docs[-1].id if len(docs) == limit else None
+#         results = [doc.to_dict() | {"doc_id": doc.id} for doc in docs]
+
+#         elapsed_time = time.perf_counter() - start_time
+#         print(f"⏱ Service execution time for Drug Category: {elapsed_time:.4f} seconds")
+
+#         return {
+#             "success": True,
+#             "data": results,
+#             "next_cursor": next_cursor,
+#             "total_count": total_docs,
+#         }
+
+#     except Exception as e:
+#         logger.error(f"❌ Error: {e}")
+#         raise HTTPException(status_code=500, detail=str(e))
 
 
 # # -------------View Drug Category----------------

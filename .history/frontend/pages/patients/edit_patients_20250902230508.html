@@ -1,0 +1,224 @@
+<!-- edit_patients.html -->
+<!-- Header -->
+<div id="page-header-data"
+     data-title="Edit Patient"
+     data-icon="person-vcard"
+     data-subtitle="Update patient details">
+</div>
+
+<!-- Back  Button -->
+<div class="d-flex justify-content-end align-items-center gap-2 mb-3 flex-wrap">
+  <button class="btn btn-danger" onclick="loadPage('patients/view_patients')">
+    <i class="bi bi-arrow-left-circle me-1"></i> Back
+  </button>
+</div>
+
+<!-- Edit Patient Form Card -->
+<div class="card shadow-sm border-0">
+  <div class="card-body">
+    <form id="edit-patient-form">
+
+        <input type="hidden" id="patient_id" name="patient_id">
+
+      <div class="row gy-4 gx-3">
+
+        <!-- Patient Id-->
+        <div class="col-md-6">
+          <label for="patientId" class="form-label">Patient Registration Id*</label>
+          <input type="text" class="form-control" id="patientId" style="background-color: #e9ecef;" readonly>
+        </div>
+
+        <!-- Full Name -->
+        <div class="col-md-6">
+          <label for="fullName" class="form-label">Full Name*</label>
+          <input type="text" class="form-control" id="fullName" placeholder="Enter Full Name" maxlength="50" style="text-transform: uppercase;" required title="Please enter the full name">
+        </div>
+
+        <!-- Phone Number -->
+        <div class="col-md-3">
+          <label for="phone" class="form-label">Phone Number*</label>
+          <input type="tel" class="form-control" id="phoneNumber" placeholder="Enter Phone Number" maxlength="10" minlength="10" pattern="[0-9]{10}" oninput="this.value = this.value.replace(/[^0-9]/g, '')" required title="Please enter a valid 10-digit phone number">
+        </div>
+
+        <!-- Alternate Phone -->
+        <div class="col-md-3">
+          <label for="altPhone" class="form-label">Alternate Phone Number</label>
+          <input type="tel" class="form-control" id="altPhoneNumber" placeholder="Enter Alternate Phone" maxlength="10" minlength="10" pattern="[0-9]{10}" oninput="this.value = this.value.replace(/[^0-9]/g, '')" title="Please enter a valid 10-digit phone number">
+        </div>
+
+        <!-- Date of Birth -->
+        <div class="col-md-4">
+          <label for="dob" class="form-label">Date of Birth*</label>
+          <input type="date" class="form-control" id="dob" required>
+        </div>
+
+        <!-- Age (auto-calculated) -->
+        <div class="col-md-2">
+          <label for="age" class="form-label">Age</label>
+          <input type="text" class="form-control" id="age" style="background-color: #e9ecef;" readonly>
+        </div>
+
+        <!-- Gender -->
+        <div class="col-md-3">
+          <label class="form-label">Gender*</label>
+          <div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="gender" value="Male" id="male">
+              <label class="form-check-label" for="male">Male</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="gender" value="Female" id="female">
+              <label class="form-check-label" for="female">Female</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="gender" value="Other" id="other">
+              <label class="form-check-label" for="other">Other</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Marital Status -->
+        <div class="col-md-3">
+          <label class="form-label">Marital Status*</label>
+          <div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="martial" value="Single" id="single">
+              <label class="form-check-label" for="single">Single</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="martial" value="Married" id="married">
+              <label class="form-check-label" for="married">Married</label>
+            </div>
+            <!-- <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="martial" value="Divorced" id="divorced">
+              <label class="form-check-label" for="divorced">Divorced</label>
+            </div> -->
+          </div>
+        </div>
+
+        <!-- Profession -->
+        <div class="col-md-6">
+          <label for="profession" class="form-label">Profession</label>
+          <select class="form-select" id="profession">
+            <option selected disabled value="">Select Profession</option>
+            <option>Others</option>
+            <option>Teacher</option>
+            <option>Professor</option>
+            <option>Doctor</option>
+            <option>Lawyer</option>
+            <option>Home Maker</option>
+            <option>Tailor</option>
+            <option>Entrepreneur</option>
+            <option>Business</option>
+            <option>Nurse</option>
+            <option>Industrial Worker</option>
+            <option>Government Officer</option>
+            <option>Police</option>
+            <option>Construction Worker</option>
+            <option>Software Engineer</option>
+            <option>Engineer</option>
+            <option>Accountant</option>
+            <option>Auditor</option>
+            <option>Pilot</option>
+            <option>Flight Air Crew</option>
+            <option>Student - School</option>
+            <option>Student - College</option>
+          </select>
+        </div>
+
+        <!-- Guardian Name -->
+        <div class="col-md-6">
+          <label for="guardian" class="form-label">Guardian Name</label>
+          <input type="text" class="form-control" id="guardian" placeholder="Enter Guardian Name" title="Please enter the guardian's name">
+        </div>
+
+        <!-- Aadhar Number -->
+        <div class="col-md-6">
+          <label for="aadhar" class="form-label">Aadhar Number</label>
+          <input type="text" class="form-control" id="aadhar" placeholder="Enter Aadhar Number" pattern="[0-9]{12}" oninput="this.value = this.value.replace(/[^0-9]/g, '')" title="Please enter a valid 12-digit Aadhar number">
+        </div>
+
+        <!-- Email -->
+        <div class="col-md-6">
+          <label for="email" class="form-label">Email Address</label>
+          <input type="email" class="form-control" id="email" placeholder="Enter Email Address" title="Please enter a valid email address">
+        </div>
+
+        <!-- Address -->
+        <div class="col-12">
+          <label for="address" class="form-label">Address</label>
+          <textarea class="form-control" id="address" rows="3" placeholder="Enter Address" title="Please enter the patient's address"></textarea>
+        </div>
+
+        <!-- Treatment Type -->
+        <div class="col-md-6">
+          <label for="treatment" class="form-label">Treatment Type*</label>
+          <select class="form-select" id="treatmentType">
+            <option selected>General</option>
+            <option>Chemical Peel</option>
+            <option>MNRF</option>
+            <option>LHR</option>
+            <option>RF</option>
+            <option>Excimer</option>
+            <option>Cryotherapy</option>
+            <option>Paring</option>
+            <option>Tattoo Removal</option>
+            <option>Biopsy</option>
+            <option>Miscellaneous</option>
+          </select>
+        </div>
+
+        <!-- Purpose -->
+        <div class="col-md-6">
+          <label for="purpose" class="form-label">Purpose of Visit*</label>
+          <input type="text" class="form-control" id="purposeOfVisit" placeholder="Enter Purpose of Visit" required title="Please enter the purpose of visit">
+        </div>
+
+        <!-- Referred By -->
+        <div class="col-md-6">
+          <label for="referred" class="form-label">Referred By</label>
+          <input type="text" class="form-control" id="referredBy" placeholder="Enter Referred By"  title="Please enter who referred the patient">
+        </div>
+      </div>
+
+      <div class="d-flex justify-content-between align-items-center mt-4 flex-wrap">
+        <!-- Left-aligned Text -->
+        <p id="registration-info" class="text mb-2 mb-md-0"></p>
+
+        <!-- Right-aligned Buttons -->
+        <div class="d-flex gap-2">
+            <!-- Delete Button -->
+            <button type="button" class="btn btn-danger" id="deleteButton">
+            <i class="bi bi-trash me-2"></i>Delete Patient
+            </button>
+
+            <!-- Submit/Update Button -->
+            <button type="submit" class="btn btn-success" id="updateButton">
+            <i class="bi bi-person-plus me-2"></i>Update Patient
+            </button>
+        </div>
+        </div>
+        
+        </div>
+      </div>
+    </form>
+
+    <!-- -------------Toast------------- -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+      <div id="emailToast" class="toast align-items-center text-bg-danger border-0" role="alert">
+        <div class="d-flex">
+          <div class="toast-body">
+            Please enter a valid email address.
+          </div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+ 

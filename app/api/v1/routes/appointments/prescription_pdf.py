@@ -63,7 +63,7 @@ async def generate_prescription_pdf(appointment_id: str, reg_no: str):
         doc = doc_ref[0]
         data = doc.to_dict()
 
-        data["Age"] = user_data["Age"]
+        data["DOB"] = user_data["DOB"]
         data["Gender"] = user_data["Gender"]
         data["PhoneNumber"] = user_data["PhoneNumber"]
 

@@ -129,7 +129,7 @@
             oninput="this.value = this.value.replace(/[^0-9.]/g, '')">
       </div>
       <div class="col-md-2 mt-2">
-        <label for="BMI" class="form-label" id="bmi_label" >BMI(kg/m<sup>2)</sup></label>
+        <label for="BMI" class="form-label" id="bmi_label" >BMI(kg/m<sup>2</sup>)</label>
         <input type="text" class="form-control bg-light" id="bmi" readonly >
       </div>
 
@@ -209,7 +209,7 @@
         </div> -->
 
         <div class="col-md-4" id="drug_name_div">
-          <label for="drug_name" id="drug_name_label" class="form-label">Drug Name*</label>
+          <label for="drug_name" id="drug_name_label" class="form-label">Drug Name</label>
           <select type="text" class="form-control" id="drug_name" list="drug_name_options">
             <option value="" selected disabled>Select a Drug Name</option>
           </select>       
@@ -223,7 +223,7 @@
         </div> -->
 
         <div class="col-md-2">
-          <label for="duration_value" id="duration_value_label" class="form-label">Duration*</label>
+          <label for="duration_value" id="duration_value_label" class="form-label">Duration</label>
           <input type="text" class="form-control" placeholder="Duration" id="duration_value" >
         </div>
 
@@ -278,8 +278,8 @@
           </div>
         </div>
         <!-- Hidden inputs to store state -->
-<input type="hidden" name="before_food" id="before_food" value="0">
-<input type="hidden" name="after_food" id="after_food" value="0">
+<input type="hidden" name="before_food" id="before_food">
+<input type="hidden" name="after_food" id="after_food">
 
         <div class="col-md-12 mt-2" id="instruction_div">
           <label for="instruction" id="instruction_label" class="form-label">Select or Add Instructions</label>

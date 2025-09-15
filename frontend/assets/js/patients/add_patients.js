@@ -12,6 +12,42 @@ initBackButton();
 
 function initAddPatientPage() {
 
+  // checking duplicate name and phone number while typing
+  document.getElementById("fullName").addEventListener("blur", async function () {
+    const fullName = this.value.trim();
+    const phoneNumber = document.getElementById("phoneNumber").value.trim();
+    if (fullName && phoneNumber.length === 10) {  
+      showLoader();
+      const isDuplicate = await checkkDuplicatePatient(fullName, phoneNumber);
+      if (!isDuplicate) {
+        hideLoader();
+        Swal.fire({
+          icon: 'warning',
+          title: '⛔ Duplicate patient found',
+          text: 'A patient with the same name and phone number already exists.',
+        });
+      }
+    }
+  });
+
+  document.getElementById("phoneNumber").addEventListener("input", async function () {
+    const fullName = document.getElementById("fullName").value.trim();
+    const phoneNumber = this.value.trim();
+    if (fullName && phoneNumber.length === 10) {  
+      showLoader();
+      const isDuplicate = await checkkDuplicatePatient(fullName, phoneNumber);
+      if (!isDuplicate) {
+        hideLoader();
+        Swal.fire({
+          icon: 'warning',
+          title: '⛔ Duplicate patient found',
+          text: 'A patient with the same name and phone number already exists.',
+        });
+      }
+    }
+  });
+      
+
   // ---------------Date of Birth and Age Calculation ---------------
   document.getElementById("dob").setAttribute("max", new Date().toISOString().split("T")[0]);
 
@@ -74,22 +110,45 @@ function validatePatientForm() {
   const purposeOfVisit = document.getElementById("purposeOfVisit").value;
   const referredBy = document.getElementById("referredBy").value;
   const phonePattern = /^[0-9]{10}$/;
-  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  // const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const emailPattern = /^[^\s@]+@[^\s@]+\.(com|org|net|edu|gov|mil|int|co|in|us|uk|io|ai)$/i;
   const email = document.getElementById("email").value;
   
 
-  if (!fullName || !phoneNumber || !dob || !gender || !marital || !profession || !treatment_type || !purposeOfVisit) {
-    Swal.fire({
-      icon: 'warning',
-      title: 'Validation',
-      text: 'Please fill in all the required fields.',
-    });
-    // if (!phonePattern.test(phoneNumber)) {
-    //   alert("Please enter a valid email and phone number.");
-    //   return false;
-    // }
-    return false;
-  }
+  // if (!fullName || !phoneNumber || !dob || !gender || !marital || !treatment_type || !purposeOfVisit) {
+  //   Swal.fire({
+  //     icon: 'warning',
+  //     title: 'Validation',
+  //     text: 'Please fill in all the required fields.',
+  //   });
+  //   return false;
+  // }
+
+  let missingFields = [];
+
+if (!fullName) missingFields.push("Full Name");
+if (!phoneNumber) missingFields.push("Phone Number");
+if (!dob) missingFields.push("Date of Birth");
+if (!gender) missingFields.push("Gender");
+if (!marital) missingFields.push("Marital Status");
+if (!treatment_type) missingFields.push("Treatment Type");
+if (!purposeOfVisit) missingFields.push("Purpose of Visit");
+
+if (missingFields.length > 0) {
+  Swal.fire({
+    icon: 'warning',
+    title: 'Missing Information',
+    html: `
+      <p>Please fill in the following required fields:</p>
+      <ul style="text-align:left;">
+        ${missingFields.map(field => `<li>${field}</li>`).join("")}
+      </ul>
+    `,
+  });
+  return false;
+}
+
+
   if (email && !emailPattern.test(email)) {
     const toast = new bootstrap.Toast(document.getElementById('emailToast'));
     toast.show();
@@ -151,6 +210,8 @@ async function checkkDuplicatePatient(fullName, phoneNumber) {
       title: '⛔ Server error. Try again later.',
     });
     console.error(err);
+  }finally {
+    hideLoader(); // Hide the loader
   }
 }
 
@@ -226,12 +287,13 @@ async function initAddPatientForm() {
       console.log("Checking for duplicate patient...");
       const isDuplicate = await checkkDuplicatePatient(data.full_name, data.phone_number);
       if (!isDuplicate) {
+        hideLoader();
         Swal.fire({
             icon: 'error',
             title: '⛔ Duplicate patient found',
-            text: 'Please check the patient details.',
-          }).then(() => {
-          hideLoader(); // Hide the loader
+            text: 'A patient with the same name and phone number already exists.',
+          // }).then(() => {
+          // hideLoader(); // Hide the loader
         });       
         return;
       }

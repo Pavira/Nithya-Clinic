@@ -94,7 +94,9 @@ async def create_patient_service(
 
 
 # -------------------------Check Duplicate Patient-------------------------
-async def check_duplicate_patient_service(full_name: str, phone_number: int):
+async def check_duplicate_patient_service(
+    full_name: str, phone_number: int, patient_id: str = None
+):
 
     logger.info(f"Querying for name={full_name.upper()} phone={phone_number}")
 
@@ -106,11 +108,18 @@ async def check_duplicate_patient_service(full_name: str, phone_number: int):
             .get()
         )
 
-        # Check if any documents match
-        if len(query) > 0:
-            return True  # Duplicate exists
-        else:
-            return False  # No duplicate
+        for doc in query:
+            data = doc.to_dict()
+            if data.get("PatientRegistrationNumber") != patient_id:
+                return True  # Duplicate exists
+
+        return False  # No duplicates (or only the same patient)
+
+        # # Check if any documents match
+        # if len(query) > 0:
+        #     return True  # Duplicate exists
+        # else:
+        #     return False  # No duplicate
 
     except Exception as e:
         logger.error(f"❌ Failed to check duplicate patient: {str(e)}")
@@ -122,18 +131,10 @@ async def view_and_search_patients_service(
     search_type: Optional[str] = Query(None),
     search_value: Optional[str] = Query(None),
     cursor: Optional[str] = Query(None),
-    limit: int = 10,
+    # limit: int = 10,
 ):
     start_time = time.perf_counter()
     try:
-        # Get total patient count from count document
-        patient_count_doc = db.collection("Count").document("count").get()
-        if patient_count_doc.exists:
-            total_docs = patient_count_doc.to_dict().get("patient_count", 0)
-        else:
-            total_docs = 0
-
-        # 1) Build base query with projection (select only what the table needs)
         fields = [
             "PatientRegistrationNumber",
             "FullName",
@@ -145,49 +146,140 @@ async def view_and_search_patients_service(
         collection_ref_field = db.collection("collection_PatientRegistration")
         collection_ref = collection_ref_field.select(fields)
 
-        # Build query based on search type
-        if search_type == "full_name" and search_value:
-            query = (
-                collection_ref.order_by("FullName")
-                .start_at([search_value])
-                .end_at([search_value + "\uf8ff"])
-            )
-        elif search_type == "phone_number" and search_value:
-            query = collection_ref.where("PhoneNumber", "==", int(search_value))
-        elif search_type == "registration_id" and search_value:
-            query = collection_ref.where(
-                "PatientRegistrationNumber", "==", str(search_value)
-            )
+        if search_type and search_value:
+            # 🔍 Search mode → no pagination, just fetch all
+            if search_type == "full_name":
+                query = (
+                    collection_ref.order_by("FullName")
+                    .start_at([search_value])
+                    .end_at([search_value + "\uf8ff"])
+                )
+            elif search_type == "phone_number":
+                query = collection_ref.where("PhoneNumber", "==", int(search_value))
+            elif search_type == "registration_id":
+                query = collection_ref.where(
+                    "PatientRegistrationNumber", "==", str(search_value)
+                )
+            else:
+                query = collection_ref
+
+            docs = query.stream()
+            results = [doc.to_dict() | {"doc_id": doc.id} for doc in docs]
+
+            return {
+                "success": True,
+                "data": results,
+                # "page_count": len(results),  # all results in one shot
+                "next_cursor": None,  # 🚫 no pagination
+                "total_count": len(results),
+            }
+
+        # 📄 Normal listing with pagination
         else:
+            limit = 10
+
+            patient_count_doc = db.collection("Count").document("count").get()
+            if patient_count_doc.exists:
+                total_docs = patient_count_doc.to_dict().get("patient_count", 0)
+            else:
+                total_docs = 0
+
             query = collection_ref.order_by("LogDateTime", direction="DESCENDING")
 
-        # Apply cursor for pagination
-        if cursor:
-            cursor_doc = collection_ref_field.document(cursor).get()
-            if cursor_doc.exists:
-                query = query.start_after(cursor_doc)
+            if cursor:
+                cursor_doc = collection_ref_field.document(cursor).get()
+                if cursor_doc.exists:
+                    query = query.start_after(cursor_doc)
 
-        query = query.limit(limit)
-        docs = query.get()
+            query = query.limit(limit)
+            docs = query.get()
 
-        # print("docs===", docs)
-        # Determine next cursor
-        next_cursor = docs[-1].id if len(docs) == limit else None
-        results = [doc.to_dict() | {"doc_id": doc.id} for doc in docs]
+            results = [doc.to_dict() | {"doc_id": doc.id} for doc in docs]
+            next_cursor = docs[-1].id if len(docs) == limit else None
 
-        elapsed_time = time.perf_counter() - start_time
-        print(f"⏱ Service execution time: {elapsed_time:.4f} seconds")
-
-        return {
-            "success": True,
-            "data": results,
-            "next_cursor": next_cursor,
-            "total_count": total_docs,
-        }
+            return {
+                "success": True,
+                "data": results,
+                # "page_count": len(results),
+                "next_cursor": next_cursor,
+                "total_count": total_docs,
+            }
 
     except Exception as e:
         logger.error(f"❌ Error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
+
+# async def view_and_search_patients_service(
+#     search_type: Optional[str] = Query(None),
+#     search_value: Optional[str] = Query(None),
+#     cursor: Optional[str] = Query(None),
+#     limit: int = 10,
+# ):
+#     start_time = time.perf_counter()
+#     try:
+#         # Get total patient count from count document
+#         patient_count_doc = db.collection("Count").document("count").get()
+#         if patient_count_doc.exists:
+#             total_docs = patient_count_doc.to_dict().get("patient_count", 0)
+#         else:
+#             total_docs = 0
+
+#         # 1) Build base query with projection (select only what the table needs)
+#         fields = [
+#             "PatientRegistrationNumber",
+#             "FullName",
+#             "PhoneNumber",
+#             "PatientType",
+#             "LogDateTime",
+#         ]
+
+#         collection_ref_field = db.collection("collection_PatientRegistration")
+#         collection_ref = collection_ref_field.select(fields)
+
+#         # Build query based on search type
+#         if search_type == "full_name" and search_value:
+#             query = (
+#                 collection_ref.order_by("FullName")
+#                 .start_at([search_value])
+#                 .end_at([search_value + "\uf8ff"])
+#             )
+#         elif search_type == "phone_number" and search_value:
+#             query = collection_ref.where("PhoneNumber", "==", int(search_value))
+#         elif search_type == "registration_id" and search_value:
+#             query = collection_ref.where(
+#                 "PatientRegistrationNumber", "==", str(search_value)
+#             )
+#         else:
+#             query = collection_ref.order_by("LogDateTime", direction="DESCENDING")
+
+#         # Apply cursor for pagination
+#         if cursor:
+#             cursor_doc = collection_ref_field.document(cursor).get()
+#             if cursor_doc.exists:
+#                 query = query.start_after(cursor_doc)
+
+#         query = query.limit(limit)
+#         docs = query.get()
+
+#         page_count = len(docs)  # ✅ number of results returned in this page
+#         next_cursor = docs[-1].id if len(docs) == limit else None
+#         results = [doc.to_dict() | {"doc_id": doc.id} for doc in docs]
+
+#         elapsed_time = time.perf_counter() - start_time
+#         print(f"⏱ Service execution time: {elapsed_time:.4f} seconds")
+
+#         return {
+#             "success": True,
+#             "data": results,
+#             "page_count": page_count,
+#             "next_cursor": next_cursor,
+#             "total_count": total_docs,
+#         }
+
+#     except Exception as e:
+#         logger.error(f"❌ Error: {e}")
+#         raise HTTPException(status_code=500, detail=str(e))
 
 
 # -------------------------Get Patient By Id-------------------------

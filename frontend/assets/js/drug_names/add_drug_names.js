@@ -1,52 +1,125 @@
 console.log("Add Drug Names Page Loaded");
 function initAddDrugsPage(){
   console.log("initAddDrugsPage");
+
+
+// ✅ Helper to enable/disable submit button
+function toggleSubmitButton() {
+  
+  const submitBtn = document.getElementById("add-drug-name-btn");
+  if (!submitBtn) return; // ✅ guard clause
+
+  const invalidInputs = document.querySelectorAll("input[name='drugName'].is-invalid");
+
+  if (invalidInputs.length > 0) {
+    submitBtn.disabled = true;
+  } else {
+    submitBtn.disabled = false;
+  }
+}
+
+// Attach event listener to the form (event delegation)
+  document.getElementById("add-drug-name-form").addEventListener("blur", async function (e) {
+  if (e.target && e.target.name === "drugName") {
+    const input = e.target;
+    const drugName = input.value.trim().toUpperCase();
+
+    if (drugName) {
+      // 1️⃣ Check local duplicates (within the form)
+      const allInputs = [...document.querySelectorAll("input[name='drugName']")];
+      const duplicateInForm = allInputs.filter(el => el.value.trim().toUpperCase() === drugName);
+
+      if (duplicateInForm.length > 1) {
+        input.classList.add("is-invalid");
+        Swal.fire({
+          icon: "warning",
+          title: "⛔ Duplicate in form",
+          text: `"${drugName}" is already entered in another row.`,
+        });
+      } else {
+        input.classList.remove("is-invalid");
+      }
+
+      // 2️⃣ Check DB duplicate (only if still valid locally)
+      if (!input.classList.contains("is-invalid")) {
+        showLoader();
+        const isUnique = await checkDuplicateDrugName(drugName);
+        hideLoader();
+
+        if (!isUnique) {
+          hideLoader();
+          input.classList.add("is-invalid");
+          Swal.fire({
+            icon: "warning",
+            title: "⛔ Already exists in database", 
+            text: `"${drugName}" is already saved.`,
+          });
+        } else {
+          input.classList.remove("is-invalid");
+        }
+      }
+    }
+
+    // 🔥 After every check, toggle submit button properly
+    toggleSubmitButton();
+  }
+}, true);
+
   addRowBtnFunction();
-  // loadDrugCategories();
   addDrugNamesFunction();
-  // let drugCategories = []; // stores fetched categories
 }
 
 
+// -----------Check Duplicate Drug Name -----------
+async function checkDuplicateDrugName(drugName) {
+  console.log("Checking for duplicate drug name...");
 
-// Function to handle initial category fetch
-// function loadDrugCategories() {
-//   const token = localStorage.getItem("token");
-//   showLoader();
-//   fetch('/api/v1/drug_category/view_drug_category', {
-//     headers: {
-//       'Content-Type': 'application/json',
-//       Authorization: `Bearer ${token}`
-//     }
-//   })
-//   .then(res => res.json())
-//   .then(data => {
-//     if (data.success && Array.isArray(data.data)) {
-//       drugCategories = data.data; // save globally
+  try {
+    const token = localStorage.getItem("token");
+    const url = `/api/v1/drug_names/check_duplicate_drug_name?drug_name=${encodeURIComponent(drugName)}`;
+    
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
-//       const dropdown = document.getElementById('drugCategory');
-//       populateDropdown(dropdown, drugCategories);
-//     } else {
-//       console.warn("Failed to load drug categories:", data.message);
-//     }
-//   })
-//   .catch(err => {
-//     console.error("Error loading categories:", err);
-//   }).finally(() => {
-//     hideLoader();
-//   });
-// }
+    if (response.status === 401) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Session Expired',
+          text: 'Your session has expired. Please sign in again.',
+        }).then(() => {
+          localStorage.removeItem("token");
+          window.location.href = "/"; // or your login page
+        });
+        return; // stop further processing
+      }
 
-// Helper Function to populate dropdown
-// function populateDropdown(selectElement, categories) {
-//   selectElement.innerHTML = `<option value="">-- Select Category --</option>`;
-//   categories.forEach(category => {
-//     const option = document.createElement('option');
-//     option.value = category.DrugCategoryId;
-//     option.textContent = category.DrugCategoryName;
-//     selectElement.appendChild(option);
-//   });
-// }
+    const result = await response.json();
+    console.log("Duplicate check result:", result);
+
+    if (result) {
+      return false; // Duplicate found
+    } else if (!result ) {
+      return true; // No duplicate
+    } else {
+      Swal.fire({
+        icon: 'error',
+        title: '⛔ Error checking duplicate drug name',
+      });
+    }
+  } catch (err) {
+    Swal.fire({
+      icon: 'error',
+      title: '⛔ Server error. Try again later.',
+    });
+    console.error(err);
+  }finally {
+    hideLoader(); // Hide the loader
+  }
+}
 
 // Function to handle adding new rows
 function addRowBtnFunction(){
@@ -62,7 +135,7 @@ function addRowBtnFunction(){
 
     newRow.innerHTML = `
       <div class="col-md-6 d-flex align-items-end">
-        <input type="text" class="form-control" name="drugName" placeholder="Enter Drug Name" required style="text-transform: uppercase;">
+        <input type="text" class="form-control" name="drugName" id="drugName" placeholder="Enter Drug Name" required style="text-transform: uppercase;">
         <button type="button" class="btn btn-outline-danger ms-2 removeRowBtn" title="Remove row">
           <i class="bi bi-dash-circle"></i>
         </button>
@@ -84,30 +157,31 @@ function addRowBtnFunction(){
   });
 }
 
-// Function to handle form submission
-function addDrugNamesFunction() {
+async function addDrugNamesFunction() {
   console.log("addDrugNamesFunction");
   const form = document.getElementById("add-drug-name-form");
-  form.addEventListener("submit", function (e) {
+
+  form.addEventListener("submit", async function (e) {
     console.log("Form submitted");
     e.preventDefault();
-    const formData = new FormData(form);
-    const drugNames = [];
-    // const drugCategoryIds = [];
-    // const drugCategoryNames = [];
-    form.querySelectorAll(".row").forEach(row => {
-      const drugName = row.querySelector("input[name='drugName']").value.trim().toUpperCase();
-      // const drugCategoryId = row.querySelector("select[name='drugCategory']").value;
-      // const drugCategoryName = row.querySelector("select[name='drugCategory'] option:checked").textContent.trim();
 
-      if (drugName) {
-        drugNames.push(drugName);
-        // drugCategoryIds.push(drugCategoryId);
-        // drugCategoryNames.push(drugCategoryName);
+    const drugNames = [];
+    let hasInvalid = false;
+
+    // 1️⃣ Collect all inputs
+    form.querySelectorAll("input[name='drugName']").forEach(input => {
+      const name = input.value.trim().toUpperCase();
+      if (input.classList.contains("is-invalid")) {
+        hasInvalid = true;
+      }
+      if (name) {
+        drugNames.push(name);
       }
     });
+
+    // 2️⃣ No drug names entered
     if (drugNames.length === 0) {
-      swal.fire({
+      Swal.fire({
         title: "No Drug Names",
         text: "Please add at least one drug name.",
         icon: "warning",
@@ -115,66 +189,200 @@ function addDrugNamesFunction() {
       return;
     }
 
-    console.log("Submitting drug names:", drugNames);
+    // 3️⃣ If any invalid fields → block submission
+    if (hasInvalid) {
+      Swal.fire({
+        icon: "error",
+        title: "Invalid Entries",
+        text: "Please fix duplicate or invalid drug names before submitting.",
+      });
+      return;
+    }
 
+    // 4️⃣ Check duplicates in form itself
+    const uniqueNames = new Set(drugNames);
+    if (uniqueNames.size !== drugNames.length) {
+      Swal.fire({
+        icon: "error",
+        title: "Duplicate in form",
+        text: "You have duplicate drug names in the form.",
+      });
+      return;
+    }
+
+    // 5️⃣ Final check with backend (bulk validation)
     const token = localStorage.getItem("token");
     showLoader();
-    fetch('/api/v1/drug_names/add_drug_names', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`
-      },
-      body: JSON.stringify({ drugNames})
-    })
-    .then(res => res.json())
-    .then(data => {
+    try {
+      const res = await fetch(`/api/v1/drug_names/check_duplicates_bulk`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ drugNames })
+      });
+
+      const result = await res.json();
       hideLoader();
-      if (data.success) {
-    Swal.fire({
-      title: "Success",
-      text: "Drug names added successfully!",
-      icon: "success",
-      confirmButtonText: "OK"
-    }).then((result) => {
-      if (result.isConfirmed) {
-        // Clear local cache so new data is fetched
-        // localStorage.removeItem("drug_list");
-        // ✅ Update localStorage instead of clearing it
-            let localStorageDrugList = JSON.parse(localStorage.getItem("drug_list")) || [];
 
-            // ✅ Append only new descriptions that aren't already in the list
-            drugNames.forEach(desc => {
-              if (!localStorageDrugList.includes(desc)) {
-                localStorageDrugList.push(desc);
-              }
-            });
-
-            localStorage.setItem("drug_list", JSON.stringify(localStorageDrugList));
-
-        // Load the page after confirmation
-        loadPage("drug_names/view_drug_names");
+      if (!result.success) {
+        Swal.fire({
+          icon: "warning",
+          title: "⛔ Already exists",
+          text: `These drug(s) already exist: ${result.duplicates.join(", ")}`,
+        });
+        return;
       }
-    });
-  } else {
-        swal.fire({
+
+      // 6️⃣ If everything is fine → proceed with save
+      showLoader();
+      fetch('/api/v1/drug_names/add_drug_names', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ drugNames })
+      })
+      .then(res => res.json())
+      .then(data => {
+        hideLoader();
+        if (data.success) {
+          Swal.fire({
+            title: "Success",
+            text: "Drug names added successfully!",
+            icon: "success",
+            confirmButtonText: "OK"
+          }).then((result) => {
+            if (result.isConfirmed) {
+              // ✅ Update localStorage instead of clearing it
+              let localStorageDrugList = JSON.parse(localStorage.getItem("drug_list")) || [];
+
+              drugNames.forEach(desc => {
+                if (!localStorageDrugList.includes(desc)) {
+                  localStorageDrugList.push(desc);
+                }
+              });
+
+              localStorage.setItem("drug_list", JSON.stringify(localStorageDrugList));
+
+              // Load the page after confirmation
+              loadPage("drug_names/view_drug_names");
+            }
+          });
+        } else {
+          Swal.fire({
+            title: "Error",
+            text: data.message || "Failed to add drug names.",
+            icon: "error",
+          });
+        }
+      })
+      .catch(err => {
+        hideLoader();
+        console.error("Error adding drug names:", err);
+        Swal.fire({
           title: "Error",
-          text: data.message || "Failed to add drug names.",
+          text: "An error occurred while adding drug names.",
           icon: "error",
         });
-      }
-    })
-    .catch(err => {
-      hideLoader();
-      console.error("Error adding drug names:", err);
-      swal.fire({
-        title: "Error",
-        text: "An error occurred while adding drug names.",
-        icon: "error",
       });
-    // }).finally(() => {
-    //   hideLoader();
-    // }
-    });
+
+    } catch (err) {
+      hideLoader();
+      console.error("Bulk duplicate check failed:", err);
+      Swal.fire({
+        icon: "error",
+        title: "Server Error",
+        text: "Failed to validate drug names. Try again later.",
+      });
+    }
   });
 }
+
+
+// Function to handle form submission
+// async function addDrugNamesFunction() {
+//   console.log("addDrugNamesFunction");
+//   const form = document.getElementById("add-drug-name-form");
+
+//   form.addEventListener("submit", function (e) {
+//     console.log("Form submitted");
+//     e.preventDefault();
+//     const formData = new FormData(form);
+//     const drugNames = [];
+//     form.querySelectorAll(".row").forEach(row => {
+//       const drugName = row.querySelector("input[name='drugName']").value.trim().toUpperCase();
+
+//       if (drugName) {
+//         drugNames.push(drugName);
+//       }
+//     });
+//     if (drugNames.length === 0) {
+//       swal.fire({
+//         title: "No Drug Names",
+//         text: "Please add at least one drug name.",
+//         icon: "warning",
+//       });
+//       return;
+//     }
+
+//     console.log("Submitting drug names:", drugNames);
+
+//     const token = localStorage.getItem("token");
+//     showLoader();
+//     fetch('/api/v1/drug_names/add_drug_names', {
+//       method: 'POST',
+//       headers: {
+//         'Content-Type': 'application/json',
+//         Authorization: `Bearer ${token}`
+//       },
+//       body: JSON.stringify({ drugNames})
+//     })
+//     .then(res => res.json())
+//     .then(data => {
+//       hideLoader();
+//       if (data.success) {
+//     Swal.fire({
+//       title: "Success",
+//       text: "Drug names added successfully!",
+//       icon: "success",
+//       confirmButtonText: "OK"
+//     }).then((result) => {
+//       if (result.isConfirmed) {
+//         // ✅ Update localStorage instead of clearing it
+//             let localStorageDrugList = JSON.parse(localStorage.getItem("drug_list")) || [];
+
+//             // ✅ Append only new descriptions that aren't already in the list
+//             drugNames.forEach(desc => {
+//               if (!localStorageDrugList.includes(desc)) {
+//                 localStorageDrugList.push(desc);
+//               }
+//             });
+
+//             localStorage.setItem("drug_list", JSON.stringify(localStorageDrugList));
+
+//         // Load the page after confirmation
+//         loadPage("drug_names/view_drug_names");
+//       }
+//     });
+//   } else {
+//         swal.fire({
+//           title: "Error",
+//           text: data.message || "Failed to add drug names.",
+//           icon: "error",
+//         });
+//       }
+//     })
+//     .catch(err => {
+//       hideLoader();
+//       console.error("Error adding drug names:", err);
+//       swal.fire({
+//         title: "Error",
+//         text: "An error occurred while adding drug names.",
+//         icon: "error",
+//       });
+//     });
+//   });
+// }

@@ -31,7 +31,24 @@ window.appHistory = window.appHistory || [];
 // Load a page into the main content area
 function loadPage(relativePath, params = {}) {
   console.log("Loading page:", relativePath); // Add this
+
   window.pageParams = params; // Save params globally
+  // Save the current page before overwriting
+  window.currentPage = relativePath;
+// ✅ Store the current page before navigating, but skip if going into history
+  if (
+    window.currentPage && 
+    relativePath !== "appointments/view_appointment_history"
+  ) {
+    window.appHistory.push({
+      page: window.currentPage,
+      params: window.pageParams || {},
+      scrollY: window.scrollY
+    });
+  }
+
+  window.currentPage = relativePath; // ✅ set after push
+
   fetch(`/admin/pages/${relativePath}.html`)
     .then(res => res.text())
     .then(html => {
@@ -71,6 +88,15 @@ function loadPage(relativePath, params = {}) {
         loadScriptOnce("/admin/assets/js/patients/add_patients.js");
       }
       if (relativePath === "patients/view_patients") {
+
+        // if (window.currentPage && window.currentPage !== "patients/view_patients") { 
+        //   window.appHistory.push({ 
+        //     page: window.currentPage, 
+        //     params: window.pageParams || {}, 
+        //     scrollY: window.scrollY   
+        //   }); 
+        // }
+
         loadScriptOnce("/admin/assets/js/patients/view_patients.js", () => {
           if (typeof initViewPatientsPage === "function") {
             initViewPatientsPage(); // ✅ Safe call
@@ -95,15 +121,6 @@ function loadPage(relativePath, params = {}) {
         });
       }
       if (relativePath === "appointments/edit_appointments") {
-        // Save history only if we're coming from another page
-        // if (window.currentPage && window.currentPage !== "appointments/edit_appointments") {
-        //   window.appHistory.push({
-        //     page: window.currentPage,
-        //     params: window.pageParams || {},
-        //     scrollY: window.scrollY
-        //   });
-        // }
-        // // Save current page
         // window.currentPage = relativePath;
         loadScriptOnce("/admin/assets/js/appointments/edit_appointments.js", () => {
           if (typeof initEditAppointmentsPage === "function") {
@@ -113,6 +130,14 @@ function loadPage(relativePath, params = {}) {
       }
       
       if (relativePath === "appointments/view_appointment_history") {
+        // if (window.currentPage && window.currentPage !== "appointments/edit_appointments") { 
+        //   window.appHistory.push({ 
+        //     page: window.currentPage, 
+        //     params: window.pageParams || {}, 
+        //     scrollY: window.scrollY   
+        //   }); 
+        // }
+
         // loadStyleOnce("admin/assets/css/appointments/view_appointment_history.css");
         loadScriptOnce("/admin/assets/js/appointments/view_appointment_history.js", () => {
           if (typeof initAppointmentHistory === "function") {
@@ -374,21 +399,21 @@ function isTokenExpired(token) {
 }
 
 //---------Loader Functionality---------
-// function showLoader() {
-//   document.getElementById("global-loader").classList.remove("d-none");
-// }
-
-// function hideLoader() {
-//   document.getElementById("global-loader").classList.add("d-none");
-// }
-
 function showLoader() {
-  document.getElementById("loader-overlay").style.display = "flex";
+  document.getElementById("global-loader").classList.remove("d-none");
 }
 
 function hideLoader() {
-  document.getElementById("loader-overlay").style.display = "none";
+  document.getElementById("global-loader").classList.add("d-none");
 }
+
+// function showLoader() {
+//   document.getElementById("loader-overlay").style.display = "flex";
+// }
+
+// function hideLoader() {
+//   document.getElementById("loader-overlay").style.display = "none";
+// }
 
 
 //----------Loader Functionality End---------
@@ -493,6 +518,11 @@ async function getPrescription(appointmentId, regNo) {
     }
 
     data = await response.json();
+
+    // For Showing Name in pdf
+    const appointmentIdforpdf = data.AppointmentNumber;
+    const patientNameforpdf = data.FullName;
+
     console.log("Prescription data:", data);
 
     if (!data || Object.keys(data).length === 0) {
@@ -530,7 +560,6 @@ if (data.Prescription.length === 0) {
       <td>${index + 1}</td>
       <td>
         ${item.drug}
-        ${item.frequency ? `<br><em class="subtext">${item.frequency}</em>` : ""}
         ${item.instruction ? `<br><em class="subtext">${item.instruction}</em>` : ""}
       </td>
       <td>${item.duration_value} ${item.duration_unit}</td>
@@ -573,10 +602,47 @@ function renderSection(label, value) {
   return `<div class="section"><strong>${label}:</strong> ${value}</div>`;
 }
 
+// based on DOB calculate age and fill the age field
+const dobString = data.DOB; // "2025-05-07T00:00:00+00:00"
+let ageField = "";
+
+if (dobString ) {
+  console.log("DOB and Age field found.");
+
+  const dob = new Date(dobString);
+  const today = new Date();
+
+  let years = today.getFullYear() - dob.getFullYear();
+  let months = today.getMonth() - dob.getMonth();
+  let days = today.getDate() - dob.getDate();
+
+  // Adjust months and years if current date is before birthdate this year
+  if (months < 0 || (months === 0 && days < 0)) {
+    years--;
+    months += 12;
+  }
+
+  // Recalculate days difference
+  const msInDay = 1000 * 60 * 60 * 24;
+  const totalDays = Math.floor((today - dob) / msInDay);
+
+  // Decide display
+  if (years > 0) {
+    ageField = `${years} year${years > 1 ? "s" : ""}`;
+  } else if (months > 0) {
+    ageField = `${months} month${months > 1 ? "s" : ""}`;
+  } else {
+    ageField = `${totalDays} day${totalDays !== 1 ? "s" : ""}`;
+  }
+} else {
+  console.warn("DOB or Age field not found.");
+}
 
     // --------------------------PDF Template----------------------------------------- 
     // data.forEach((data, index) => {
     let prescriptionBodyHTML = `
+    <input type="hidden" id="hiddenPatientName" value="${data.FullName || ''}" />
+    <input type="hidden" id="hiddenAppointmentNumber" value="${appointmentIdforpdf || ''}" />
     
     <div class="prescription-container">
       <div class="top-panel">
@@ -627,7 +693,7 @@ function renderSection(label, value) {
                 <div><strong>Date of Consultation:</strong> ${consultationDatetime || ''}</div>
             </div>
             <div class="info-row">
-                <div><strong>Age:</strong> ${data.Age || ''}</div>
+                <div><strong>Age:</strong> ${ageField || ''}</div>
                 <div><strong>Registration No:</strong> ${data.PatientRegistrationNumber || ''}</div>
             </div>
             <div class="info-row">
@@ -666,7 +732,7 @@ function renderSection(label, value) {
                 <div class="doctor-notes">
                     <strong>Note:</strong>
                     <p>*If you develop allergies from any medication consult your doctor or near by hospital immediately.<br>
-                    *Kindly bring this prescription record or softcopy of every visit</p>
+                    *Kindly bring this prescription record or softcopy of every visit.</p>
                 </div>     
                 <div class="consult-time">
                     Consulting Time: 10.30 am to 1.30 pm & 4.30 pm to 7.30 pm | Monday to Saturday [Sunday Holiday]
@@ -700,31 +766,25 @@ function renderSection(label, value) {
   document.getElementById("downloadPdfBtn").addEventListener("click", function () {
     const element = document.querySelector(".prescription-body");
 
-    // Grab the form where appointment_no lives
-    const form = document.querySelector("#appointment_no")?.closest("form");
-
-    // Get all inputs inside the form
-    const inputs = form?.querySelectorAll("input.form-control.bg-light");
-
-    // Pick the second input → Full Name
-    const patientName = inputs && inputs[1] ? inputs[1].value : "Patient";
-
-    const appointmentNumber = document.querySelector("#appointment_no")?.innerText || "Appointment";
+    // Retrieve hidden fields
+    const patientName = document.querySelector("#hiddenPatientName")?.value || "Patient";
+    const appointmentNumber = document.querySelector("#hiddenAppointmentNumber")?.value || "Appointment";
 
     const safeName = patientName.replace(/[^a-z0-9]/gi, "_");
     const fileName = `${safeName}_${appointmentNumber}.pdf`;
 
     const opt = {
-      margin: [0.5, 0.5, 0.5, 0.5],
+      margin: [0.5, 0, 0.5, 0.5], // top, left, bottom, right
       filename: fileName,
       image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2 , useCORS: true},
+      html2canvas: { scale: 2, useCORS: true },
       jsPDF: { unit: 'cm', format: 'a4', orientation: 'portrait' },
       pagebreak: { mode: ['css', 'legacy'] }
     };
 
     html2pdf().set(opt).from(element).save();
-  });
+});
+
 // }
 
 // ----------------- Print PDF Functions ------------------- //

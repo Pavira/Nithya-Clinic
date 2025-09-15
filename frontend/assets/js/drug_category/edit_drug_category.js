@@ -1,169 +1,216 @@
 function initEditDrugCategoryPage(){
+
+  // // checking duplicate name and phone number while typing
+const drugInput = document.getElementById("description");
+const submitBtn = document.getElementById("edit-drug-category-btn"); // <-- your submit button id
+
+
+drugInput.addEventListener("blur", async function () {
+  const description = this.value.trim().toUpperCase(); // normalize to uppercase
+  const olddescription = (window.pageParams?.description || "").toUpperCase();
+
+  // Reset state
+  submitBtn.disabled = false;
+  this.classList.remove("is-invalid");
+
+  if (description) {
+    // Only check if user changed the drug name
+    if (description !== olddescription) {
+      showLoader();
+      const exists = await checkDuplicateCategory(description);
+      hideLoader();
+
+      if (!exists) {
+        Swal.fire({
+          icon: "warning",
+          title: "⛔ Duplicate Template found",
+          text: `"${description}" already exists in the database.`,
+        });
+        this.classList.add("is-invalid");
+        submitBtn.disabled = true; // 🚫 block submission
+      }
+    }
+  }
+});
+
     showCategoryDetails();
     editCategoryFunction();
 }
 
-// document.getElementById('addRowBtn').addEventListener('click', function () {
-//   addDescriptionRow('');
-// });
+// -----------Check Duplicate category-----------
+async function checkDuplicateCategory(description) {
+  console.log("Checking for duplicate description...");
 
-// Utility to create a description row
-  // function createDescriptionRow(value = '', index = 0) {
-  //   const row = document.createElement('div');
-  //   row.classList.add('row', 'gy-3', 'gx-3', 'align-items-end', 'description-row', 'mb-2');
+  try {
+    const token = localStorage.getItem("token");
+    const url = `/api/v1/drug_category/check_duplicate_category?description=${encodeURIComponent(description)}`;
+    
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
-  //   row.innerHTML = `
-  //     <div class="col-md-6">
-  //       <label class="form-label">${index === 0 ? 'Description*' : '&nbsp;'}</label>
-  //       <input type="text" class="form-control" name="description[]" value="${value}" placeholder="Enter Description" required>
-  //     </div>
-  //     <div class="col-md-2">
-  //       ${index === 0
-  //         ? `<button type="button" class="btn btn-outline-primary" onclick="addDescriptionRow()" title="Add another row">
-  //             <i class="bi bi-plus-circle"></i>
-  //           </button>`
-  //         : `<button type="button" class="btn btn-outline-danger" onclick="removeRow(this)" title="Remove this row">
-  //             <i class="bi bi-x-circle"></i>
-  //           </button>`}
-  //     </div>
-  //   `;
-  //   return row;
-  // }
+    if (response.status === 401) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Session Expired',
+          text: 'Your session has expired. Please sign in again.',
+        }).then(() => {
+          localStorage.removeItem("token");
+          window.location.href = "/"; // or your login page
+        });
+        return; // stop further processing
+      }
 
-  // Add new description row
-  // function addDescriptionRow(value = '') {
-  //   const rowsContainer = document.getElementById('drug-category-rows');
-  //   const index = rowsContainer.querySelectorAll('.description-row').length;
-  //   const newRow = createDescriptionRow(value, index);
-  //   rowsContainer.appendChild(newRow);
-  // }
+    const result = await response.json();
+    console.log("Duplicate check result:", result);
 
-  // Remove row
-  // function removeRow(btn) {
-  //   btn.closest('.description-row').remove();
-  // }
+    if (result) {
+      return false; // Duplicate found
+    } else if (!result ) {
+      return true; // No duplicate
+    } else {
+      Swal.fire({
+        icon: 'error',
+        title: '⛔ Error checking duplicate template',
+      });
+    }
+  } catch (err) {
+    Swal.fire({
+      icon: 'error',
+      title: '⛔ Server error. Try again later.',
+    });
+    console.error(err);
+  }finally {
+    hideLoader(); // Hide the loader
+  }
+}
 
-  // Populate category details (from encoded data)
+
   function showCategoryDetails() {
     // const category_name = window.pageParams?.category_name;
     const description = window.pageParams?.description;    
     document.getElementById('description').value = description || '';
-
-
-    // let category_description = [];
-    // try {
-    //   category_description = JSON.parse(decodeURIComponent(description_encoded || '[]'));
-    // } catch (e) {
-    //   console.error("❌ Failed to parse description:", e);
-    // }
-
-    // // Set the category name
-    // document.getElementById('drugCategoryName').value = category_name || '';
-    // console.log("Category id:", window.pageParams?.category_id);
-    // console.log("Category Name:", category_name);
-    // console.log("Category Description:", category_description);
-
-    // const rowsContainer = document.getElementById('drug-category-rows');
-    // rowsContainer.innerHTML = '';
-
-    // // If empty, add one blank row
-    // if (category_description.length === 0) {
-    //   addDescriptionRow();
-    // } else {
-    //   category_description.forEach((desc, index) => {
-    //     const row = createDescriptionRow(desc, index);
-    //     rowsContainer.appendChild(row);
-    //   });
-    // }
   }
 
 //   Edit drug category function
 function editCategoryFunction() {
-  const form = document.getElementById('edit-drug-category-form');
+  const form = document.getElementById("edit-drug-category-form");
   if (!form) return;
 
-  form.addEventListener('submit', function (e) {
+  form.addEventListener("submit", async function (e) {
     e.preventDefault();
 
     const formData = new FormData(form);
-    // const drugCategoryName = formData.get("drugCategoryName");              // string
-    const description = formData.get("description");              // string
+    const description = formData.get("description").trim().toUpperCase();
+    const olddescription = (window.pageParams?.description || "").toUpperCase();
 
     if (!window.pageParams?.category_id) {
       Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'Category ID is missing. Cannot edit category.'
+        icon: "error",
+        title: "Error",
+        text: "Category ID is missing. Cannot edit category.",
       });
       return;
     }
 
-    console.log("Category Id:", window.pageParams?.category_id);
-
-    if (description.length === 0) {
+    if (!description) {
       Swal.fire({
-        icon: 'warning',
-        title: 'Validation Error',
-        text: 'Please enter description.',
+        icon: "warning",
+        title: "Validation Error",
+        text: "Please enter Description",
       });
       return;
     }
 
-    const requestData = {
-      drugCategoryId: window.pageParams?.category_id, // Assuming the ID is passed in pageParams
-      // drugCategoryName,
-      description
-    };
+    try {
+      let canSave = true;
 
-    console.log("Request Data:", requestData);
+      // ✅ Only check duplicate if user changed the description
+      if (description !== olddescription) {
+        showLoader();
+        const isAvailable = await checkDuplicateCategory(description);
+        hideLoader();
 
-    showLoader();
-    const token = localStorage.getItem("token");
-    fetch('/api/v1/drug_category/edit_drug_category', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(requestData)
-    })
-    .then(response => response.json())
-    .then(data => {
-      hideLoader();
-      if (data.success) {
-        Swal.fire({
-          icon: 'success',
-          title: 'Success',
-          text: `Template updated successfully!`,
-          confirmButtonText: "OK"
-        }).then(async (result) => {
-          if (result.isConfirmed) {
-            // await fetchInstructions();
-            loadPage("drug_category/view_drug_category");
-          }
-        });
-      } else {
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: data.message || 'Failed to update template.'
-        });
+        if (!isAvailable) {
+          Swal.fire({
+            icon: "warning",
+            title: "⛔ Duplicate Template found",
+            text: `"${description}" already exists in database.`,
+          });
+          canSave = false;
+        }
       }
-    })
-    .catch(error => {
+
+      // ✅ If no duplicate OR unchanged, save template
+      if (canSave) {
+        const requestData = {
+          drugCategoryId: window.pageParams?.category_id,
+          description,
+        };
+
+        console.log("Request Data:", requestData);
+
+        showLoader();
+        const token = localStorage.getItem("token");
+        fetch("/api/v1/drug_category/edit_drug_category", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(requestData),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            hideLoader();
+            if (data.success) {
+              Swal.fire({
+                icon: "success",
+                title: "Success",
+                text: `Template updated successfully!`,
+                confirmButtonText: "OK",
+              }).then(async (result) => {
+                if (result.isConfirmed) {
+                  await fetchInstructions();
+                  loadPage("drug_category/view_drug_category");
+                }
+              });
+            } else {
+              Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: data.message || "Failed to update template.",
+              });
+            }
+          })
+          .catch((error) => {
+            hideLoader();
+            console.error("Error:", error);
+            Swal.fire({
+              icon: "error",
+              title: "Error",
+              text: error.message || "An unexpected error occurred.",
+            });
+          })
+          .finally(() => {
+            hideLoader();
+          });
+      }
+    } catch (error) {
       hideLoader();
-      console.error('Error:', error);
+      console.error("Error:", error);
       Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: error.message || 'An unexpected error occurred.'
+        icon: "error",
+        title: "Error",
+        text: error.message || "An unexpected error occurred.",
       });
-    })
-    .finally(() => {
-      hideLoader();
-    })
+    }
   });
 }
+
 
 
 document.getElementById('delete-drug-category-btn').addEventListener('click', function() {
@@ -202,7 +249,7 @@ document.getElementById('delete-drug-category-btn').addEventListener('click', fu
           confirmButtonText: "OK"
         }).then(async (result) => {
           if (result.isConfirmed) {
-            // await fetchInstructions();
+            await fetchInstructions();
             loadPage("drug_category/view_drug_category");
           }
         });

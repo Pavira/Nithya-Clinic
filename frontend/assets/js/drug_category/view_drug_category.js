@@ -63,13 +63,13 @@
 
   // 🔁 PAGINATION STATE
   let paginationMap = new Map();
-  let currentPage = 1;
-  let totalPages = 1;
-  let pageSize = 10;
+  // let currentPage = 1;
+  // let totalPages = 1;
+  // let pageSize = 10;
 
   async function fetchDrugCategories(isInitial = false, pageNumber = 1) {
     const searchType = document.getElementById("search_type").value;
-    const searchValue = document.getElementById("search_value").value.trim();
+    const searchValue = document.getElementById("search_value").value.trim().toUpperCase();
     const tableBody = document.getElementById("drug-category-table-body");
 
     if (isInitial) {
@@ -77,17 +77,29 @@
       pageNumber = 1;
     }
 
+    const isSearch = Boolean(searchType && searchValue);
+    const queryParams = new URLSearchParams({
+      search_type: searchType || "",
+      search_value: searchValue || "",
+    });
+
+    // 📌 Only send cursor when NOT searching
+    if (!isSearch) {
+      const cursor = paginationMap.get(pageNumber) || "";
+      if (cursor) queryParams.set("cursor", cursor);
+    }
+
     const token = localStorage.getItem("token");
-    let cursor = paginationMap.get(pageNumber) || "";
+    // let cursor = paginationMap.get(pageNumber) || "";
 
     showLoader();
     try {
-      const queryParams = new URLSearchParams({
-        search_type: searchType || "",
-        search_value: searchValue || "",
-        cursor,
-        limit: pageSize,
-      });
+      // const queryParams = new URLSearchParams({
+      //   search_type: searchType || "",
+      //   search_value: searchValue || "",
+      //   cursor,
+      //   limit: pageSize,
+      // });
 
       const response = await fetch(`/api/v1/drug_category/view_and_search_drug_category?${queryParams}`, {
         method: "GET",
@@ -104,12 +116,24 @@
 
       document.getElementById("drug-category-count").textContent = totalCount;
 
-      totalPages = Math.ceil(totalCount / pageSize);
-      currentPage = pageNumber;
-
-      if (nextCursor) {
-        paginationMap.set(pageNumber + 1, nextCursor);
+      // 🔄 Pagination state
+      if (isSearch) {
+        totalPages = 1;
+        currentPage = 1;
+        paginationMap.clear();
+      } else {
+        const pageSize = 10;
+        totalPages = Math.ceil(totalCount / pageSize);
+        currentPage = pageNumber;
+        if (nextCursor) paginationMap.set(pageNumber + 1, nextCursor);
       }
+
+      // totalPages = Math.ceil(totalCount / pageSize);
+      // currentPage = pageNumber;
+
+      // if (nextCursor) {
+      //   paginationMap.set(pageNumber + 1, nextCursor);
+      // }
 
       tableBody.innerHTML = "";
       if (categories.length === 0) {
@@ -119,7 +143,11 @@
 
       categories.forEach((category, index) => {
         const row = document.createElement("tr");
-        const serialNumber = (currentPage - 1) * pageSize + index + 1;
+        // const serialNumber = (currentPage - 1) * pageSize + index + 1;
+        const serialNumber = isSearch
+          ? (index + 1)                      // show 1..N for search results
+          : ((currentPage - 1) * 10 + index + 1); // normal paginated serial
+       
         row.innerHTML = `
           <td>${serialNumber}</td>
           <td>${category.Description || "N/A"}</td>
@@ -145,14 +173,13 @@
   }
   async function viewDrugCategoryFunction() {
     const searchInput = document.getElementById("search_value");
-    
 
     const handleSearch = debounce(() => {
-      const value = searchInput.value.trim();
+      const value = searchInput.value.trim().toUpperCase();
 
       if (value === "") {
         fetchDrugCategories(true, 1);
-      } else if (value.length > 2) {
+      } else if (value.length > 3) {
         fetchDrugCategories(true, 1);
       }
     }, 400);

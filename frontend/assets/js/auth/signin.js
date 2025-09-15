@@ -31,7 +31,8 @@ document.addEventListener("DOMContentLoaded", () => {
     loginForm.addEventListener("submit", async function (e) {
       e.preventDefault();
       const email = document.querySelector('input[type="email"]').value;
-      const password = document.querySelector('input[type="password"]').value;
+      // const password = document.querySelector('input[type="password"]').value;
+      const password = document.getElementById("password").value; // ✅ fixed selector
 
       showLoader(); // Show loader before making the request
       try {

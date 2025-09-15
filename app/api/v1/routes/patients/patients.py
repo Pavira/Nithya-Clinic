@@ -12,6 +12,7 @@ from app.services.patients.patient_service import (
     view_and_search_patients_service,
 )
 from app.utils.logger import logger
+from app.db.firebase_client import db
 
 router = APIRouter(tags=["Patients"])
 
@@ -35,16 +36,50 @@ async def add_patient(patient_data: PatientCreateSchema):
 
 # -------------Check Duplicate Patient----------------
 @router.get("/check_duplicate_patient")
-async def check_duplicate_patient(full_name: str, phone_number: int):
+async def check_duplicate_patient(
+    full_name: str, phone_number: int, patient_id: str = None
+):
     """
     API to check if a patient with the same full name and phone number already exists.
     """
     try:
 
-        result = await check_duplicate_patient_service(full_name, phone_number)
+        result = await check_duplicate_patient_service(
+            full_name, phone_number, patient_id
+        )
         return success_response(message="Duplicate check successful", data=result)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+# async def check_duplicate_patient_service(
+#     full_name: str, phone_number: int, exclude_id: str = None
+# ):
+#     logger.info(
+#         f"Querying for name={full_name.upper()} phone={phone_number}, exclude_id={exclude_id}"
+#     )
+
+#     try:
+#         query = (
+#             db.collection("collection_PatientRegistration")
+#             .where("FullName", "==", full_name.upper())
+#             .where("PhoneNumber", "==", phone_number)
+#             .get()
+#         )
+
+#         for doc in query:
+#             data = doc.to_dict()
+#             if (
+#                 exclude_id is None
+#                 or data.get("PatientRegistrationNumber") != exclude_id
+#             ):
+#                 return True
+
+#         return False  # No duplicate
+
+#     except Exception as e:
+#         logger.error(f"❌ Failed to check duplicate patient: {str(e)}")
+#         raise HTTPException(status_code=500, detail="Failed to check duplicate patient")
 
 
 # -------------View Patients----------------
@@ -53,7 +88,7 @@ async def view_and_search_patients(
     search_type: str = None,
     search_value: str = None,
     cursor: str = None,
-    limit: int = None,
+    # limit: int = None,
 ):
     """
     API to view and search patients.
@@ -63,7 +98,7 @@ async def view_and_search_patients(
             search_type=search_type,
             search_value=search_value,
             cursor=cursor,
-            limit=limit,
+            # limit=limit,
         )
         return success_response(message="Patients retrieved successfully", data=result)
     except Exception as e:

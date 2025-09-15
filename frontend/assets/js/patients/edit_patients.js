@@ -13,13 +13,14 @@ function validatePatientForm() {
   const purposeOfVisit = document.getElementById("purposeOfVisit").value;
   const referredBy = document.getElementById("referredBy").value;
   const phonePattern = /^[0-9]{10}$/;
-  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  // const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const emailPattern = /^[^\s@]+@[^\s@]+\.(com|org|net|edu|gov|mil|int|co|in|us|uk|io|ai)$/i;
   const email = document.getElementById("email").value;
   const aadharNumber = document.getElementById("aadhar").value;
   const aadharPattern = /^[0-9]{12}$/;
   
 
-  if (!fullName || !phoneNumber || !dob || !gender || !marital || !profession || !treatment_type || !purposeOfVisit) {
+  if (!fullName || !phoneNumber || !dob || !gender || !marital || !treatment_type || !purposeOfVisit) {
     Swal.fire({
       icon: 'warning',
       title: 'Validation',
@@ -32,13 +33,14 @@ function validatePatientForm() {
     return false;
   }
   if (email && !emailPattern.test(email)) {
-    // const toast = new bootstrap.Toast(document.getElementById('emailToast'));
-    // toast.show();
-    Swal.fire({
-      icon: 'warning',
-      title: 'Validation',
-      text: 'Please enter a valid email address.',
-    });
+    const toast = new bootstrap.Toast(document.getElementById('emailToast'));
+    toast.show();
+    
+    // Swal.fire({
+    //   icon: 'warning',
+    //   title: 'Validation',
+    //   text: 'Please enter a valid email address.',
+    // });
     return false;
   }
   if (phoneNumber && !phonePattern.test(phoneNumber)) {
@@ -68,12 +70,13 @@ function validatePatientForm() {
 }
 
 // -----------Check Duplicate Patient -----------
-async function checkkDuplicatePatient(fullName, phoneNumber) {
+async function checkDuplicatePatient(fullName, phoneNumber) {
   console.log("Checking for duplicate patient...");
-
+  const patientId = window.pageParams?.patient_id;
+  showLoader();
   try {
     const token = localStorage.getItem("token");
-    const url = `/api/v1/patients/check_duplicate_patient?full_name=${encodeURIComponent(fullName)}&phone_number=${phoneNumber}`;
+    const url = `/api/v1/patients/check_duplicate_patient?full_name=${encodeURIComponent(fullName)}&phone_number=${phoneNumber}&patient_id=${patientId}`;
     
     const response = await fetch(url, {
       method: 'GET',
@@ -113,8 +116,11 @@ async function checkkDuplicatePatient(fullName, phoneNumber) {
       title: '⛔ Server error. Try again later.',
     });
     console.error(err);
+  } finally {
+    hideLoader(); // Hide the loader
   }
 }
+
 
     // ---------------Update Patient Functionality ---------------
     document.getElementById("updateButton").addEventListener("click", async (e) => {
@@ -125,10 +131,28 @@ async function checkkDuplicatePatient(fullName, phoneNumber) {
         if (!validatePatientForm()) 
             return validatePatientForm();
 
+        const fullName = document.getElementById("fullName").value.trim().toUpperCase();
+      
+        const phoneNumber = document.getElementById("phoneNumber").value;
+        
+        // ----------- Check Duplicate Patient -----------
+        console.log("Checking for duplicate patient...");
+        const isDuplicate = await checkDuplicatePatient(fullName, phoneNumber);
+        if (!isDuplicate) {
+          hideLoader();
+          Swal.fire({
+              icon: 'error',
+              title: '⛔ Duplicate patient found',
+              text: 'A patient with the same name and phone number already exists.',
+            // }).then(() => {
+            // hideLoader(); // Hide the loader
+          });       
+          return;
+        }
+          
         // ----------- Collect Form Data -----------
         console.log("Collecting patient form data...");
-        const fullName = document.getElementById("fullName").value;
-        const phoneNumber = document.getElementById("phoneNumber").value;
+        
         const altPhoneNumber = document.getElementById("altPhoneNumber").value;
         const dob = document.getElementById("dob").value;
         const ageText = document.getElementById("age").value;  // e.g. "5 years"
@@ -141,7 +165,7 @@ async function checkkDuplicatePatient(fullName, phoneNumber) {
 
         const profession = document.getElementById("profession").value;
         const guardian = document.getElementById("guardian").value;
-        const aadhar = document.getElementById("aadhar").value;
+        const aadhar = document.getElementById("aadhar").value == "" ? 0 : parseInt(document.getElementById("aadhar").value);
 
         const treatmentType = document.getElementById("treatmentType").value;
         const purposeOfVisit = document.getElementById("purposeOfVisit").value;
@@ -185,13 +209,16 @@ async function checkkDuplicatePatient(fullName, phoneNumber) {
         const updateResult = await updateRes.json();
 
         if (updateRes.ok && updateResult.success) {
+            hideLoader();
             Swal.fire({
                 icon: 'success',
                 title: 'Updated!',
                 text: `Patient ${updateResult.data.FullName} updated successfully.`,
-                showConfirmButton: false,
-                timer: 1500
-            }).then(loadPage("patients/view_patients"));
+                confirmButtonText: 'OK',
+          }).then(() => {
+            // Redirect after user clicks OK
+            loadPage("patients/view_patients");
+          });
             
         } else {
             alert("❌ Failed to update user: " + updateResult.message);
@@ -316,15 +343,52 @@ async function initEditPatientsPage() {
     const result = await res.json();
     const patient = result.data;
 
+    // based on DOB calculate age and fill the age field
+    const dobString = patient.DOB; // "2025-05-07T00:00:00+00:00"
+const ageField = document.getElementById("age");
+
+if (dobString && ageField) {
+  console.log("DOB and Age field found.");
+
+  const dob = new Date(dobString);
+  const today = new Date();
+
+  let years = today.getFullYear() - dob.getFullYear();
+  let months = today.getMonth() - dob.getMonth();
+  let days = today.getDate() - dob.getDate();
+
+  // Adjust months and years if current date is before birthdate this year
+  if (months < 0 || (months === 0 && days < 0)) {
+    years--;
+    months += 12;
+  }
+
+  // Recalculate days difference
+  const msInDay = 1000 * 60 * 60 * 24;
+  const totalDays = Math.floor((today - dob) / msInDay);
+
+  // Decide display
+  if (years > 0) {
+    ageField.value = `${years} year${years > 1 ? "s" : ""}`;
+  } else if (months > 0) {
+    ageField.value = `${months} month${months > 1 ? "s" : ""}`;
+  } else {
+    ageField.value = `${totalDays} day${totalDays !== 1 ? "s" : ""}`;
+  }
+} else {
+  console.warn("DOB or Age field not found.");
+}
+
+
     // Fill the form
     document.getElementById("patientId").value = patient.PatientRegistrationNumber === null ? "" : patient.PatientRegistrationNumber;
     document.getElementById("fullName").value = patient.FullName === null ? "" : patient.FullName;
     document.getElementById("phoneNumber").value = patient.PhoneNumber === null ? "" : patient.PhoneNumber;
     document.getElementById("altPhoneNumber").value = patient.AlternatePhoneNumber === 0 ? "" : patient.AlternatePhoneNumber;
-    document.getElementById("aadhar").value = patient.AadharNumber === "" ? "" : patient.AadharNumber;
+    document.getElementById("aadhar").value = patient.AadharNumber === 0 ? "" : patient.AadharNumber;
     // document.getElementById("dob").value = patient.DOB;
     document.getElementById("dob").value = patient.DOB.split("T")[0]; // Sets value as "2025-07-01"
-    document.getElementById("age").value = patient.Age;
+    // document.getElementById("age").value = patient.Age;
     const genderRadio = document.querySelector(`input[name="gender"][value="${patient.Gender}"]`);
     if (genderRadio) genderRadio.checked = true;
     // console.log(patient.MaritialStatus);
@@ -360,6 +424,45 @@ async function initEditPatientsPage() {
     finally {
         hideLoader();
     }
+
+
+  // checking duplicate name and phone number while typing
+  document.getElementById("fullName").addEventListener("blur", async function () {
+    const fullName = this.value.trim().toUpperCase();
+    const testpatientName = window.pageParams.patient_name;
+    
+    const phoneNumber = document.getElementById("phoneNumber").value.trim();
+    if (fullName != testpatientName  && phoneNumber.length === 10) {  
+      // showLoader();
+      const isDuplicate = await checkDuplicatePatient(fullName, phoneNumber);
+      if (!isDuplicate) {
+        hideLoader();
+        Swal.fire({
+          icon: 'warning',
+          title: '⛔ Duplicate patient found',
+          text: 'A patient with the same name and phone number already exists.',
+        });
+      }
+    }
+  });
+
+  document.getElementById("phoneNumber").addEventListener("input", async function () {
+    const fullName = document.getElementById("fullName").value.trim().toUpperCase();
+    // const patientId =  document.getElementById("patientId").value;
+    const phoneNumber = this.value.trim();
+    if (fullName != testpatientName && phoneNumber.length === 10) {  
+      // showLoader();
+      const isDuplicate = await checkDuplicatePatient(fullName, phoneNumber);
+      if (!isDuplicate) {
+        hideLoader();
+        Swal.fire({
+          icon: 'warning',
+          title: '⛔ Duplicate patient found',
+          text: 'A patient with the same name and phone number already exists.',
+        });
+      }
+    }
+  });  
 
     // ---------------Date of Birth and Age Calculation ---------------
   document.getElementById("dob").setAttribute("max", new Date().toISOString().split("T")[0]);
@@ -408,4 +511,5 @@ async function initEditPatientsPage() {
 
 }
 
-initEditPatientsPage();
+// initEditPatientsPage();
+window.initEditPatientsPage = initEditPatientsPage;

@@ -73,9 +73,9 @@
 
   // 🔁 PAGINATION STATE
   let paginationMap = new Map(); // pageNumber => cursor
-  let currentPage = 1;
-  let totalPages = 1;
-  let pageSize = 10;
+  // let currentPage = 1;
+  // let totalPages = 1;
+  // let pageSize = 10;
 
   async function fetchPatients(isInitial = false, pageNumber = 1) {
     const searchType = document.getElementById("search_type").value;
@@ -87,17 +87,29 @@
       pageNumber = 1;
     }
 
+    const isSearch = Boolean(searchType && searchValue);
+    const queryParams = new URLSearchParams({
+      search_type: searchType || "",
+      search_value: searchValue || "",
+    });
+
+    // 📌 Only send cursor when NOT searching
+    if (!isSearch) {
+      const cursor = paginationMap.get(pageNumber) || "";
+      if (cursor) queryParams.set("cursor", cursor);
+    }
+
     const token = localStorage.getItem("token");
-    let cursor = paginationMap.get(pageNumber) || "";
+    // let cursor = paginationMap.get(pageNumber) || "";
 
     showLoader();
     try {
-      const queryParams = new URLSearchParams({
-        search_type: searchType || "",
-        search_value: searchValue || "",
-        cursor,
-        limit: pageSize,
-      });
+      // const queryParams = new URLSearchParams({
+      //   search_type: searchType || "",
+      //   search_value: searchValue || "",
+      //   cursor,
+      //   // limit: pageSize,
+      // });
 
       const startTime = performance.now();
       const response = await fetch(`/api/v1/patients/view_and_search_patients?${queryParams}`, {
@@ -132,24 +144,43 @@
       const patientCountElement = document.getElementById("patient-count");
       patientCountElement.textContent = totalCount;
 
-      totalPages = Math.ceil(totalCount / pageSize);
-      currentPage = pageNumber;
 
-      // Store next cursor for next page
-      if (nextCursor) {
-        paginationMap.set(pageNumber + 1, nextCursor);
+      // 🔄 Pagination state
+      if (isSearch) {
+        totalPages = 1;
+        currentPage = 1;
+        paginationMap.clear();
+      } else {
+        const pageSize = 10;
+        totalPages = Math.ceil(totalCount / pageSize);
+        currentPage = pageNumber;
+        if (nextCursor) paginationMap.set(pageNumber + 1, nextCursor);
       }
+
+      
+      // totalPages = Math.ceil(totalCount / pageSize);
+      // currentPage = pageNumber;
+
+      // // Store next cursor for next page
+      // if (nextCursor) {
+      //   paginationMap.set(pageNumber + 1, nextCursor);
+      // }
 
       // Render table
       patientsTableBody.innerHTML = "";
       if (patients.length === 0) {
         patientsTableBody.innerHTML = "<tr><td colspan='6' class='text-center'>No patients found.</td></tr>";
+        renderPagination(currentPage, totalPages);
         return;
       }
 
       patients.forEach((patient, index) => {
         const row = document.createElement("tr");
-        const serialNumber = (currentPage - 1) * pageSize + index + 1;
+        // const serialNumber = (currentPage - 1) * pageSize + index + 1;
+        const serialNumber = isSearch
+          ? (index + 1)                      // show 1..N for search results
+          : ((currentPage - 1) * 10 + index + 1); // normal paginated serial
+
         row.innerHTML = `
           <td>${serialNumber}</td>
           <td>${patient.PatientRegistrationNumber || "N/A"}</td>
@@ -157,7 +188,7 @@
           <td>${patient.PhoneNumber || "N/A"}</td>
           <td>${patient.PatientType || "N/A"}</td>
           <td>
-            <button class="btn btn-sm btn-outline-secondary me-1" title="Edit Patient" onclick="loadPage('patients/edit_patients', {patient_id: '${patient.PatientRegistrationNumber}'})"><i class="bi bi-pencil"></i></button>
+            <button class="btn btn-sm btn-outline-secondary me-1" title="Edit Patient" onclick="loadPage('patients/edit_patients', {patient_id: '${patient.PatientRegistrationNumber}', patient_name: '${patient.FullName}'})"><i class="bi bi-pencil"></i></button>
             <button class="btn btn-sm btn-outline-warning me-1" title="View History" onclick="loadPage('appointments/view_appointment_history', {reg_no: '${patient.PatientRegistrationNumber}'})"><i class="bi bi-clock-history"></i></button>
             <button class="btn btn-sm btn-outline-primary me-1" title="Book Appointment" onclick="loadPage('appointments/add_appointments', {patient_id: '${patient.PatientRegistrationNumber}', patient_name: '${patient.FullName}', patient_phone: '${patient.PhoneNumber}', patient_type: '${patient.PatientType}',})"><i class="bi bi-calendar-plus"></i></button>
           </td>
@@ -185,7 +216,7 @@
 
       if (value === "") {
         fetchPatients(true, 1);
-      } else if (type && value.length > 2) {
+      } else if (type && value.length > 3) {
         fetchPatients(true, 1);
       }
     }, 400);

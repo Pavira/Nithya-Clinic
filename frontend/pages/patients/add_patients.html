@@ -30,7 +30,7 @@
         <!-- Full Name -->
         <div class="col-md-6">
           <label for="fullName" class="form-label">Full Name*</label>
-          <input type="text" class="form-control" id="fullName" placeholder="Enter Full Name" maxlength="50" style="text-transform: uppercase;" required title="Please enter the full name">
+          <input type="text" class="form-control" id="fullName" placeholder="Enter Full Name" maxlength="50" style="text-transform: uppercase;"  required oninput="this.value = this.value.replace(/[^A-Za-z\s.]/g, '')"  title="Please enter the full name">
         </div>
 
         <!-- Phone Number -->
@@ -62,7 +62,7 @@
           <label class="form-label">Gender*</label>
           <div>
             <div class="form-check form-check-inline">
-              <input class="form-check-input" type="radio" name="gender" value="Male" id="male" checked>
+              <input class="form-check-input" type="radio" name="gender" value="Male" id="male" checked required>
               <label class="form-check-label" for="male">Male</label>
             </div>
             <div class="form-check form-check-inline">
@@ -81,7 +81,7 @@
           <label class="form-label">Marital Status*</label>
           <div>
             <div class="form-check form-check-inline">
-              <input class="form-check-input" type="radio" name="marital" value="Single" id="single">
+              <input class="form-check-input" type="radio" name="marital" value="Single" id="single" required>
               <label class="form-check-label" for="single">Single</label>
             </div>
             <div class="form-check form-check-inline">
@@ -97,7 +97,7 @@
 
         <!-- Profession -->
         <div class="col-md-6">
-          <label for="profession" class="form-label">Profession*</label>
+          <label for="profession" class="form-label">Profession</label>
           <select class="form-select" id="profession">
             <option selected disabled value="">Select Profession</option>
             <option>Others</option>

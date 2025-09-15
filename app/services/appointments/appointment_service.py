@@ -439,8 +439,10 @@ async def cancel_appointment_service(appointment_id: str):
 async def get_appointment_history_service(reg_no: str):
     global db
     try:
-        query = db.collection("collection_PatientAppointment").where(
-            "PatientRegistrationNumber", "==", reg_no
+        query = (
+            db.collection("collection_PatientAppointment")
+            .where("PatientRegistrationNumber", "==", reg_no)
+            .where("AppointmentStatus", "==", "Closed")
         )
         docs = query.stream()
 

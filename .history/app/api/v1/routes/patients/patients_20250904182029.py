@@ -1,0 +1,154 @@
+from fastapi import APIRouter, HTTPException, Request
+from app.schemas.patient_schema import PatientCreateSchema
+from app.services.patients.patient_service import (
+    check_duplicate_patient_service,
+    create_patient_service,
+    delete_patient_service,
+    get_patient_by_id_service,
+    update_patient_service,
+)
+from app.utils.response import success_response
+from app.services.patients.patient_service import (
+    view_and_search_patients_service,
+)
+from app.utils.logger import logger
+from app.db.firebase_client import db
+
+router = APIRouter(tags=["Patients"])
+
+
+# -------------Add Patient----------------
+@router.post("/add_patient")
+async def add_patient(patient_data: PatientCreateSchema):
+    """
+    API to create a new patient record.
+    """
+    try:
+        print("Creating patient with data:", patient_data)
+        # current_user = getattr(request.state, "current_user", None)
+        result = await create_patient_service(patient_data)
+
+        return success_response(message="Patient created successfully", data=result)
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# -------------Check Duplicate Patient----------------
+@router.get("/check_duplicate_patient")
+async def check_duplicate_patient(
+    full_name: str, phone_number: int, patient_id: str = None
+):
+    """
+    API to check if a patient with the same full name and phone number already exists.
+    """
+    try:
+
+        result = await check_duplicate_patient_service(
+            full_name, phone_number, patient_id
+        )
+        return success_response(message="Duplicate check successful", data=result)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# async def check_duplicate_patient_service(
+#     full_name: str, phone_number: int, exclude_id: str = None
+# ):
+#     logger.info(
+#         f"Querying for name={full_name.upper()} phone={phone_number}, exclude_id={exclude_id}"
+#     )
+
+#     try:
+#         query = (
+#             db.collection("collection_PatientRegistration")
+#             .where("FullName", "==", full_name.upper())
+#             .where("PhoneNumber", "==", phone_number)
+#             .get()
+#         )
+
+#         for doc in query:
+#             data = doc.to_dict()
+#             if (
+#                 exclude_id is None
+#                 or data.get("PatientRegistrationNumber") != exclude_id
+#             ):
+#                 return True
+
+#         return False  # No duplicate
+
+#     except Exception as e:
+#         logger.error(f"❌ Failed to check duplicate patient: {str(e)}")
+#         raise HTTPException(status_code=500, detail="Failed to check duplicate patient")
+
+
+# -------------View Patients----------------
+@router.get("/view_and_search_patients")
+async def view_and_search_patients(
+    search_type: str = None,
+    search_value: str = None,
+    cursor: str = None,
+    # limit: int = None,
+):
+    """
+    API to view and search patients.
+    """
+    try:
+        result = await view_and_search_patients_service(
+            search_type=search_type,
+            search_value=search_value,
+            cursor=cursor,
+            # limit=limit,
+        )
+        return success_response(message="Patients retrieved successfully", data=result)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# -------------Update Patient----------------
+@router.put("/{patientId}")
+async def update_patient(
+    patientId: str,
+    patient_data: PatientCreateSchema,
+):
+    """
+    API to update a patient record.
+    """
+    try:
+        # print("Creating patient with data:", patient_data)
+        # current_user = getattr(request.state, "current_user", None)
+        result = await update_patient_service(patientId, patient_data)
+        print(result)
+        return success_response(message="Patient updated successfully", data=result)
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# -------------Get Patient By Id----------------
+@router.get("/{patientId}")
+async def get_patient(patientId: str):
+    """
+    API to get a patient record by ID.
+    """
+    try:
+        result = await get_patient_by_id_service(patientId)
+        # print(result)
+        return success_response(message="Patient retrieved successfully", data=result)
+    except Exception as e:
+        logger.error(f"❌ Error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# -------------Delete Patient By Id----------------
+@router.delete("/{patientId}")
+async def delete_patient(patientId: str):
+    """
+    API to delete a patient record by ID.
+    """
+    try:
+        result = await delete_patient_service(patientId)
+        return success_response(message="Patient deleted successfully", data=result)
+    except Exception as e:
+        logger.error(f"❌ Error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
